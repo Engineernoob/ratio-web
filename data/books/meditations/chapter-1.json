@@ -1,0 +1,20 @@
+{
+  "chapter": 1,
+  "chapter_title": "Debts and Lessons",
+  "summary": "Marcus Aurelius reflects on what he learned from his family, teachers, and mentors. He lists the virtues and lessons he received from each person, showing gratitude and recognizing how others shaped his character.",
+  "micro_lessons": [
+    {
+      "title": "Gratitude for Teachers",
+      "core_idea": "Acknowledge what you've learned from others. No knowledge exists in isolation.",
+      "micro_test_q": "Why does Marcus begin by listing his teachers?",
+      "micro_test_a": "To practice gratitude and recognize that wisdom comes from learning from others, not from isolation."
+    },
+    {
+      "title": "Character Formation",
+      "core_idea": "Character is built through observation and emulation of virtuous examples.",
+      "micro_test_q": "How does one develop good character according to Marcus?",
+      "micro_test_a": "By observing and learning from virtuous people, then practicing those virtues in daily life."
+    }
+  ]
+}
+
