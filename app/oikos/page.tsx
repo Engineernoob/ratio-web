@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { PlateHeader } from "@/components/PlateHeader";
 import { BrutalistCard } from "@/components/BrutalistCard";
 import { ContextPanel } from "@/components/ContextPanel";
@@ -33,7 +34,8 @@ export default function OikosPage() {
 
   const fetchFeed = async () => {
     try {
-      const response = await fetch("/api/feed?count=5");
+      const today = new Date().toISOString().split("T")[0];
+      const response = await fetch(`/api/feed?date=${today}`);
       const data = await response.json();
       if (data.feed) {
         setFeedItems(data.feed);
@@ -138,16 +140,156 @@ export default function OikosPage() {
     );
   }
 
+  // Split feed items into three panels
+  const lectioItems = feedItems.filter(
+    (item) => item.type === "book_micro" || item.type === "book_summary"
+  );
+  const ritualItems = feedItems.filter((item) => item.type === "tiktok");
+  const memoriaItems = feedItems.filter((item) => item.type === "puzzle");
+
   return (
     <>
       <Main>
-        <PlateHeader
-          title="OIKOS"
-          subtitle="Daily Knowledge Feed"
-          plateNumber="I"
-        />
+        {/* Greeting Section */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-center mb-12 pb-8 border-b border-border"
+        >
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
+            className="font-serif text-6xl font-bold salve-glow engraved mb-4"
+          >
+            SALVE, SCHOLAR
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="font-mono text-sm text-muted-foreground tracking-wider"
+          >
+            Initium sapientiae est cognitio sui
+          </motion.p>
+        </motion.div>
 
-        <div className="space-y-6">
+        {/* Three Floating Panels */}
+        <div className="grid grid-cols-3 gap-6 mb-12">
+          {/* Lectio Panel */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="relative"
+          >
+            <div className="absolute inset-0 -z-10 opacity-10 dither grain">
+              <div className="w-full h-full bg-gradient-to-br from-muted/20 to-background" />
+            </div>
+            <BrutalistCard borderWidth="1.5" className="p-6 floating-panel">
+              <div className="font-serif text-lg mb-4 engraved engrave">
+                LECTIO
+              </div>
+              <div className="font-mono text-xs text-muted-foreground mb-4">
+                Reading & Study
+              </div>
+              <div className="space-y-3">
+                {lectioItems.slice(0, 2).map((item) => (
+                  <div key={item.id} className="border-b border-border pb-2">
+                    <div className="font-mono text-xs font-semibold mb-1">
+                      {item.title.substring(0, 40)}...
+                    </div>
+                    <div className="font-mono text-[10px] text-muted-foreground">
+                      {item.content.substring(0, 60)}...
+                    </div>
+                  </div>
+                ))}
+                {lectioItems.length === 0 && (
+                  <div className="font-mono text-xs text-muted-foreground">
+                    No readings today
+                  </div>
+                )}
+              </div>
+            </BrutalistCard>
+          </motion.div>
+
+          {/* Ritual Panel */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="relative"
+          >
+            <div className="absolute inset-0 -z-10 opacity-10 dither grain">
+              <div className="w-full h-full bg-gradient-to-br from-muted/20 to-background" />
+            </div>
+            <BrutalistCard borderWidth="1.5" className="p-6 floating-panel">
+              <div className="font-serif text-lg mb-4 engraved engrave">
+                RITUAL
+              </div>
+              <div className="font-mono text-xs text-muted-foreground mb-4">
+                Daily Practice
+              </div>
+              <div className="space-y-3">
+                {ritualItems.slice(0, 2).map((item) => (
+                  <div key={item.id} className="border-b border-border pb-2">
+                    <div className="font-mono text-xs font-semibold mb-1">
+                      {item.title.substring(0, 40)}...
+                    </div>
+                    {item.example && (
+                      <div className="font-mono text-[10px] text-muted-foreground italic">
+                        {item.example.substring(0, 50)}...
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {ritualItems.length === 0 && (
+                  <div className="font-mono text-xs text-muted-foreground">
+                    No rituals today
+                  </div>
+                )}
+              </div>
+            </BrutalistCard>
+          </motion.div>
+
+          {/* Memoria Panel */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="relative"
+          >
+            <div className="absolute inset-0 -z-10 opacity-10 dither grain">
+              <div className="w-full h-full bg-gradient-to-br from-muted/20 to-background" />
+            </div>
+            <BrutalistCard borderWidth="1.5" className="p-6 floating-panel">
+              <div className="font-serif text-lg mb-4 engraved engrave">
+                MEMORIA
+              </div>
+              <div className="font-mono text-xs text-muted-foreground mb-4">
+                Retention
+              </div>
+              <div className="space-y-3">
+                {memoriaItems.slice(0, 2).map((item) => (
+                  <div key={item.id} className="border-b border-border pb-2">
+                    <div className="font-mono text-xs font-semibold mb-1">
+                      {item.title.substring(0, 40)}...
+                    </div>
+                  </div>
+                ))}
+                {memoriaItems.length === 0 && (
+                  <div className="font-mono text-xs text-muted-foreground">
+                    No reviews today
+                  </div>
+                )}
+              </div>
+            </BrutalistCard>
+          </motion.div>
+        </div>
+
+        {/* Full Feed Items */}
+        <div className="space-y-6 scholar-content">
           {feedItems.length === 0 ? (
             <BrutalistCard borderWidth="1.5" className="p-6">
               <div className="font-mono text-sm text-muted-foreground">
@@ -156,87 +298,93 @@ export default function OikosPage() {
             </BrutalistCard>
           ) : (
             feedItems.map((item, index) => (
-              <BrutalistCard
+              <motion.div
                 key={item.id}
-                borderWidth={index === 0 ? "1.5" : "1"}
-                className="p-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="font-serif text-lg engraved">
-                    {item.title}
-                  </div>
-                  <div className="font-mono text-xs text-muted-foreground border border-border px-2 py-1">
-                    {getTypeLabel(item.type)}
-                  </div>
-                </div>
-
-                <div className="font-mono text-sm space-y-4">
-                  <p className="text-muted-foreground leading-relaxed">
-                    {item.content}
-                  </p>
-
-                  {item.example && (
-                    <div className="border-t border-border pt-4">
-                      <div className="font-serif text-sm mb-2 engraved">
-                        Example
-                      </div>
-                      <p className="text-muted-foreground italic text-xs">
-                        {item.example}
-                      </p>
+                <BrutalistCard
+                  borderWidth={index === 0 ? "1.5" : "1"}
+                  className="p-6"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="font-serif text-lg engraved engrave">
+                      {item.title}
                     </div>
-                  )}
+                    <div className="font-mono text-xs text-muted-foreground border border-border px-2 py-1">
+                      {getTypeLabel(item.type)}
+                    </div>
+                  </div>
 
-                  {item.micro_test_q && (
-                    <div className="border-t border-border pt-4">
-                      <div className="font-serif text-sm mb-2 engraved">
-                        Micro-Test
-                      </div>
-                      <div className="space-y-3">
-                        <p className="text-muted-foreground">
-                          {item.micro_test_q}
+                  <div className="font-mono text-sm space-y-4">
+                    <p className="text-muted-foreground leading-relaxed">
+                      {item.content}
+                    </p>
+
+                    {item.example && (
+                      <div className="border-t border-border pt-4">
+                        <div className="font-serif text-sm mb-2 engraved">
+                          Example
+                        </div>
+                        <p className="text-muted-foreground italic text-xs">
+                          {item.example}
                         </p>
-
-                        {revealedAnswers.has(item.id) ? (
-                          <div>
-                            <div className="mb-2 font-semibold">Answer:</div>
-                            <p className="text-muted-foreground mb-3">
-                              {item.micro_test_a}
-                            </p>
-                            {!addedToMemoria.has(item.id) && (
-                              <OrangeAction onClick={() => addToMemoria(item)}>
-                                Add to MEMORIA
-                              </OrangeAction>
-                            )}
-                            {addedToMemoria.has(item.id) && (
-                              <div className="font-mono text-xs text-muted-foreground">
-                                ✓ Added to MEMORIA
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <OrangeAction onClick={() => toggleAnswer(item.id)}>
-                            Reveal Answer
-                          </OrangeAction>
-                        )}
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  {!item.micro_test_q && (
-                    <div className="border-t border-border pt-4">
-                      <OrangeAction onClick={() => addToMemoria(item)}>
-                        Add to MEMORIA
-                      </OrangeAction>
-                    </div>
-                  )}
-                </div>
-              </BrutalistCard>
+                    {item.micro_test_q && (
+                      <div className="border-t border-border pt-4">
+                        <div className="font-serif text-sm mb-2 engraved">
+                          Micro-Test
+                        </div>
+                        <div className="space-y-3">
+                          <p className="text-muted-foreground">
+                            {item.micro_test_q}
+                          </p>
+
+                          {revealedAnswers.has(item.id) ? (
+                            <div>
+                              <div className="mb-2 font-semibold">Answer:</div>
+                              <p className="text-muted-foreground mb-3">
+                                {item.micro_test_a}
+                              </p>
+                              {!addedToMemoria.has(item.id) && (
+                                <OrangeAction onClick={() => addToMemoria(item)}>
+                                  Add to MEMORIA
+                                </OrangeAction>
+                              )}
+                              {addedToMemoria.has(item.id) && (
+                                <div className="font-mono text-xs text-muted-foreground">
+                                  ✓ Added to MEMORIA
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <OrangeAction onClick={() => toggleAnswer(item.id)}>
+                              Reveal Answer
+                            </OrangeAction>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {!item.micro_test_q && (
+                      <div className="border-t border-border pt-4">
+                        <OrangeAction onClick={() => addToMemoria(item)}>
+                          Add to MEMORIA
+                        </OrangeAction>
+                      </div>
+                    )}
+                  </div>
+                </BrutalistCard>
+              </motion.div>
             ))
           )}
         </div>
       </Main>
 
-      <ContextPanel title="Daily Feed">
+      <ContextPanel title="Daily Ritual">
         <BrutalistCard borderWidth="1" className="p-4 mb-4">
           <div className="font-serif text-sm mb-2 engraved">Today's Items</div>
           <div className="font-mono text-xs space-y-1">

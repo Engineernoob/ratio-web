@@ -113,7 +113,242 @@
   --sidebar-ring: #D9572B;
 }
 
-/* Halftone/Dithering Pattern */
+/* ============================================
+   TYPOGRAPHY SYSTEM
+   ============================================ */
+
+@layer base {
+  * {
+    @apply border-border;
+    border-radius: 0 !important;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-mono);
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+  
+  .scholar-content {
+    max-width: 740px;
+    margin: 0 auto;
+  }
+}
+
+/* ============================================
+   ANIMATION KEYFRAMES
+   ============================================ */
+
+@keyframes ditherReveal {
+  0% {
+    opacity: 0;
+    filter: contrast(0) brightness(0);
+  }
+  50% {
+    filter: contrast(0.5) brightness(0.3);
+  }
+  100% {
+    opacity: 1;
+    filter: contrast(1.4) brightness(0.85);
+  }
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+@keyframes salveGlow {
+  0%, 100% {
+    text-shadow: 
+      0 0 5px rgba(217, 87, 43, 0.3),
+      0 0 10px rgba(217, 87, 43, 0.2),
+      1px 1px 0 rgba(0, 0, 0, 0.8),
+      -1px -1px 0 rgba(255, 255, 255, 0.3);
+  }
+  50% {
+    text-shadow: 
+      0 0 15px rgba(217, 87, 43, 0.6),
+      0 0 25px rgba(217, 87, 43, 0.4),
+      1px 1px 0 rgba(0, 0, 0, 0.8),
+      -1px -1px 0 rgba(255, 255, 255, 0.3);
+  }
+}
+
+@keyframes engraveReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+    text-shadow: 
+      1px 1px 0 rgba(0, 0, 0, 0),
+      -1px -1px 0 rgba(255, 255, 255, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    text-shadow: 
+      1px 1px 0 rgba(0, 0, 0, 0.8),
+      -1px -1px 0 rgba(255, 255, 255, 0.3);
+  }
+}
+
+@keyframes correctGlow {
+  0% {
+    box-shadow: 0 0 0 rgba(217, 87, 43, 0);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(217, 87, 43, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(217, 87, 43, 0);
+  }
+}
+
+@keyframes crtFlicker {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.98;
+  }
+}
+
+@keyframes fadeThroughBlack {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes floatingPanel {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes ritualGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(217, 87, 43, 0);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(217, 87, 43, 0.4);
+  }
+}
+
+@keyframes shrinkFlash {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.98);
+    filter: brightness(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+.dither-reveal {
+  animation: ditherReveal 1.5s ease-out forwards;
+}
+
+.scanline {
+  position: relative;
+  overflow: hidden;
+}
+
+.scanline::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  animation: scanline 3s linear infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.engrave {
+  animation: engraveReveal 0.8s ease-out forwards;
+}
+
+.salve-glow {
+  animation: salveGlow 3s ease-in-out infinite;
+}
+
+.correct-glow {
+  animation: correctGlow 0.6s ease-out;
+}
+
+.crt-flicker {
+  animation: crtFlicker 0.15s infinite;
+}
+
+.fade-through-black {
+  animation: fadeThroughBlack 0.5s ease-in-out;
+}
+
+.floating-panel {
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+
+.floating-panel:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.ritual-glow {
+  transition: box-shadow 0.3s ease-out;
+}
+
+.ritual-glow:hover {
+  animation: ritualGlow 2s ease-in-out infinite;
+}
+
+.shrink-flash:active {
+  animation: shrinkFlash 0.2s ease-out;
+}
+
+/* ============================================
+   DITHERING & TEXTURE EFFECTS
+   ============================================ */
+
 .dither::before {
   content: "";
   position: absolute;
@@ -140,7 +375,6 @@
   z-index: 1;
 }
 
-/* PS1-era Pixel Grain */
 .grain {
   position: relative;
 }
@@ -158,7 +392,6 @@
   mix-blend-mode: overlay;
 }
 
-/* Engraved Text Effect */
 .engraved {
   text-shadow: 
     1px 1px 0 rgba(0, 0, 0, 0.8),
@@ -166,7 +399,6 @@
   letter-spacing: 0.05em;
 }
 
-/* PS1-style Halftone Grid Texture */
 .grid-dither {
   position: relative;
 }
@@ -197,7 +429,6 @@
   z-index: 1;
 }
 
-/* Grain Texture Utility */
 .grain-texture {
   position: relative;
 }
@@ -215,7 +446,6 @@
   mix-blend-mode: overlay;
 }
 
-/* Engraving Image Effects - Heavy Halftone, Dot-Matrix, Brutalist Lighting */
 .engraving-image {
   position: relative;
 }
@@ -295,16 +525,9 @@ body::before {
   z-index: 9999;
 }
 
-@layer base {
-  * {
-    @apply border-border;
-    border-radius: 0 !important;
-  }
-  body {
-    @apply bg-background text-foreground;
-    font-family: var(--font-mono);
-  }
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-serif);
-  }
+/* Panel Inner Shadow */
+.panel-shadow {
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.05),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.3);
 }

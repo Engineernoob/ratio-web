@@ -1,4 +1,8 @@
+"use client";
+
 import { ReactNode } from "react";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface ContextPanelProps {
   children: ReactNode;
@@ -7,18 +11,22 @@ interface ContextPanelProps {
 
 export function ContextPanel({ children, title }: ContextPanelProps) {
   return (
-    <aside className="w-80 border-l border-border bg-background overflow-y-auto dither grain relative">
+    <motion.aside
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="w-80 border-l border-border bg-background overflow-y-auto dither grain relative panel-shadow"
+    >
       <div className="p-6">
         {title && (
           <div className="mb-6 border-b border-border pb-4">
-            <h2 className="font-serif text-xl font-semibold engraved">{title}</h2>
+            <h2 className="font-serif text-xl font-semibold engraved engrave">{title}</h2>
           </div>
         )}
         <div className="space-y-6">
           {children}
         </div>
       </div>
-    </aside>
+    </motion.aside>
   );
 }
-

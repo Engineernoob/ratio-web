@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, IBM_Plex_Mono } from "next/font/google";
+import { EB_Garamond, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { RootLayoutWrapper } from "@/components/RootLayoutWrapper";
 
-const cormorantGaramond = Cormorant_Garamond({
+const ebGaramond = EB_Garamond({
   variable: "--font-serif",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const ibmPlexMono = IBM_Plex_Mono({
+const jetBrainsMono = JetBrains_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${cormorantGaramond.variable} ${ibmPlexMono.variable} font-mono antialiased`}
+        className={`${ebGaramond.variable} ${jetBrainsMono.variable} font-mono antialiased`}
       >
         <RootLayoutWrapper>{children}</RootLayoutWrapper>
       </body>

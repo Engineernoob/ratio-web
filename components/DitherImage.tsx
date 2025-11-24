@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface DitherImageProps {
@@ -19,16 +22,22 @@ export function DitherImage({
   priority = false
 }: DitherImageProps) {
   return (
-    <div className={cn("relative dither grain engraving-image overflow-hidden border border-border", className)}>
-      <Image
-        src={src}
-        alt={alt}
-        width={width}
-        height={height}
-        className="w-full h-auto engraving-filter"
-        priority={priority}
-      />
+    <div className={cn("relative dither grain engraving-image scanline overflow-hidden border border-border", className)}>
+      <motion.div
+        initial={{ opacity: 0, filter: "contrast(0) brightness(0)" }}
+        animate={{ opacity: 1, filter: "contrast(1.4) brightness(0.85)" }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
+        className="dither-reveal"
+      >
+        <Image
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          className="w-full h-auto engraving-filter"
+          priority={priority}
+        />
+      </motion.div>
     </div>
   );
 }
-
