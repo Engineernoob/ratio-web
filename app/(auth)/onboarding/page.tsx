@@ -4,7 +4,7 @@ import { useState } from "react";
 import { AuthCard } from "@/components/AuthCard";
 import { AuthButton } from "@/components/AuthButton";
 import { BrutalistCard } from "@/components/BrutalistCard";
-import { ClassicalFigure } from "@/components/ClassicalFigure";
+import { ClassicalImage } from "@/components/ClassicalImage";
 import { useRouter } from "next/navigation";
 
 const studyAreas = [
@@ -54,7 +54,11 @@ export default function OnboardingPage() {
         {step === 1 && (
           <div className="text-center">
             <div className="mb-8">
-              <ClassicalFigure />
+              <ClassicalImage
+                src="/images/classical/philosopher-welcome.jpg"
+                alt="Classical Greek philosopher"
+                priority
+              />
             </div>
             <h1 className="font-serif text-4xl font-bold engraved mb-4">
               Welcome to RATIO
@@ -184,7 +188,10 @@ export default function OnboardingPage() {
         {step === 4 && (
           <div className="text-center">
             <div className="mb-8">
-              <ClassicalFigure />
+              <ClassicalImage
+                src="/images/classical/statue-ascension.jpg"
+                alt="Classical Greek statue"
+              />
             </div>
             <h2 className="font-serif text-4xl font-bold engraved mb-4">
               Begin Your Ascension

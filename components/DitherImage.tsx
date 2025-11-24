@@ -7,6 +7,7 @@ interface DitherImageProps {
   width?: number;
   height?: number;
   className?: string;
+  priority?: boolean;
 }
 
 export function DitherImage({ 
@@ -14,16 +15,18 @@ export function DitherImage({
   alt, 
   width = 800, 
   height = 600,
-  className 
+  className,
+  priority = false
 }: DitherImageProps) {
   return (
-    <div className={cn("relative dither grain overflow-hidden border border-border", className)}>
+    <div className={cn("relative dither grain engraving-image overflow-hidden border border-border", className)}>
       <Image
         src={src}
         alt={alt}
         width={width}
         height={height}
-        className="w-full h-auto"
+        className="w-full h-auto engraving-filter"
+        priority={priority}
       />
     </div>
   );

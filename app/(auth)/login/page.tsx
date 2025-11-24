@@ -2,7 +2,7 @@
 
 import { AuthCard } from "@/components/AuthCard";
 import { AuthButton } from "@/components/AuthButton";
-import { ClassicalFigure } from "@/components/ClassicalFigure";
+import { ClassicalImage } from "@/components/ClassicalImage";
 
 export default function LoginPage() {
   const handleGoogle = () => {
@@ -23,9 +23,13 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background grid-dither grain-texture p-4">
       <AuthCard className="border-[1.5px]">
-        {/* Classical Figure */}
+        {/* Classical Statue Image */}
         <div className="mb-8">
-          <ClassicalFigure />
+          <ClassicalImage
+            src="/images/classical/statue-login.jpg"
+            alt="Classical Greek statue"
+            priority
+          />
         </div>
 
         {/* Title */}
