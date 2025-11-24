@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PlateHeader } from "@/components/PlateHeader";
+import { motion } from "framer-motion";
+import { FogPanel } from "@/components/FogPanel";
+import { CircularRecallMeter } from "@/components/CircularRecallMeter";
 import { MemoryGrid } from "@/components/MemoryGrid";
 import { ContextPanel } from "@/components/ContextPanel";
-import { BrutalistCard } from "@/components/BrutalistCard";
 import { Main } from "@/components/Main";
 import { OrangeAction } from "@/components/OrangeAction";
 
@@ -61,17 +62,15 @@ export default function MemoriaPage() {
         body: JSON.stringify({
           action: "update",
           conceptId: currentReview.id,
-          result
-        })
+          result,
+        }),
       });
 
       if (response.ok) {
-        // Move to next review or refresh
         if (currentReviewIndex < dueReviews.length - 1) {
           setCurrentReviewIndex(currentReviewIndex + 1);
           setShowAnswer(false);
         } else {
-          // All reviews done, refresh
           fetchReviews();
           setCurrentReviewIndex(0);
           setShowAnswer(false);
@@ -84,15 +83,32 @@ export default function MemoriaPage() {
 
   const currentReview = dueReviews[currentReviewIndex];
 
+  // Calculate overall confidence level
+  const calculateConfidence = () => {
+    if (allConcepts.length === 0) return 0;
+    const totalRetention = allConcepts.reduce((sum, concept) => {
+      const retention = Math.min(
+        100,
+        Math.round(concept.review_count * 15 + concept.ease_factor * 20)
+      );
+      return sum + retention;
+    }, 0);
+    return Math.round(totalRetention / allConcepts.length);
+  };
+
+  const confidenceLevel = calculateConfidence();
+
   // Convert concepts to memory grid format
-  const memoryCells = allConcepts.map((concept, index) => {
-    // Calculate retention based on review count and ease factor
-    const retention = Math.min(100, Math.round(concept.review_count * 15 + concept.ease_factor * 20));
+  const memoryCells = allConcepts.map((concept) => {
+    const retention = Math.min(
+      100,
+      Math.round(concept.review_count * 15 + concept.ease_factor * 20)
+    );
     return {
       id: concept.id,
       title: concept.title.substring(0, 10),
       retention,
-      lastReview: new Date(concept.next_review)
+      lastReview: new Date(concept.next_review),
     };
   });
 
@@ -100,16 +116,17 @@ export default function MemoriaPage() {
     return (
       <>
         <Main>
-          <PlateHeader 
-            title="MEMORIA" 
-            subtitle="Retention Mosaic Grid"
-            plateNumber="IV"
-          />
-          <BrutalistCard borderWidth="1.5" className="p-6">
-            <div className="font-mono text-sm text-muted-foreground">Loading reviews...</div>
-          </BrutalistCard>
+          <FogPanel className="card-padding">
+            <div className="font-mono text-sm text-muted-foreground">
+              Loading reviews...
+            </div>
+          </FogPanel>
         </Main>
-        <ContextPanel title="Review Schedule" />
+        <ContextPanel title="Review Schedule">
+          <div className="font-mono text-xs text-muted-foreground">
+            Loading...
+          </div>
+        </ContextPanel>
       </>
     );
   }
@@ -117,21 +134,38 @@ export default function MemoriaPage() {
   return (
     <>
       <Main>
-        <PlateHeader 
-          title="MEMORIA" 
-          subtitle="Retention Mosaic Grid"
-          plateNumber="IV"
-        />
-        
-        <div className="space-y-6">
+        {/* Hero Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="mb-16 section-spacing"
+        >
+          <h1 className="font-serif text-[64px] font-normal tracking-[0.08em] uppercase mb-4 fade-fog-in">
+            MEMORIA
+          </h1>
+          <p className="font-mono text-sm text-muted-foreground tracking-wider">
+            Retention & Spaced Repetition
+          </p>
+        </motion.div>
+
+        {/* Circular Recall Meter */}
+        <div className="mb-16 flex justify-center">
+          <CircularRecallMeter percentage={confidenceLevel} size={280} />
+        </div>
+
+        {/* Review Section */}
+        <div className="space-y-6 mb-16">
           {dueReviews.length > 0 && currentReview ? (
-            <BrutalistCard borderWidth="1.5" className="p-6">
-              <div className="font-serif text-lg mb-4 engraved">
+            <FogPanel className="card-padding">
+              <div className="font-serif text-lg mb-4 engraved engrave">
                 Review {currentReviewIndex + 1} of {dueReviews.length}
               </div>
               <div className="font-mono text-sm space-y-4">
                 <div>
-                  <div className="font-semibold mb-2">{currentReview.title}</div>
+                  <div className="font-semibold mb-2">
+                    {currentReview.title}
+                  </div>
                   <p className="text-muted-foreground leading-relaxed mb-4">
                     {currentReview.explanation}
                   </p>
@@ -139,15 +173,19 @@ export default function MemoriaPage() {
 
                 <div className="border-t border-border pt-4">
                   <div className="mb-2 font-semibold">Question:</div>
-                  <p className="text-muted-foreground mb-4">{currentReview.micro_question}</p>
-                  
+                  <p className="text-muted-foreground mb-4">
+                    {currentReview.micro_question}
+                  </p>
+
                   {showAnswer ? (
                     <div className="space-y-4">
                       <div className="border-t border-border pt-4">
                         <div className="mb-2 font-semibold">Answer:</div>
-                        <p className="text-muted-foreground mb-4">{currentReview.micro_answer}</p>
+                        <p className="text-muted-foreground mb-4">
+                          {currentReview.micro_answer}
+                        </p>
                       </div>
-                      
+
                       <div className="flex gap-3">
                         <OrangeAction
                           onClick={() => handleReviewResult("correct")}
@@ -155,12 +193,13 @@ export default function MemoriaPage() {
                         >
                           Correct
                         </OrangeAction>
-                        <button
+                        <OrangeAction
                           onClick={() => handleReviewResult("incorrect")}
-                          className="flex-1 border border-border px-4 py-2 font-mono text-sm hover:bg-secondary"
+                          className="flex-1"
+                          active={false}
                         >
                           Incorrect
-                        </button>
+                        </OrangeAction>
                       </div>
                     </div>
                   ) : (
@@ -170,29 +209,37 @@ export default function MemoriaPage() {
                   )}
                 </div>
               </div>
-            </BrutalistCard>
+            </FogPanel>
           ) : (
-            <BrutalistCard borderWidth="1.5" className="p-6">
-              <div className="font-serif text-lg mb-4 engraved">No Reviews Due</div>
+            <FogPanel className="card-padding">
+              <div className="font-serif text-lg mb-4 engraved engrave">
+                No Reviews Due
+              </div>
               <div className="font-mono text-sm text-muted-foreground">
-                All concepts are up to date. Check back tomorrow for new reviews.
+                All concepts are up to date. Check back tomorrow for new
+                reviews.
               </div>
-            </BrutalistCard>
-          )}
-
-          {allConcepts.length > 0 && (
-            <div>
-              <div className="font-mono text-sm text-muted-foreground mb-4">
-                Retention levels: Darker = stronger memory. Review items below 60%.
-              </div>
-              <MemoryGrid cells={memoryCells} />
-            </div>
+            </FogPanel>
           )}
         </div>
+
+        {/* Memory Grid */}
+        {allConcepts.length > 0 && (
+          <div>
+            <div className="font-serif text-xl mb-6 engraved engrave">
+              Retention Mosaic
+            </div>
+            <div className="font-mono text-sm text-muted-foreground mb-4">
+              Retention levels: Darker = stronger memory. Review items below
+              60%.
+            </div>
+            <MemoryGrid cells={memoryCells} />
+          </div>
+        )}
       </Main>
 
       <ContextPanel title="Review Schedule">
-        <BrutalistCard borderWidth="1" className="p-4 mb-4">
+        <FogPanel className="card-padding mb-4">
           <div className="font-serif text-sm mb-2 engraved">Due Today</div>
           <div className="font-mono text-xs space-y-1">
             {dueReviews.length > 0 ? (
@@ -203,21 +250,27 @@ export default function MemoriaPage() {
               <div className="text-muted-foreground">None</div>
             )}
           </div>
-        </BrutalistCard>
+        </FogPanel>
 
-        <BrutalistCard borderWidth="1" className="p-4 mb-4">
+        <FogPanel className="card-padding mb-4">
           <div className="font-serif text-sm mb-2 engraved">Statistics</div>
           <div className="font-mono text-xs space-y-1">
             <div>Total Concepts: {allConcepts.length}</div>
             <div>Due Reviews: {dueReviews.length}</div>
-            <div>Average Reviews: {allConcepts.length > 0 
-              ? Math.round(allConcepts.reduce((sum, c) => sum + c.review_count, 0) / allConcepts.length)
-              : 0}
+            <div>
+              Average Reviews:{" "}
+              {allConcepts.length > 0
+                ? Math.round(
+                    allConcepts.reduce((sum, c) => sum + c.review_count, 0) /
+                      allConcepts.length
+                  )
+                : 0}
             </div>
+            <div>Confidence Level: {confidenceLevel}%</div>
           </div>
-        </BrutalistCard>
+        </FogPanel>
 
-        <BrutalistCard borderWidth="1" className="p-4">
+        <FogPanel className="card-padding">
           <div className="font-serif text-sm mb-2 engraved">Intervals</div>
           <div className="font-mono text-xs space-y-1">
             <div>1d → 3d → 7d → 14d → 30d</div>
@@ -225,7 +278,7 @@ export default function MemoriaPage() {
               Correct answers advance interval. Incorrect resets to 1 day.
             </div>
           </div>
-        </BrutalistCard>
+        </FogPanel>
       </ContextPanel>
     </>
   );

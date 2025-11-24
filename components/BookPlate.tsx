@@ -1,56 +1,82 @@
-import { ReactNode } from "react";
+"use client";
+
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { BrutalistCard } from "./BrutalistCard";
-import { PlateHeader } from "./PlateHeader";
+import { FogPanel } from "./FogPanel";
+import { EngravedStatue } from "./EngravedStatue";
 
 interface BookPlateProps {
   title: string;
   author: string;
+  slug: string;
+  imageSrc?: string;
   year?: number;
-  description?: string;
-  themes?: string[];
   className?: string;
-  children?: ReactNode;
 }
 
 export function BookPlate({
   title,
   author,
+  slug,
+  imageSrc,
   year,
-  description,
-  themes,
   className,
-  children,
 }: BookPlateProps) {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push(`/bibliotheca/${slug}`);
+  };
+
   return (
-    <BrutalistCard className={cn("p-6 mb-6", className)} borderWidth="1.5">
-      <PlateHeader title={title} subtitle={author} />
-      
-      {year && (
-        <div className="text-xs text-muted-foreground font-mono mb-4">
-          {year}
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className={cn("relative cursor-pointer group", className)}
+      onClick={handleClick}
+    >
+      <FogPanel className="card-padding" hover>
+        {/* Miniature EngravedStatue thumbnail */}
+        {imageSrc && (
+          <div className="mb-4 opacity-60">
+            <EngravedStatue
+              imageSrc={imageSrc}
+              alt={title}
+              size="sm"
+              className="w-full"
+              vignette
+            />
+          </div>
+        )}
+
+        {/* Content */}
+        <div className="relative z-10">
+          {/* Title - Serif */}
+          <h3 className="font-serif text-2xl font-semibold engraved engrave mb-2 group-hover:text-accent transition-colors">
+            {title}
+          </h3>
+
+          {/* Author & Year - Mono */}
+          <div className="font-mono text-xs text-muted-foreground mb-4">
+            {author}
+            {year && (
+              <span className="ml-2">
+                {year > 0 ? year : Math.abs(year) + " BCE"}
+              </span>
+            )}
+          </div>
+
+          {/* Decorative line */}
+          <div className="border-t border-border mb-4" />
+
+          {/* Hover indicator */}
+          <div className="font-mono text-[10px] text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+            Click to open →
+          </div>
         </div>
-      )}
-      
-      {description && (
-        <p className="font-mono text-sm mb-4 leading-relaxed">{description}</p>
-      )}
-      
-      {themes && themes.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          {themes.map((theme, idx) => (
-            <span
-              key={idx}
-              className="border border-border px-2 py-1 text-xs font-mono"
-            >
-              {theme}
-            </span>
-          ))}
-        </div>
-      )}
-      
-      {children}
-    </BrutalistCard>
+      </FogPanel>
+    </motion.div>
   );
 }
-

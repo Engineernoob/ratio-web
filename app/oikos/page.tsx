@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { PlateHeader } from "@/components/PlateHeader";
-import { BrutalistCard } from "@/components/BrutalistCard";
+import { motion } from "framer-motion";
+import { FogPanel } from "@/components/FogPanel";
+import { EngravedStatue } from "@/components/EngravedStatue";
 import { ContextPanel } from "@/components/ContextPanel";
 import { Main } from "@/components/Main";
 import { OrangeAction } from "@/components/OrangeAction";
@@ -39,7 +39,6 @@ export default function OikosPage() {
       const data = await response.json();
       if (data.feed) {
         setFeedItems(data.feed);
-        // Auto-add items with micro-tests to memoria
         data.feed.forEach((item: FeedItem) => {
           if (item.micro_test_q) {
             addToMemoria(item);
@@ -55,7 +54,6 @@ export default function OikosPage() {
 
   const addToMemoria = async (item: FeedItem) => {
     if (addedToMemoria.has(item.id)) return;
-
     try {
       const response = await fetch("/api/memoria", {
         method: "POST",
@@ -80,7 +78,6 @@ export default function OikosPage() {
           },
         }),
       });
-
       if (response.ok) {
         setAddedToMemoria((prev) => new Set(prev).add(item.id));
       }
@@ -101,40 +98,18 @@ export default function OikosPage() {
     });
   };
 
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case "tiktok":
-        return "MICRO-INSIGHT";
-      case "book_summary":
-        return "BOOK SUMMARY";
-      case "book_micro":
-        return "BOOK LESSON";
-      case "puzzle":
-        return "PUZZLE";
-      default:
-        return "LESSON";
-    }
-  };
-
   if (loading) {
     return (
       <>
         <Main>
-          <PlateHeader
-            title="OIKOS"
-            subtitle="Daily Ritual & Lessons"
-            plateNumber="I"
-          />
-          <BrutalistCard borderWidth="1.5" className="p-6">
+          <FogPanel className="card-padding">
             <div className="font-mono text-sm text-muted-foreground">
               Loading today's feed...
             </div>
-          </BrutalistCard>
+          </FogPanel>
         </Main>
         <ContextPanel title="Daily Ritual">
-          <div className="font-mono text-xs text-muted-foreground">
-            Loading...
-          </div>
+          <div className="font-mono text-xs text-muted-foreground">Loading...</div>
         </ContextPanel>
       </>
     );
@@ -149,45 +124,44 @@ export default function OikosPage() {
 
   return (
     <>
-      <Main>
-        {/* Greeting Section */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center mb-12 pb-8 border-b border-border"
-        >
-          <motion.h1
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
-            className="font-serif text-6xl font-bold salve-glow engraved mb-4"
-          >
-            SALVE, SCHOLAR
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
-            className="font-mono text-sm text-muted-foreground tracking-wider"
-          >
-            Initium sapientiae est cognitio sui
-          </motion.p>
-        </motion.div>
+      <Main className="scroll-fade-top scroll-fade-bottom">
+        {/* Hero Header with Background Statue */}
+        <div className="relative mb-16 section-spacing">
+          {/* Background Engraved Statue */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-[0.08] pointer-events-none">
+            <EngravedStatue
+              imageSrc="/images/classical/statue-login.jpg"
+              alt="Classical statue"
+              size="lg"
+              className="max-w-full max-h-[600px]"
+            />
+          </div>
 
-        {/* Three Floating Panels */}
-        <div className="grid grid-cols-3 gap-6 mb-12">
-          {/* Lectio Panel */}
+          {/* Hero Content */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="relative z-10 text-center"
+          >
+            <h1 className="font-serif text-[64px] font-normal tracking-[0.08em] uppercase mb-4 fade-fog-in">
+              SALVE, SCHOLAR
+            </h1>
+            <p className="font-mono text-sm text-muted-foreground tracking-wider">
+              Initium sapientiae est cognitio sui
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Main Grid Layout - 3 Floating FogPanels */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+          {/* LECTIO Panel */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="relative"
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="absolute inset-0 -z-10 opacity-10 dither grain">
-              <div className="w-full h-full bg-gradient-to-br from-muted/20 to-background" />
-            </div>
-            <BrutalistCard borderWidth="1.5" className="p-6 floating-panel">
+            <FogPanel className="card-padding soft-float">
               <div className="font-serif text-lg mb-4 engraved engrave">
                 LECTIO
               </div>
@@ -211,20 +185,16 @@ export default function OikosPage() {
                   </div>
                 )}
               </div>
-            </BrutalistCard>
+            </FogPanel>
           </motion.div>
 
-          {/* Ritual Panel */}
+          {/* RITUAL Panel */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="relative"
+            transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <div className="absolute inset-0 -z-10 opacity-10 dither grain">
-              <div className="w-full h-full bg-gradient-to-br from-muted/20 to-background" />
-            </div>
-            <BrutalistCard borderWidth="1.5" className="p-6 floating-panel">
+            <FogPanel className="card-padding soft-float">
               <div className="font-serif text-lg mb-4 engraved engrave">
                 RITUAL
               </div>
@@ -250,20 +220,16 @@ export default function OikosPage() {
                   </div>
                 )}
               </div>
-            </BrutalistCard>
+            </FogPanel>
           </motion.div>
 
-          {/* Memoria Panel */}
+          {/* MEMORIA Panel */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="relative"
+            transition={{ duration: 0.6, delay: 0.4 }}
           >
-            <div className="absolute inset-0 -z-10 opacity-10 dither grain">
-              <div className="w-full h-full bg-gradient-to-br from-muted/20 to-background" />
-            </div>
-            <BrutalistCard borderWidth="1.5" className="p-6 floating-panel">
+            <FogPanel className="card-padding soft-float">
               <div className="font-serif text-lg mb-4 engraved engrave">
                 MEMORIA
               </div>
@@ -284,18 +250,18 @@ export default function OikosPage() {
                   </div>
                 )}
               </div>
-            </BrutalistCard>
+            </FogPanel>
           </motion.div>
         </div>
 
         {/* Full Feed Items */}
         <div className="space-y-6 scholar-content">
           {feedItems.length === 0 ? (
-            <BrutalistCard borderWidth="1.5" className="p-6">
+            <FogPanel className="card-padding">
               <div className="font-mono text-sm text-muted-foreground">
                 No feed items available.
               </div>
-            </BrutalistCard>
+            </FogPanel>
           ) : (
             feedItems.map((item, index) => (
               <motion.div
@@ -304,16 +270,13 @@ export default function OikosPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
               >
-                <BrutalistCard
-                  borderWidth={index === 0 ? "1.5" : "1"}
-                  className="p-6"
-                >
-                  <div className="flex items-start justify-between mb-3">
+                <FogPanel className="card-padding">
+                  <div className="flex items-start justify-between mb-4">
                     <div className="font-serif text-lg engraved engrave">
                       {item.title}
                     </div>
-                    <div className="font-mono text-xs text-muted-foreground border border-border px-2 py-1">
-                      {getTypeLabel(item.type)}
+                    <div className="font-mono text-xs text-muted-foreground border border-border px-2 py-1 rounded">
+                      {item.type.toUpperCase()}
                     </div>
                   </div>
 
@@ -377,7 +340,7 @@ export default function OikosPage() {
                       </div>
                     )}
                   </div>
-                </BrutalistCard>
+                </FogPanel>
               </motion.div>
             ))
           )}
@@ -385,21 +348,14 @@ export default function OikosPage() {
       </Main>
 
       <ContextPanel title="Daily Ritual">
-        <BrutalistCard borderWidth="1" className="p-4 mb-4">
+        <FogPanel className="card-padding mb-4">
           <div className="font-serif text-sm mb-2 engraved">Today's Items</div>
           <div className="font-mono text-xs space-y-1">
             {feedItems.length} items loaded
           </div>
-          <div className="font-mono text-xs text-muted-foreground mt-2 space-y-1">
-            {feedItems.map((item, idx) => (
-              <div key={item.id}>
-                {idx + 1}. {getTypeLabel(item.type)}
-              </div>
-            ))}
-          </div>
-        </BrutalistCard>
+        </FogPanel>
 
-        <BrutalistCard borderWidth="1" className="p-4">
+        <FogPanel className="card-padding">
           <div className="font-serif text-sm mb-2 engraved">Sources</div>
           <div className="font-mono text-xs space-y-1">
             <div>• TikTok Lessons</div>
@@ -407,7 +363,7 @@ export default function OikosPage() {
             <div>• Book Micro-Lessons</div>
             <div>• Puzzles</div>
           </div>
-        </BrutalistCard>
+        </FogPanel>
       </ContextPanel>
     </>
   );

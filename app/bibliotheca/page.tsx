@@ -1,34 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PlateHeader } from "@/components/PlateHeader";
+import { motion } from "framer-motion";
 import { BookPlate } from "@/components/BookPlate";
+import { EngravedStatue } from "@/components/EngravedStatue";
+import { FogPanel } from "@/components/FogPanel";
 import { ContextPanel } from "@/components/ContextPanel";
-import { BrutalistCard } from "@/components/BrutalistCard";
 import { Main } from "@/components/Main";
-import { OrangeAction } from "@/components/OrangeAction";
 
 interface BookSummary {
   title: string;
   author: string;
   year?: number;
   key_ideas: string[];
-  micro_lessons?: MicroLesson[];
-}
-
-interface MicroLesson {
-  id: string;
-  title: string;
-  core_idea: string;
-  micro_test_q: string;
-  micro_test_a: string;
 }
 
 export default function BibliothecaPage() {
   const [summaries, setSummaries] = useState<BookSummary[]>([]);
-  const [selectedBook, setSelectedBook] = useState<BookSummary | null>(null);
-  const [selectedMicroLessons, setSelectedMicroLessons] = useState<MicroLesson[]>([]);
-  const [revealedAnswers, setRevealedAnswers] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -49,192 +37,116 @@ export default function BibliothecaPage() {
     }
   };
 
-  const handleBookClick = async (book: BookSummary) => {
-    setSelectedBook(book);
-    try {
-      const response = await fetch(`/api/books?title=${encodeURIComponent(book.title)}`);
-      const data = await response.json();
-      if (data.microLessons) {
-        setSelectedMicroLessons(data.microLessons);
-      }
-    } catch (error) {
-      console.error("Error fetching micro-lessons:", error);
-    }
+  const getSlug = (title: string) => {
+    return title.toLowerCase().replace(/\s+/g, "-");
   };
 
-  const toggleAnswer = (lessonId: string) => {
-    setRevealedAnswers(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(lessonId)) {
-        newSet.delete(lessonId);
-      } else {
-        newSet.add(lessonId);
-      }
-      return newSet;
-    });
+  const getImageSrc = (slug: string) => {
+    return `/images/classical/${slug}.jpg`;
   };
 
   if (loading) {
     return (
       <>
         <Main>
-          <PlateHeader 
-            title="BIBLIOTHECA" 
-            subtitle="Library of Knowledge"
-            plateNumber="II"
-          />
-          <BrutalistCard borderWidth="1.5" className="p-6">
-            <div className="font-mono text-sm text-muted-foreground">Loading library...</div>
-          </BrutalistCard>
+          <FogPanel className="card-padding">
+            <div className="font-mono text-sm text-muted-foreground">
+              Loading library...
+            </div>
+          </FogPanel>
         </Main>
-        <ContextPanel title="Author Bio" />
+        <ContextPanel title="Library">
+          <div className="font-mono text-xs text-muted-foreground">Loading...</div>
+        </ContextPanel>
       </>
     );
   }
 
   return (
     <>
-      <Main>
-        <PlateHeader 
-          title="BIBLIOTHECA" 
-          subtitle="Library of Knowledge"
-          plateNumber="II"
-        />
-        
-        <div className="space-y-6">
-          {!selectedBook ? (
-            summaries.map((book) => (
-              <BookPlate
-                key={book.title}
-                title={book.title}
-                author={book.author}
-                year={book.year}
-                description={book.key_ideas[0] || "Key insights from this work."}
-                themes={book.key_ideas.slice(0, 3).map(idea => idea.substring(0, 20))}
-              >
-                <div className="mt-4">
-                  <OrangeAction onClick={() => handleBookClick(book)}>
-                    View Summary & Micro-Lessons
-                  </OrangeAction>
-                </div>
-              </BookPlate>
-            ))
-          ) : (
-            <>
-              <BrutalistCard borderWidth="1.5" className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <div className="font-serif text-2xl engraved mb-2">{selectedBook.title}</div>
-                    <div className="font-mono text-sm text-muted-foreground">
-                      by {selectedBook.author} {selectedBook.year && `(${selectedBook.year > 0 ? selectedBook.year : Math.abs(selectedBook.year) + ' BCE'})`}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setSelectedBook(null);
-                      setSelectedMicroLessons([]);
-                      setRevealedAnswers(new Set());
-                    }}
-                    className="border border-border px-3 py-1 font-mono text-xs hover:bg-secondary"
-                  >
-                    Back
-                  </button>
-                </div>
+      <Main className="scroll-fade-top scroll-fade-bottom">
+        {/* Ritual Header with Architectural Engraving Background */}
+        <div className="relative mb-16 section-spacing">
+          {/* Muted architectural engraving behind header */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-[0.12] pointer-events-none">
+            <EngravedStatue
+              imageSrc="/images/classical/temple.jpg"
+              alt="Classical temple"
+              size="lg"
+              className="max-w-full max-h-[400px]"
+            />
+          </div>
 
-                <div className="font-mono text-sm space-y-4">
-                  <div>
-                    <div className="font-serif text-lg mb-3 engraved">Key Ideas</div>
-                    <ul className="space-y-2 text-muted-foreground">
-                      {selectedBook.key_ideas.map((idea, idx) => (
-                        <li key={idx} className="border-l border-border pl-3">
-                          {idea}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </BrutalistCard>
-
-              {selectedMicroLessons.length > 0 && (
-                <div>
-                  <div className="font-serif text-xl mb-4 engraved">Micro-Lessons</div>
-                  <div className="space-y-4">
-                    {selectedMicroLessons.map((lesson) => (
-                      <BrutalistCard key={lesson.id} borderWidth="1" className="p-6">
-                        <div className="font-serif text-lg mb-3 engraved">{lesson.title}</div>
-                        <div className="font-mono text-sm space-y-4">
-                          <p className="text-muted-foreground leading-relaxed">{lesson.core_idea}</p>
-                          
-                          <div className="border-t border-border pt-4">
-                            <div className="font-serif text-sm mb-2 engraved">Micro-Test</div>
-                            <div className="space-y-3">
-                              <p className="text-muted-foreground">{lesson.micro_test_q}</p>
-                              
-                              {revealedAnswers.has(lesson.id) ? (
-                                <div>
-                                  <div className="mb-2 font-semibold">Answer:</div>
-                                  <p className="text-muted-foreground">{lesson.micro_test_a}</p>
-                                </div>
-                              ) : (
-                                <OrangeAction onClick={() => toggleAnswer(lesson.id)}>
-                                  Reveal Answer
-                                </OrangeAction>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </BrutalistCard>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="relative z-10 pb-8 border-b border-border"
+          >
+            <h1 className="font-serif text-[64px] font-normal tracking-[0.08em] uppercase mb-4 fade-fog-in">
+              BIBLIOTHECA
+            </h1>
+            <p className="text-xs opacity-70 font-mono mb-12">
+              The eternal archive of Ratio. Choose a volume to open.
+            </p>
+          </motion.div>
         </div>
+
+        {/* Floating Grid of Books */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {summaries.map((book, index) => {
+            const slug = getSlug(book.title);
+            return (
+              <motion.div
+                key={book.title}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <BookPlate
+                  title={book.title}
+                  author={book.author}
+                  slug={slug}
+                  imageSrc={getImageSrc(slug)}
+                  year={book.year}
+                />
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {summaries.length === 0 && (
+          <FogPanel className="card-padding">
+            <div className="font-mono text-sm text-muted-foreground">
+              No books available in the library.
+            </div>
+          </FogPanel>
+        )}
       </Main>
 
-      <ContextPanel title={selectedBook ? "Book Details" : "Library"}>
-        {selectedBook ? (
-          <>
-            <BrutalistCard borderWidth="1" className="p-4 mb-4">
-              <div className="font-serif text-sm mb-2 engraved">Selected Book</div>
-              <div className="font-mono text-xs">
-                <div className="font-semibold">{selectedBook.title}</div>
-                <div className="text-muted-foreground mt-1">{selectedBook.author}</div>
-              </div>
-            </BrutalistCard>
+      <ContextPanel title="Library">
+        <FogPanel className="card-padding mb-4">
+          <div className="font-serif text-sm mb-2 engraved">Collection</div>
+          <div className="font-mono text-xs space-y-1">
+            {summaries.length} {summaries.length === 1 ? "volume" : "volumes"} available
+          </div>
+        </FogPanel>
 
-            <BrutalistCard borderWidth="1" className="p-4 mb-4">
-              <div className="font-serif text-sm mb-2 engraved">Key Ideas</div>
-              <div className="font-mono text-xs text-muted-foreground">
-                {selectedBook.key_ideas.length} ideas
-              </div>
-            </BrutalistCard>
+        <FogPanel className="card-padding mb-4">
+          <div className="font-serif text-sm mb-2 engraved">Volumes</div>
+          <div className="font-mono text-xs text-muted-foreground space-y-1">
+            {summaries.map((book) => (
+              <div key={book.title}>• {book.title}</div>
+            ))}
+          </div>
+        </FogPanel>
 
-            <BrutalistCard borderWidth="1" className="p-4">
-              <div className="font-serif text-sm mb-2 engraved">Micro-Lessons</div>
-              <div className="font-mono text-xs text-muted-foreground">
-                {selectedMicroLessons.length} lessons available
-              </div>
-            </BrutalistCard>
-          </>
-        ) : (
-          <>
-            <BrutalistCard borderWidth="1" className="p-4 mb-4">
-              <div className="font-serif text-sm mb-2 engraved">Library</div>
-              <div className="font-mono text-xs space-y-1">
-                {summaries.length} books available
-              </div>
-            </BrutalistCard>
-
-            <BrutalistCard borderWidth="1" className="p-4">
-              <div className="font-serif text-sm mb-2 engraved">Instructions</div>
-              <div className="font-mono text-xs text-muted-foreground">
-                Click a book to view its summary, key ideas, and micro-lessons.
-              </div>
-            </BrutalistCard>
-          </>
-        )}
+        <FogPanel className="card-padding">
+          <div className="font-serif text-sm mb-2 engraved">Instructions</div>
+          <div className="font-mono text-xs text-muted-foreground">
+            Click a volume to view its summary, key ideas, chapters, and micro-lessons.
+          </div>
+        </FogPanel>
       </ContextPanel>
     </>
   );

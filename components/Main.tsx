@@ -1,16 +1,17 @@
 import { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 interface MainProps {
   children: ReactNode;
+  className?: string;
 }
 
-export function Main({ children }: MainProps) {
+export function Main({ children, className }: MainProps) {
   return (
-    <main className="flex-1 overflow-y-auto bg-background dither grain relative">
-      <div className="p-8 max-w-6xl mx-auto">
+    <main className={cn("flex-1 overflow-y-auto bg-background dither grain relative", className)}>
+      <div className="p-8 max-w-6xl mx-auto scroll-fade-top scroll-fade-bottom">
         {children}
       </div>
     </main>
   );
 }
-

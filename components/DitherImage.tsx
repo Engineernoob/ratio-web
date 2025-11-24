@@ -27,7 +27,7 @@ export function DitherImage({
         initial={{ opacity: 0, filter: "contrast(0) brightness(0)" }}
         animate={{ opacity: 1, filter: "contrast(1.4) brightness(0.85)" }}
         transition={{ duration: 1.5, ease: "easeOut" }}
-        className="dither-reveal"
+        className="dither-reveal relative"
       >
         <Image
           src={src}
@@ -37,6 +37,10 @@ export function DitherImage({
           className="w-full h-auto engraving-filter"
           priority={priority}
         />
+        {/* Scanline overlay */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="scanline-overlay w-full h-full" />
+        </div>
       </motion.div>
     </div>
   );
