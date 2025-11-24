@@ -4,9 +4,9 @@ import { getDailyFeed, getAllTikTokLessons, getAllBookSummaries } from "@/lib/fe
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const count = parseInt(searchParams.get("count") || "5");
+    const date = searchParams.get("date") || new Date().toISOString().split("T")[0];
     
-    const feed = getDailyFeed(count);
+    const feed = await getDailyFeed(date);
     
     return NextResponse.json({ feed });
   } catch (error) {
