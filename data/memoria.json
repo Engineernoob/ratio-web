@@ -1,4 +1,30 @@
 {
-  "concepts": []
+  "concepts": [
+    {
+      "title": "The Universe Is Constantly Changing",
+      "explanation": "Remembering the impermanent nature of events makes daily frustrations seem trivial.",
+      "micro_question": "How does remembering impermanence help?",
+      "micro_answer": "It shrinks the importance of temporary frustrations.",
+      "source": "book",
+      "id": "concept-1764012261728",
+      "date_added": "2025-11-24",
+      "next_review": "2025-11-24",
+      "interval_days": 0,
+      "ease_factor": 1,
+      "review_count": 0
+    },
+    {
+      "title": "Resisting Anger by Example",
+      "explanation": "From his family, Marcus learned how to remain composed and not overreact emotionally.",
+      "micro_question": "How did Marcus learn emotional control?",
+      "micro_answer": "By watching family members model calm, non-reactive behavior.",
+      "source": "book",
+      "id": "concept-1764012261733",
+      "date_added": "2025-11-24",
+      "next_review": "2025-11-24",
+      "interval_days": 0,
+      "ease_factor": 1,
+      "review_count": 0
+    }
+  ]
 }
-
