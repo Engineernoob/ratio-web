@@ -37,7 +37,8 @@ export function EngravedStatue({
   const dimensions = sizeMap[size];
 
   useEffect(() => {
-    const img = new Image();
+    // Use native browser Image constructor, not Next.js Image component
+    const img = new window.Image();
     img.onload = () => {
       setIsLoading(false);
       setHasError(false);
