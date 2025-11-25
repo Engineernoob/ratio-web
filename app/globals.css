@@ -221,6 +221,314 @@ body::after {
     max-width: 1200px;
     margin: 0 auto;
   }
+
+  .breathing-glow {
+    animation: breathingGlow 4s ease-in-out infinite;
+  }
+
+  .static-overlay {
+    animation: staticOverlay 3s ease-in-out infinite;
+  }
+
+  .parallax-drift {
+    animation: parallaxDrift 20s ease-in-out infinite;
+  }
+
+  .etched-divider {
+    position: relative;
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(255, 255, 255, 0.1) 20%,
+      rgba(255, 255, 255, 0.1) 80%,
+      transparent
+    );
+    margin: 24px 0;
+  }
+
+  .etched-divider::before,
+  .etched-divider::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    width: 1px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .etched-divider::before {
+    left: 20%;
+  }
+
+  .etched-divider::after {
+    right: 20%;
+  }
+
+  .small-caps {
+    font-variant: small-caps;
+  }
+
+  .marble-card {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 4px 24px rgba(0, 0, 0, 0.3);
+    transition: transform 0.24s ease-out, box-shadow 0.24s ease-out;
+  }
+
+  .marble-card:hover {
+    transform: scale(1.02) translateY(-2px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  .engraved-border {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
+  .engraved-border:hover {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05),
+      0 0 20px rgba(245, 245, 220, 0.1);
+  }
+}
+
+/* ============================================
+   OIKOS BACKGROUND
+   ============================================ */
+
+.oikos-bg {
+  position: relative;
+  background-image: url("/images/backgrounds/acropolis-dithered.png");
+  background-size: 120%;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: translate3d(0, 0, 0);
+  will-change: background-position;
+  opacity: 0.12;
+}
+
+@supports (background-attachment: fixed) {
+  .oikos-bg {
+    animation: parallaxDrift 20s ease-in-out infinite;
+  }
+}
+
+.oikos-bg::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.fog-top {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 10, 11, 0.6) 0%,
+    rgba(10, 10, 11, 0.3) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 0.3s ease;
+}
+
+.fog-bottom {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(
+    to top,
+    rgba(10, 10, 11, 0.6) 0%,
+    rgba(10, 10, 11, 0.3) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 0.3s ease;
+}
+
+.stone-tablet {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+  box-shadow: 
+    inset 0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 -1px 4px rgba(255, 255, 255, 0.05),
+    0 4px 24px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.stone-tablet::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.02) 2px,
+      rgba(255, 255, 255, 0.02) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.02) 2px,
+      rgba(255, 255, 255, 0.02) 4px
+    );
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.stone-tablet:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    inset 0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 -1px 4px rgba(255, 255, 255, 0.05),
+    0 8px 32px rgba(198, 122, 58, 0.2),
+    0 0 40px rgba(0, 0, 0, 0.5);
+  border-color: rgba(198, 122, 58, 0.3);
+}
+
+.engraved-text {
+  color: #c67a3a;
+  text-shadow: 
+    1px 1px 2px rgba(0, 0, 0, 0.8),
+    -1px -1px 1px rgba(255, 255, 255, 0.1),
+    0 0 8px rgba(198, 122, 58, 0.3);
+  letter-spacing: 0.1em;
+}
+
+.scroll-card {
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    rgba(245, 245, 240, 0.05) 0%,
+    rgba(240, 240, 235, 0.03) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 24px;
+}
+
+.parchment-mask {
+  position: relative;
+  background-image: url("/images/textures/parchment-dither.png");
+  background-size: 200px 200px;
+  background-repeat: repeat;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 5%,
+    black 95%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 5%,
+    black 95%,
+    transparent 100%
+  );
+}
+
+.parchment-mask::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 1px,
+    rgba(0, 0, 0, 0.02) 1px,
+    rgba(0, 0, 0, 0.02) 2px
+  );
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.wax-seal-button {
+  position: relative;
+  padding: 10px 20px;
+  font-family: var(--font-serif);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #c67a3a;
+  background: linear-gradient(
+    135deg,
+    rgba(198, 122, 58, 0.15) 0%,
+    rgba(198, 122, 58, 0.08) 100%
+  );
+  border: 1px solid rgba(198, 122, 58, 0.3);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.wax-seal-button::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50px;
+  background: radial-gradient(
+    circle at center,
+    rgba(198, 122, 58, 0.2) 0%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.wax-seal-button:hover::before {
+  opacity: 1;
+}
+
+.wax-seal-button:hover {
+  border-color: rgba(198, 122, 58, 0.5);
+  box-shadow: 
+    inset 0 1px 2px rgba(255, 255, 255, 0.1),
+    0 4px 16px rgba(198, 122, 58, 0.3);
+  transform: translateY(-1px);
+}
+
+.oikos-bg::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.015;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 2;
+  animation: staticOverlay 3s ease-in-out infinite;
 }
 
 /* ============================================
@@ -295,6 +603,38 @@ body::after {
   }
   50% {
     transform: translateY(-2px);
+  }
+}
+
+@keyframes breathingGlow {
+  0%,
+  100% {
+    text-shadow: 0 0 20px rgba(245, 245, 220, 0.3),
+      0 0 40px rgba(245, 245, 220, 0.1);
+  }
+  50% {
+    text-shadow: 0 0 30px rgba(245, 245, 220, 0.5),
+      0 0 60px rgba(245, 245, 220, 0.2);
+  }
+}
+
+@keyframes staticOverlay {
+  0%,
+  100% {
+    opacity: 0.01;
+  }
+  50% {
+    opacity: 0.02;
+  }
+}
+
+@keyframes parallaxDrift {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-10px) translateX(5px);
   }
 }
 

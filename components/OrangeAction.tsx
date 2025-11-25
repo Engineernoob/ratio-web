@@ -33,6 +33,7 @@ export function OrangeAction({
         disabled={disabled}
         className={cn(
           "border border-border px-4 py-2 font-mono text-sm transition-all ritual-glow shrink-flash",
+          "focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-background",
           disabled
             ? "opacity-50 cursor-not-allowed"
             : active
@@ -40,6 +41,8 @@ export function OrangeAction({
             : "bg-background text-foreground hover:bg-accent/10",
           className
         )}
+        aria-disabled={disabled}
+        tabIndex={disabled ? -1 : 0}
       >
         {children}
       </Component>

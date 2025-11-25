@@ -6,9 +6,10 @@ import { SideNav } from "./SideNav";
 
 export function RootLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAuthRoute = pathname?.startsWith("/login") || pathname?.startsWith("/onboarding");
+  const isOikosPage = pathname === "/oikos";
 
-  if (isAuthRoute) {
+  // OIKOS page has its own layout with TopNav
+  if (isOikosPage) {
     return (
       <>
         <div className="dither-overlay" />
