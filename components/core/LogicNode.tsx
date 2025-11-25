@@ -27,10 +27,12 @@ export function LogicNode({
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5, delay, ease: "easeOut" }}
       drag={draggable}
-      dragConstraints={draggable ? { left: 0, right: 0, top: 0, bottom: 0 } : undefined}
+      dragConstraints={
+        draggable ? { left: 0, right: 0, top: 0, bottom: 0 } : undefined
+      }
       className={cn(
         "relative",
-        "bg-gradient-to-br from-fogwhite to-transparent",
+        "bg-linear-to-br from-fogwhite to-transparent",
         "border border-[rgba(255,255,255,0.1)] rounded-lg",
         "backdrop-blur-sm",
         draggable && "cursor-move",
@@ -50,12 +52,12 @@ export function LogicNode({
           mixBlendMode: "overlay",
         }}
       />
-      
+
       {/* Content */}
       <div className="relative z-10 p-4">
         {title && (
           <div className="mb-2">
-            <h4 className="font-serif text-sm uppercase tracking-[0.1em] engraved-text">
+            <h4 className="font-serif text-sm uppercase tracking-widest engraved-text">
               {title}
             </h4>
           </div>
@@ -67,4 +69,3 @@ export function LogicNode({
     </motion.div>
   );
 }
-

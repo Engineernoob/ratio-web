@@ -5,6 +5,7 @@ Reusable UI components following Ratio OS's neo-classical brutalist design syste
 ## Components
 
 ### StoneTablet
+
 Engraved stone tablet with dithering and texture overlays. Perfect for section headers and content blocks.
 
 ```tsx
@@ -14,24 +15,23 @@ Engraved stone tablet with dithering and texture overlays. Perfect for section h
 ```
 
 ### ScrollCard
+
 Parchment-style scroll card with unrolling animation. Used for feed items and content lists.
 
 ```tsx
-<ScrollCard delay={0.2}>
-  {content}
-</ScrollCard>
+<ScrollCard delay={0.2}>{content}</ScrollCard>
 ```
 
 ### WaxSealButton
+
 Wax seal-styled button with radial glow and dithering. Perfect for important actions.
 
 ```tsx
-<WaxSealButton onClick={handleClick}>
-  Reveal Answer
-</WaxSealButton>
+<WaxSealButton onClick={handleClick}>Reveal Answer</WaxSealButton>
 ```
 
 ### FogPanel
+
 Floating panel with fog gradient and dithering overlay. Base component for cards and containers.
 
 ```tsx
@@ -40,7 +40,18 @@ Floating panel with fog gradient and dithering overlay. Base component for cards
 </FogPanel>
 ```
 
+### FogCard
+
+Card variant with subtle fog effects and rounded borders. Used in bibliotheca components.
+
+```tsx
+<FogCard hover={true} delay={0.2}>
+  {content}
+</FogCard>
+```
+
 ### EngravedHeader
+
 Serif header with engraved text effect and breathing glow. Supports h1-h6 levels.
 
 ```tsx
@@ -50,6 +61,7 @@ Serif header with engraved text effect and breathing glow. Supports h1-h6 levels
 ```
 
 ### FloatingSigil
+
 Circular floating sigil with gentle animation. Perfect for icons and decorative elements.
 
 ```tsx
@@ -59,15 +71,15 @@ Circular floating sigil with gentle animation. Perfect for icons and decorative 
 ```
 
 ### ParchmentOverlay
+
 Parchment-textured overlay with ink fade effect. Wraps content in ancient scroll aesthetic.
 
 ```tsx
-<ParchmentOverlay delay={0.1}>
-  {content}
-</ParchmentOverlay>
+<ParchmentOverlay delay={0.1}>{content}</ParchmentOverlay>
 ```
 
 ### LogicNode
+
 Draggable logic node for knowledge graphs. Includes dithering and fog effects.
 
 ```tsx
@@ -77,6 +89,7 @@ Draggable logic node for knowledge graphs. Includes dithering and fog effects.
 ```
 
 ### LedgerList
+
 Ancient ledger-style list with engraved labels. Perfect for data tables and records.
 
 ```tsx
@@ -92,6 +105,7 @@ Ancient ledger-style list with engraved labels. Perfect for data tables and reco
 ## Design Tokens
 
 All components use:
+
 - **Colors**: `obsidian`, `gravestone`, `marble`, `ivory`, `parchment`, `bronze`, `wax`, `fogwhite`
 - **Typography**: Serif for headers, mono for body
 - **Effects**: Dithering, fog gradients, stone textures, parchment textures
@@ -100,6 +114,13 @@ All components use:
 ## Usage
 
 ```tsx
-import { StoneTablet, ScrollCard, WaxSealButton } from "@/components/core";
+import {
+  StoneTablet,
+  ScrollCard,
+  WaxSealButton,
+  FogPanel,
+  FogCard,
+} from "@/components/core";
 ```
 
+For a complete list of all components, see [COMPONENTS_LIST.md](./COMPONENTS_LIST.md).

@@ -30,7 +30,7 @@ export function ScrollPreviewCard({
   const Content = (
     <FogPanel className={cn("p-6", className)} delay={delay}>
       <div className="mb-4">
-        <h3 className="font-serif text-lg uppercase tracking-[0.1em] engraved-text mb-2">
+        <h3 className="font-serif text-lg uppercase tracking-widest engraved-text mb-2">
           {title}
         </h3>
         {(author || source) && (
@@ -51,7 +51,7 @@ export function ScrollPreviewCard({
           {categoryTags.map((tag) => (
             <span
               key={tag}
-              className="font-mono text-[10px] uppercase tracking-wider border border-[rgba(255,255,255,0.1)] px-2 py-1"
+              className="font-mono text-[10px] uppercase tracking-wider border border-border px-2 py-1"
             >
               {tag}
             </span>
@@ -59,7 +59,7 @@ export function ScrollPreviewCard({
         </div>
       )}
 
-      <div className="pt-4 border-t border-[rgba(255,255,255,0.08)]">
+      <div className="pt-4 border-t border-border">
         <OrangeAction as="div" className="w-full text-center">
           {href ? "Open Scroll" : "View Details"}
         </OrangeAction>
@@ -77,4 +77,3 @@ export function ScrollPreviewCard({
 
   return Content;
 }
-

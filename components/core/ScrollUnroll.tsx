@@ -28,7 +28,7 @@ export function ScrollUnroll({
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
       >
-        <div className="font-serif text-xl uppercase tracking-[0.1em] engraved-text mb-4">
+        <div className="font-serif text-xl uppercase tracking-widest engraved-text mb-4">
           {title}
         </div>
       </motion.button>
@@ -57,7 +57,8 @@ export function ScrollUnroll({
                 transition={{ duration: 0.8, delay: 0.3 }}
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                  background: "linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%)",
+                  background:
+                    "linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 100%)",
                 }}
               />
 
@@ -69,4 +70,3 @@ export function ScrollUnroll({
     </div>
   );
 }
-

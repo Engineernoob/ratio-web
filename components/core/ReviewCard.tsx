@@ -38,7 +38,7 @@ export function ReviewCard({
           <div className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
             {typeLabels[type]}
           </div>
-          <h3 className="font-serif text-base uppercase tracking-[0.08em] engraved-text">
+          <h3 className="font-serif text-base uppercase tracking-widest engraved-text">
             {title}
           </h3>
         </div>
@@ -46,7 +46,7 @@ export function ReviewCard({
       </div>
 
       {onReview && (
-        <div className="pt-4 border-t border-[rgba(255,255,255,0.08)]">
+        <div className="pt-4 border-t border-border">
           <OrangeAction onClick={onReview} className="w-full">
             Review
           </OrangeAction>
@@ -55,4 +55,3 @@ export function ReviewCard({
     </FogPanel>
   );
 }
-

@@ -28,7 +28,7 @@ export function KnowledgeStreakIndicator({
           initial={{ width: 0 }}
           animate={{ width: `${Math.min(100, (days / 30) * 100)}%` }}
           transition={{ duration: 0.8, delay: delay + 0.2 }}
-          className="h-full bg-gradient-to-r from-bronze to-[rgba(198,122,58,0.6)]"
+          className="h-full bg-linear-to-r from-bronze to-[rgba(198,122,58,0.6)]"
           style={{
             boxShadow: "0 0 8px rgba(198,122,58,0.4)",
           }}
@@ -59,17 +59,13 @@ export function KnowledgeStreakIndicator({
           transition={{ duration: 0.2, delay: delay + i * 0.02 }}
           className={cn(
             "w-2 h-2 rounded-full",
-            i < activeDots
-              ? "bg-bronze"
-              : "bg-[rgba(255,255,255,0.1)]"
+            i < activeDots ? "bg-bronze" : "bg-[rgba(255,255,255,0.1)]"
           )}
           style={{
-            boxShadow:
-              i < activeDots ? "0 0 4px rgba(198,122,58,0.5)" : "none",
+            boxShadow: i < activeDots ? "0 0 4px rgba(198,122,58,0.5)" : "none",
           }}
         />
       ))}
     </motion.div>
   );
 }
-

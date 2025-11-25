@@ -48,7 +48,7 @@ export function ModalPanel({
             <div
               className={cn(
                 "relative w-full max-w-3xl max-h-[90vh] overflow-y-auto",
-                "bg-gradient-to-br from-fogwhite to-transparent",
+                "bg-linear-to-br from-fogwhite to-transparent",
                 "border border-[rgba(255,255,255,0.12)]",
                 "backdrop-blur-sm",
                 "p-8"
@@ -70,7 +70,7 @@ export function ModalPanel({
 
               <div className="relative z-10">
                 <div className="flex items-start justify-between mb-6">
-                  <EngravedHeader level={3} title={title} />
+                  <EngravedHeader level={3}>{title}</EngravedHeader>
                   <OrangeAction onClick={onClose} className="text-sm">
                     Close
                   </OrangeAction>
@@ -87,4 +87,3 @@ export function ModalPanel({
     </AnimatePresence>
   );
 }
-

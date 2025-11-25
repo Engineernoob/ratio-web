@@ -44,10 +44,10 @@ All components from your requirements have been created in `/components/core/`.
 
 ## ✅ 6. System UI Components
 
-- **TopNav** - Global navbar with flat engraved tabs (in root `/components/`)
-- **SideNav** - Side navigation (in root `/components/`)
+- **TopNavBar** - Global navbar with flat engraved tabs (in `core/`)
 - **BreadcrumbBar** - Location bar component
 - **DividerBar** - Dotted divider lines
+- ⚠️ **SideNav** - Referenced in RootLayoutWrapper but file not found
 
 ## ✅ 7. Feedback Components
 
@@ -97,12 +97,16 @@ import {
   DividerBar,
   KnowledgeStreakIndicator,
   SuccessSealAnimation,
+  FogPanel,
+  FogCard, // Card variant with different styling
+  TopNavBar,
 } from "@/components/core";
 ```
 
 ## Design System
 
 All components follow the Ratio OS aesthetic:
+
 - Monochrome color palette
 - Dithering and grain textures
 - Engraved serif typography
@@ -111,4 +115,3 @@ All components follow the Ratio OS aesthetic:
 - Fog gradients
 - Framer Motion animations
 - Responsive design
-

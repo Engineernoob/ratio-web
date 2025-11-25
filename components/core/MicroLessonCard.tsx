@@ -29,7 +29,7 @@ export function MicroLessonCard({
   return (
     <FogPanel className={cn("p-6", className)} delay={delay}>
       <div className="mb-4">
-        <h3 className="font-serif text-lg uppercase tracking-[0.1em] engraved-text mb-2">
+        <h3 className="font-serif text-lg uppercase tracking-widest engraved-text mb-2">
           {title}
         </h3>
         <p className="font-mono text-xs text-muted-foreground mb-3">
@@ -43,7 +43,7 @@ export function MicroLessonCard({
 
       {progress !== undefined && progress > 0 && (
         <div className="mb-4">
-          <div className="h-1 bg-[rgba(255,255,255,0.1)] mb-2">
+          <div className="h-1 bg-fogwhite mb-2">
             <div
               className="h-full bg-bronze transition-all duration-300"
               style={{ width: `${progress}%` }}

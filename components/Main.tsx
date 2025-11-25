@@ -8,7 +8,12 @@ interface MainProps {
 
 export function Main({ children, className }: MainProps) {
   return (
-    <main className={cn("flex-1 overflow-y-auto bg-background dither grain relative", className)}>
+    <main
+      className={cn(
+        "flex-1 overflow-y-auto bg-background dither grain relative",
+        className
+      )}
+    >
       <div className="p-8 max-w-6xl mx-auto scroll-fade-top scroll-fade-bottom">
         {children}
       </div>

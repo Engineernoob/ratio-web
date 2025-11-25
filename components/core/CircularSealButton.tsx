@@ -35,7 +35,7 @@ export function CircularSealButton({
   size = "md",
 }: CircularSealButtonProps) {
   const symbolContent =
-    typeof symbol === "string" ? symbolMap[symbol] : symbol;
+    typeof symbol === "string" ? symbolMap[symbol as keyof typeof symbolMap] : symbol;
 
   return (
     <motion.button
@@ -45,7 +45,7 @@ export function CircularSealButton({
       disabled={disabled}
       className={cn(
         "relative flex flex-col items-center justify-center",
-        "bg-gradient-to-br from-[rgba(198,122,58,0.2)] to-[rgba(198,122,58,0.1)]",
+        "bg-linear-to-br from-[rgba(198,122,58,0.2)] to-[rgba(198,122,58,0.1)]",
         "border border-[rgba(198,122,58,0.4)] rounded-full",
         "backdrop-blur-sm",
         sizeClasses[size],

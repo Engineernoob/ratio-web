@@ -17,6 +17,7 @@ module.exports = {
         wax: "#923434",
         fogwhite: "rgba(255,255,255,0.04)",
         deepfog: "rgba(0,0,0,0.3)",
+        gold: "#d7c49eff",
       },
 
       fontFamily: {
@@ -27,6 +28,9 @@ module.exports = {
       boxShadow: {
         stone: "0 0 24px rgba(255,255,255,0.05)",
         glow: "0 0 16px rgba(201,178,125,0.25)",
+        "gold-glow": "0 0 20px rgba(215,196,158,0.3)",
+        "inset-neu":
+          "inset 0 2px 4px rgba(0,0,0,0.4), inset 0 -2px 4px rgba(255,255,255,0.05), 0 0 30px rgba(0,0,0,0.5)",
       },
 
       spacing: {

@@ -3,6 +3,7 @@ export { StoneTablet } from "./StoneTablet";
 export { ScrollCard } from "./ScrollCard";
 export { WaxSealButton } from "./WaxSealButton";
 export { FogPanel } from "./FogPanel";
+export { FogCard } from "./FogCard";
 export { EngravedHeader } from "./EngravedHeader";
 export { FloatingSigil } from "./FloatingSigil";
 export { ParchmentOverlay } from "./ParchmentOverlay";
@@ -11,8 +12,11 @@ export { LedgerList } from "./LedgerList";
 
 // Layout Components
 export { SectionHeader } from "./SectionHeader";
+export { SectionHeaderEngraved } from "./SectionHeaderEngraved";
 export { BreadcrumbBar } from "./BreadcrumbBar";
 export { DividerBar } from "./DividerBar";
+export { GridDivider } from "./GridDivider";
+export { PanelContainer } from "./PanelContainer";
 
 // Image & Media Components
 export { EngravedStatue } from "./EngravedStatue";
@@ -52,3 +56,24 @@ export { Toast, ToastContainer } from "./Toast";
 export { KnowledgeStreakIndicator } from "./KnowledgeStreakIndicator";
 export { SuccessSealAnimation } from "./SuccessSealAnimation";
 
+// Scholarium Components
+export { LedgerBox } from "./LedgerBox";
+export { LogicTable } from "./LogicTable";
+export { DebateHornBox } from "./DebateHornBox";
+
+// Oikos Page Components
+export { TopNavBar } from "./TopNavBar";
+export { HeroSection } from "./HeroSection";
+export { LectioCard } from "./LectioCard";
+export { RitualCard } from "./RitualCard";
+export { MemoriaCard } from "./MemoriaCard";
+export { DayStatusPanel } from "./DayStatusPanel";
+export { NextActionsPanel } from "./NextActionsPanel";
+export { ScrollFeedCard } from "./ScrollFeedCard";
+
+// Ars Rationis Components
+export { LogicPillar } from "./LogicPillar";
+export { DebatePanel } from "./DebatePanel";
+export { LedgerPanel } from "./LedgerPanel";
+export { AxiomTable } from "./AxiomTable";
+export { ComputationLogSection } from "./ComputationLogSection";

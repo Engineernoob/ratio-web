@@ -48,7 +48,8 @@ export function LogicBuilderBlock({
         className
       )}
       style={{
-        boxShadow: "inset 0 1px 2px rgba(255,255,255,0.05), 0 2px 8px rgba(0,0,0,0.3)",
+        boxShadow:
+          "inset 0 1px 2px rgba(255,255,255,0.05), 0 2px 8px rgba(0,0,0,0.3)",
       }}
     >
       {/* Stone texture */}
@@ -62,7 +63,7 @@ export function LogicBuilderBlock({
       />
 
       <div className="relative z-10">
-        <div className="font-serif text-xs uppercase tracking-[0.1em] engraved-text mb-2">
+        <div className="font-serif text-xs uppercase tracking-widest engraved-text mb-2">
           {typeLabels[type]}
         </div>
         <div className="font-mono text-sm leading-relaxed">{children}</div>
@@ -70,4 +71,3 @@ export function LogicBuilderBlock({
     </motion.div>
   );
 }
-

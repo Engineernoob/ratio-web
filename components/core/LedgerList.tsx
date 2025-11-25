@@ -31,13 +31,14 @@ export function LedgerList({
       transition={{ duration: 0.6, delay, ease: "easeOut" }}
       className={cn(
         "relative",
-        "bg-gradient-to-br from-fogwhite to-transparent",
+        "bg-linear-to-br from-fogwhite to-transparent",
         "border border-[rgba(255,255,255,0.08)]",
         "backdrop-blur-sm",
         className
       )}
       style={{
-        boxShadow: "inset 0 1px 2px rgba(255,255,255,0.05), 0 2px 8px rgba(0,0,0,0.3)",
+        boxShadow:
+          "inset 0 1px 2px rgba(255,255,255,0.05), 0 2px 8px rgba(0,0,0,0.3)",
       }}
     >
       {/* Dither overlay */}
@@ -48,7 +49,7 @@ export function LedgerList({
           mixBlendMode: "overlay",
         }}
       />
-      
+
       <div className="relative z-10">
         {items.map((item, index) => (
           <motion.div
@@ -58,12 +59,14 @@ export function LedgerList({
             transition={{ duration: 0.4, delay: delay + index * 0.05 }}
             className={cn(
               "p-4",
-              showDividers && index < items.length - 1 && "border-b border-[rgba(255,255,255,0.08)]"
+              showDividers &&
+                index < items.length - 1 &&
+                "border-b border-[rgba(255,255,255,0.08)]"
             )}
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
-                <div className="font-serif text-sm uppercase tracking-[0.08em] engraved-text mb-1">
+                <div className="font-serif text-sm uppercase tracking-widest engraved-text mb-1">
                   {item.label}
                 </div>
                 {item.sublabel && (
@@ -84,4 +87,3 @@ export function LedgerList({
     </motion.div>
   );
 }
-

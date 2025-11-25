@@ -52,7 +52,7 @@ export function DailyLedger({
       className={cn(className)}
     >
       <div className="mb-4">
-        <h3 className="font-serif text-lg uppercase tracking-[0.1em] engraved-text mb-2">
+        <h3 className="font-serif text-lg uppercase tracking-widest engraved-text mb-2">
           Daily Ledger
         </h3>
       </div>

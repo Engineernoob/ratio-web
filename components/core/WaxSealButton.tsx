@@ -26,9 +26,9 @@ export function WaxSealButton({
       className={cn(
         "relative",
         "px-6 py-3",
-        "font-serif text-sm uppercase tracking-[0.1em]",
+        "font-serif text-sm uppercase tracking-widest",
         "text-bronze",
-        "bg-gradient-to-br from-[rgba(198,122,58,0.15)] to-[rgba(198,122,58,0.08)]",
+        "bg-linear-to-br from-[rgba(198,122,58,0.15)] to-[rgba(198,122,58,0.08)]",
         "border border-[rgba(198,122,58,0.3)] rounded-full",
         "backdrop-blur-sm",
         "transition-all duration-300",
@@ -38,17 +38,19 @@ export function WaxSealButton({
         className
       )}
       style={{
-        boxShadow: "inset 0 1px 2px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.3)",
+        boxShadow:
+          "inset 0 1px 2px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.3)",
       }}
     >
       {/* Radial glow */}
       <div
         className="absolute inset-0 rounded-full pointer-events-none opacity-0 hover:opacity-100 transition-opacity duration-300"
         style={{
-          background: "radial-gradient(circle at center, rgba(198,122,58,0.2) 0%, transparent 70%)",
+          background:
+            "radial-gradient(circle at center, rgba(198,122,58,0.2) 0%, transparent 70%)",
         }}
       />
-      
+
       {/* Dither overlay */}
       <div
         className="absolute inset-0 rounded-full pointer-events-none opacity-20"
@@ -57,9 +59,8 @@ export function WaxSealButton({
           mixBlendMode: "overlay",
         }}
       />
-      
+
       <span className="relative z-10">{children}</span>
     </motion.button>
   );
 }
-

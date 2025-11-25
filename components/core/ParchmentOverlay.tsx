@@ -22,13 +22,14 @@ export function ParchmentOverlay({
       transition={{ duration: 0.6, delay, ease: "easeOut" }}
       className={cn(
         "relative",
-        "bg-gradient-to-br from-parchment/10 via-parchment/5 to-transparent",
+        "bg-linear-to-br from-parchment/10 via-parchment/5 to-transparent",
         "border border-[rgba(201,178,125,0.2)]",
         "backdrop-blur-sm",
         className
       )}
       style={{
-        boxShadow: "inset 0 1px 2px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.3)",
+        boxShadow:
+          "inset 0 1px 2px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.3)",
       }}
     >
       {/* Parchment texture */}
@@ -41,7 +42,7 @@ export function ParchmentOverlay({
           mixBlendMode: "overlay",
         }}
       />
-      
+
       {/* Dither pattern */}
       <div
         className="absolute inset-0 pointer-events-none opacity-15"
@@ -50,17 +51,17 @@ export function ParchmentOverlay({
           mixBlendMode: "overlay",
         }}
       />
-      
+
       {/* Ink fade effect */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.05) 50%, transparent 100%)",
+          background:
+            "linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.05) 50%, transparent 100%)",
         }}
       />
-      
+
       <div className="relative z-10">{children}</div>
     </motion.div>
   );
 }
-

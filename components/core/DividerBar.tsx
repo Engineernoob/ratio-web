@@ -15,9 +15,9 @@ export function DividerBar({ className, delay = 0 }: DividerBarProps) {
       animate={{ opacity: 1, scaleX: 1 }}
       transition={{ duration: 0.6, delay, ease: "easeOut" }}
       className={cn(
-        "h-[1px] my-6",
-        "bg-gradient-to-r",
-        "from-transparent via-[rgba(198,122,58,0.3)] to-transparent",
+        "h-px my-6",
+        "bg-linear-to-r",
+        "from-transparent via-gold to-transparent",
         "border-dotted border-t border-[rgba(198,122,58,0.2)]",
         className
       )}
@@ -28,4 +28,3 @@ export function DividerBar({ className, delay = 0 }: DividerBarProps) {
     />
   );
 }
-

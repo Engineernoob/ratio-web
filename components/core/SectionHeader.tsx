@@ -28,15 +28,16 @@ export function SectionHeader({
       <div
         className="absolute inset-0 flex items-center justify-center pointer-events-none"
         style={{
-          background: "radial-gradient(circle, rgba(232, 230, 225, 0.15) 0%, transparent 70%)",
+          background:
+            "radial-gradient(circle, rgba(232, 230, 225, 0.15) 0%, transparent 70%)",
           filter: "blur(20px)",
           transform: "scale(1.2)",
         }}
       />
-      
+
       <div className="relative z-10">
         <h1
-          className="font-serif text-5xl md:text-6xl font-normal tracking-[0.12em] uppercase mb-4 engraved-text"
+          className="font-serif text-5xl md:text-6xl font-normal tracking-widest uppercase mb-4 engraved-text"
           style={{
             textShadow:
               "2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(255,255,255,0.1), 0 0 30px rgba(232, 230, 225, 0.3)",
@@ -45,7 +46,7 @@ export function SectionHeader({
           {title}
         </h1>
         {subtitle && (
-          <p className="font-mono text-sm text-muted-foreground tracking-wider uppercase">
+          <p className="font-mono text-sm text-muted-foreground tracking-widest uppercase">
             {subtitle}
           </p>
         )}
@@ -53,4 +54,3 @@ export function SectionHeader({
     </motion.div>
   );
 }
-

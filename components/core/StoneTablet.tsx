@@ -27,7 +27,7 @@ export function StoneTablet({
       transition={{ duration: 0.6, delay, ease: "easeOut" }}
       className={cn(
         "relative",
-        "bg-gradient-to-br from-[rgba(255,255,255,0.08)] via-[rgba(255,255,255,0.04)] to-[rgba(255,255,255,0.02)]",
+        "bg-linear-to-br from-[rgba(255,255,255,0.08)] via-[rgba(255,255,255,0.04)] to-[rgba(255,255,255,0.02)]",
         "border border-[rgba(255,255,255,0.12)] rounded-sm",
         "backdrop-blur-sm",
         "transition-all duration-300",
@@ -36,7 +36,8 @@ export function StoneTablet({
         className
       )}
       style={{
-        boxShadow: "inset 0 2px 8px rgba(0,0,0,0.3), inset 0 -1px 4px rgba(255,255,255,0.05), 0 4px 24px rgba(0,0,0,0.4)",
+        boxShadow:
+          "inset 0 2px 8px rgba(0,0,0,0.3), inset 0 -1px 4px rgba(255,255,255,0.05), 0 4px 24px rgba(0,0,0,0.4)",
       }}
     >
       <div className="relative p-8">
@@ -49,7 +50,7 @@ export function StoneTablet({
             mixBlendMode: "overlay",
           }}
         />
-        
+
         {/* Dither overlay */}
         <div
           className="absolute inset-0 pointer-events-none opacity-15"
@@ -58,10 +59,13 @@ export function StoneTablet({
             mixBlendMode: "overlay",
           }}
         />
-        
+
         {/* Engraved Title */}
         <div className="mb-4 relative z-10">
-          <h3 className="font-serif text-xl uppercase tracking-[0.15em] engraved-text mb-2" style={{ color: "#c67a3a" }}>
+          <h3
+            className="font-serif text-xl uppercase tracking-widest engraved-text mb-2"
+            style={{ color: "#c67a3a" }}
+          >
             {title}
           </h3>
           {subtitle && (
@@ -77,4 +81,3 @@ export function StoneTablet({
     </motion.div>
   );
 }
-

@@ -23,14 +23,15 @@ export function ScrollCard({
       transition={{ duration: 0.8, delay, ease: "easeOut" }}
       className={cn(
         "relative",
-        "bg-gradient-to-br from-parchment/10 via-parchment/5 to-transparent",
+        "bg-linear-to-br from-parchment/10 via-parchment/5 to-transparent",
         "border border-[rgba(201,178,125,0.2)] rounded-sm",
         "backdrop-blur-sm",
         "overflow-hidden",
         className
       )}
       style={{
-        boxShadow: "inset 0 1px 2px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.3)",
+        boxShadow:
+          "inset 0 1px 2px rgba(255,255,255,0.1), 0 2px 8px rgba(0,0,0,0.3)",
       }}
     >
       {/* Parchment texture */}
@@ -43,18 +44,19 @@ export function ScrollCard({
           mixBlendMode: "overlay",
         }}
       />
-      
+
       {/* Mask gradient for scroll effect */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          maskImage: "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)",
-          WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)",
+          maskImage:
+            "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, transparent 0%, black 5%, black 95%, transparent 100%)",
         }}
       />
-      
+
       <div className="relative z-10 p-6">{children}</div>
     </motion.div>
   );
 }
-

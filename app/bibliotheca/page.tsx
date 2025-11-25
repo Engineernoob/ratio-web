@@ -1,153 +1,198 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { BookPlate } from "@/components/BookPlate";
-import { EngravedStatue } from "@/components/core/EngravedStatue";
-import { FogPanel } from "@/components/core/FogPanel";
-import { ContextPanel } from "@/components/core/ContextPanel";
+import { useState } from "react";
+import { PageHeader } from "@/components/bibliotheca/PageHeader";
+import { ScrollShelf } from "@/components/bibliotheca/ScrollShelf";
+import { LibraryLedger } from "@/components/bibliotheca/LibraryLedger";
+import { BookOverview } from "@/components/bibliotheca/BookOverview";
+import { Chapter } from "@/components/bibliotheca/ChapterList";
 import { Main } from "@/components/Main";
 
-interface BookSummary {
-  title: string;
-  author: string;
-  year?: number;
-  key_ideas: string[];
-}
+// Mock data
+const mockBooks = [
+  {
+    id: "meditations",
+    title: "MEDITATIONS",
+    author: "M. AVRELIVS",
+    slug: "meditations",
+    description:
+      "A series of personal writings by Marcus Aurelius, Roman Emperor and Stoic philosopher, recording his private notes to himself and ideas on Stoic philosophy. Written in Greek while on campaign between 170 and 180 AD, the Meditations reflect on how to live a virtuous life and find tranquility in the face of adversity.",
+  },
+  {
+    id: "rhetoric",
+    title: "RHETORIC",
+    author: "ARISTOTELES",
+    slug: "rhetoric",
+    description:
+      "Aristotle's treatise on the art of persuasion. One of the most influential works on rhetoric, it examines the means of persuasion available in any given situation, focusing on three modes: ethos (credibility), pathos (emotion), and logos (logic).",
+  },
+];
+
+const mockChapters: Record<string, Chapter[]> = {
+  meditations: [
+    {
+      id: "med-1",
+      chapterNumber: 1,
+      title: "DEBTS AND LESSONS",
+      description:
+        "Marcus Aurelius opens by listing the virtues, attitudes, and moral habits he inherited from his family, mentors, and teachers. This book is a map of his psychological ancestry—showing how character is formed through example rather than instruction.",
+      microLessonsCount: 2,
+      microLessonsTime: "5 MIN",
+      microLessonsType: "PROMPTA",
+    },
+    {
+      id: "med-2",
+      chapterNumber: 2,
+      title: "ON MEETING THE DAY",
+      description:
+        "Reflections on beginning each day with purpose and accepting whatever comes with equanimity. Marcus reminds himself to expect nothing and to be ready for any challenge.",
+      microLessonsCount: 3,
+      microLessonsTime: "7 MIN",
+      microLessonsType: "EXERCITIA",
+    },
+    {
+      id: "med-3",
+      chapterNumber: 3,
+      title: "VIEW FROM ABOVE",
+      description:
+        "A meditation on perspective—seeing one's life and troubles from a cosmic viewpoint. This exercise helps reduce the importance of petty concerns and connects the individual to the universal.",
+      microLessonsCount: 1,
+      microLessonsTime: "10 MIN",
+      microLessonsType: "VISIO MENTALIS",
+    },
+  ],
+  rhetoric: [
+    {
+      id: "rhet-1",
+      chapterNumber: 1,
+      title: "ON PERSVASION",
+      description:
+        "Introduction to the three modes of persuasion: ethos, pathos, and logos. Aristotle establishes rhetoric as the counterpart of dialectic and examines its fundamental principles.",
+      microLessonsCount: 2,
+      microLessonsTime: "5 MIN",
+      microLessonsType: "PROMPTA",
+    },
+    {
+      id: "rhet-2",
+      chapterNumber: 2,
+      title: "ETHOS AND CHARACTER",
+      description:
+        "The first mode of persuasion: establishing credibility through character, wisdom, and virtue. How speakers can make themselves trustworthy and authoritative.",
+      microLessonsCount: 3,
+      microLessonsTime: "7 MIN",
+      microLessonsType: "EXERCITIA",
+    },
+    {
+      id: "rhet-3",
+      chapterNumber: 3,
+      title: "PATHOS AND EMOTION",
+      description:
+        "The second mode: appealing to the audience's emotions. Aristotle examines various emotions and how to arouse them effectively in different contexts.",
+      microLessonsCount: 1,
+      microLessonsTime: "10 MIN",
+      microLessonsType: "VISIO MENTALIS",
+    },
+  ],
+};
+
+const mockRecentlyOpened = [
+  {
+    id: "recent-1",
+    title: "MEDITATIONS",
+    chapter: "CAPVT I — DEBTS AND LESSONS",
+  },
+  {
+    id: "recent-2",
+    title: "RHETORIC",
+    chapter: "BOOK I — ON PERSVASION",
+  },
+];
 
 export default function BibliothecaPage() {
-  const [summaries, setSummaries] = useState<BookSummary[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [selectedBookId, setSelectedBookId] = useState<string>("meditations");
+  const [expandedChapterId, setExpandedChapterId] = useState<
+    string | undefined
+  >("med-1");
 
-  useEffect(() => {
-    fetchSummaries();
-  }, []);
+  const selectedBook =
+    mockBooks.find((book) => book.id === selectedBookId) || null;
+  const selectedChapters = selectedBook
+    ? mockChapters[selectedBook.id] || []
+    : [];
 
-  const fetchSummaries = async () => {
-    try {
-      const response = await fetch("/api/feed", { method: "POST" });
-      const data = await response.json();
-      if (data.summaries) {
-        setSummaries(data.summaries);
-      }
-    } catch (error) {
-      console.error("Error fetching summaries:", error);
-    } finally {
-      setLoading(false);
+  const handleSelectBook = (bookId: string) => {
+    setSelectedBookId(bookId);
+    // Auto-expand first chapter when switching books
+    const firstChapter = mockChapters[bookId]?.[0];
+    setExpandedChapterId(firstChapter?.id);
+  };
+
+  const handleToggleChapter = (chapterId: string) => {
+    setExpandedChapterId(
+      expandedChapterId === chapterId ? undefined : chapterId
+    );
+  };
+
+  const handleContinueLectio = () => {
+    // Navigate to the first chapter of the selected book
+    const firstChapter = selectedChapters[0];
+    if (firstChapter) {
+      setExpandedChapterId(firstChapter.id);
+      // Scroll to book overview
+      document
+        .querySelector("[data-book-overview]")
+        ?.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  const getSlug = (title: string) => {
-    return title.toLowerCase().replace(/\s+/g, "-");
+  const handleViewSummary = () => {
+    // Navigate to book summary page
+    if (selectedBook) {
+      window.location.href = `/bibliotheca/${selectedBook.slug}`;
+    }
   };
-
-  const getImageSrc = (slug: string) => {
-    return `/images/classical/${slug}.jpg`;
-  };
-
-  if (loading) {
-    return (
-      <>
-        <Main>
-          <FogPanel className="card-padding">
-            <div className="font-mono text-sm text-muted-foreground">
-              Loading library...
-            </div>
-          </FogPanel>
-        </Main>
-        <ContextPanel title="Library">
-          <div className="font-mono text-xs text-muted-foreground">Loading...</div>
-        </ContextPanel>
-      </>
-    );
-  }
 
   return (
-    <>
-      <Main className="scroll-fade-top scroll-fade-bottom">
-        {/* Ritual Header with Architectural Engraving Background */}
-        <div className="relative mb-16 section-spacing">
-          {/* Muted architectural engraving behind header */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-[0.12] pointer-events-none">
-            <EngravedStatue
-              imageSrc="/images/classical/temple.jpg"
-              alt="Classical temple"
-              size="lg"
-              className="max-w-full max-h-[400px]"
+    <Main>
+      <div className="w-full">
+        {/* Top Header Section - Full Width */}
+        <PageHeader />
+
+        {/* Two-Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 mb-8">
+          {/* Left: ScrollShelf (70%) */}
+          <div className="lg:col-span-7">
+            <ScrollShelf
+              books={mockBooks}
+              selectedBookId={selectedBookId}
+              onSelectBook={handleSelectBook}
             />
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="relative z-10 pb-8 border-b border-border"
-          >
-            <h1 className="font-serif text-[64px] font-normal tracking-[0.08em] uppercase mb-4 fade-fog-in">
-              BIBLIOTHECA
-            </h1>
-            <p className="text-xs opacity-70 font-mono mb-12">
-              The eternal archive of Ratio. Choose a volume to open.
-            </p>
-          </motion.div>
+          {/* Right: LibraryLedger (30%) */}
+          <div className="lg:col-span-3">
+            <LibraryLedger
+              bookCount={mockBooks.length}
+              scrollsExplored={1}
+              recentlyOpened={mockRecentlyOpened}
+              onContinueLectio={handleContinueLectio}
+            />
+          </div>
         </div>
 
-        {/* Floating Grid of Books */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {summaries.map((book, index) => {
-            const slug = getSlug(book.title);
-            return (
-              <motion.div
-                key={book.title}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-              >
-                <BookPlate
-                  title={book.title}
-                  author={book.author}
-                  slug={slug}
-                  imageSrc={getImageSrc(slug)}
-                  year={book.year}
-                />
-              </motion.div>
-            );
-          })}
-        </div>
-
-        {summaries.length === 0 && (
-          <FogPanel className="card-padding">
-            <div className="font-mono text-sm text-muted-foreground">
-              No books available in the library.
-            </div>
-          </FogPanel>
+        {/* Bottom: BookOverview (Full Width) */}
+        {selectedBook && (
+          <div data-book-overview>
+            <BookOverview
+              book={selectedBook}
+              chapters={selectedChapters}
+              expandedChapterId={expandedChapterId}
+              onToggleChapter={handleToggleChapter}
+              onViewSummary={handleViewSummary}
+            />
+          </div>
         )}
-      </Main>
-
-      <ContextPanel title="Library">
-        <FogPanel className="card-padding mb-4">
-          <div className="font-serif text-sm mb-2 engraved">Collection</div>
-          <div className="font-mono text-xs space-y-1">
-            {summaries.length} {summaries.length === 1 ? "volume" : "volumes"} available
-          </div>
-        </FogPanel>
-
-        <FogPanel className="card-padding mb-4">
-          <div className="font-serif text-sm mb-2 engraved">Volumes</div>
-          <div className="font-mono text-xs text-muted-foreground space-y-1">
-            {summaries.map((book) => (
-              <div key={book.title}>• {book.title}</div>
-            ))}
-          </div>
-        </FogPanel>
-
-        <FogPanel className="card-padding">
-          <div className="font-serif text-sm mb-2 engraved">Instructions</div>
-          <div className="font-mono text-xs text-muted-foreground">
-            Click a volume to view its summary, key ideas, chapters, and micro-lessons.
-          </div>
-        </FogPanel>
-      </ContextPanel>
-    </>
+      </div>
+    </Main>
   );
 }
