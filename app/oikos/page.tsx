@@ -2,17 +2,17 @@
 
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
-import { FogPanel } from "@/components/FogPanel";
-import { EngravedStatue } from "@/components/EngravedStatue";
+import { FogPanel } from "@/components/core/FogPanel";
+import { EngravedStatue } from "@/components/core/EngravedStatue";
 import { TopNav } from "@/components/TopNav";
-import { OrangeAction } from "@/components/OrangeAction";
-import { ToastContainer } from "@/components/Toast";
-import { SkeletonLoader } from "@/components/SkeletonLoader";
-import { ExpandableText } from "@/components/ExpandableText";
+import { OrangeAction } from "@/components/core/OrangeAction";
+import { ToastContainer } from "@/components/core/Toast";
+import { SkeletonLoader } from "@/components/core/SkeletonLoader";
+import { ExpandableText } from "@/components/core/ExpandableText";
 import { useToast } from "@/hooks/useToast";
-import { StoneTablet } from "@/components/ui/StoneTablet";
-import { ScrollCard } from "@/components/ui/ScrollCard";
-import { WaxSealButton } from "@/components/ui/WaxSealButton";
+import { StoneTablet } from "@/components/core/StoneTablet";
+import { ScrollCard } from "@/components/core/ScrollCard";
+import { WaxSealButton } from "@/components/core/WaxSealButton";
 
 interface FeedItem {
   id: string;

@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { FogPanel } from "./FogPanel";
+import { FogPanel } from "./core/FogPanel";
 
 interface CircularRecallMeterProps {
   percentage: number;

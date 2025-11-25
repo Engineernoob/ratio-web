@@ -1,6 +1,6 @@
-import { PlateHeader } from "@/components/PlateHeader";
+import { PlateHeader } from "@/components/core/PlateHeader";
 import { BrutalistCard } from "@/components/BrutalistCard";
-import { ContextPanel } from "@/components/ContextPanel";
+import { ContextPanel } from "@/components/core/ContextPanel";
 import { Main } from "@/components/Main";
 
 const completedItems = [

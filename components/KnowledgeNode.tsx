@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { FogPanel } from "./FogPanel";
+import { FogPanel } from "./core/FogPanel";
 import { cn } from "@/lib/utils";
 
 interface KnowledgeNodeProps {

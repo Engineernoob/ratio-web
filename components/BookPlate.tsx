@@ -3,8 +3,8 @@
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { FogPanel } from "./FogPanel";
-import { EngravedStatue } from "./EngravedStatue";
+import { FogPanel } from "./core/FogPanel";
+import { EngravedStatue } from "./core/EngravedStatue";
 
 interface BookPlateProps {
   title: string;

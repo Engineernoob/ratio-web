@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { PlateHeader } from "@/components/PlateHeader";
+import { PlateHeader } from "@/components/core/PlateHeader";
 import { BrutalistCard } from "@/components/BrutalistCard";
-import { ContextPanel } from "@/components/ContextPanel";
+import { ContextPanel } from "@/components/core/ContextPanel";
 import { Main } from "@/components/Main";
-import { OrangeAction } from "@/components/OrangeAction";
-import { DitherImage } from "@/components/DitherImage";
-import { ClassicalImage } from "@/components/ClassicalImage";
+import { OrangeAction } from "@/components/core/OrangeAction";
+import { DitherImage } from "@/components/core/DitherImage";
+import { ClassicalImage } from "@/components/core/ClassicalImage";
 
 interface BookSummary {
   title: string;

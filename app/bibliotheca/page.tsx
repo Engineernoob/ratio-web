@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { BookPlate } from "@/components/BookPlate";
-import { EngravedStatue } from "@/components/EngravedStatue";
-import { FogPanel } from "@/components/FogPanel";
-import { ContextPanel } from "@/components/ContextPanel";
+import { EngravedStatue } from "@/components/core/EngravedStatue";
+import { FogPanel } from "@/components/core/FogPanel";
+import { ContextPanel } from "@/components/core/ContextPanel";
 import { Main } from "@/components/Main";
 
 interface BookSummary {

@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PlateHeader } from "@/components/PlateHeader";
+import { PlateHeader } from "@/components/core/PlateHeader";
 import { BrutalistCard } from "@/components/BrutalistCard";
-import { ContextPanel } from "@/components/ContextPanel";
-import { OrangeAction } from "@/components/OrangeAction";
+import { ContextPanel } from "@/components/core/ContextPanel";
+import { OrangeAction } from "@/components/core/OrangeAction";
 import { Main } from "@/components/Main";
 
 interface Puzzle {

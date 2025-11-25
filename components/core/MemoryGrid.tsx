@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { cn } from "@/lib/utils";
-import { BrutalistCard } from "./BrutalistCard";
+import { BrutalistCard } from "../BrutalistCard";
 
 interface MemoryCell {
   id: string;
@@ -34,14 +34,17 @@ export function MemoryGrid({ cells, onCellClick }: MemoryGridProps) {
   return (
     <div className="grid grid-cols-4 gap-2">
       {cells.map((cell) => (
-        <BrutalistCard
+        <div
           key={cell.id}
+          onClick={() => handleClick(cell)}
           className={cn(
             "aspect-square p-3 cursor-pointer transition-colors",
             selectedId === cell.id && "border-accent bg-accent/10"
           )}
-          onClick={() => handleClick(cell)}
         >
+          <BrutalistCard
+            className="h-full"
+          >
           <div className="h-full flex flex-col">
             <div className="flex-1 flex items-center justify-center">
               <div
@@ -58,7 +61,8 @@ export function MemoryGrid({ cells, onCellClick }: MemoryGridProps) {
               {cell.retention}%
             </div>
           </div>
-        </BrutalistCard>
+          </BrutalistCard>
+        </div>
       ))}
     </div>
   );

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { EngravedStatue } from "@/components/EngravedStatue";
 import { KnowledgeNode } from "@/components/KnowledgeNode";
-import { FogPanel } from "@/components/FogPanel";
+import { FogPanel } from "@/components/core/FogPanel";
 import { ContextPanel } from "@/components/ContextPanel";
 import { Main } from "@/components/Main";
 

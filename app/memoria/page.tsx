@@ -2,12 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { FogPanel } from "@/components/FogPanel";
+import { FogPanel } from "@/components/core/FogPanel";
 import { CircularRecallMeter } from "@/components/CircularRecallMeter";
-import { MemoryGrid } from "@/components/MemoryGrid";
-import { ContextPanel } from "@/components/ContextPanel";
+import { MemoryGrid } from "@/components/core/MemoryGrid";
+import { ContextPanel } from "@/components/core/ContextPanel";
 import { Main } from "@/components/Main";
-import { OrangeAction } from "@/components/OrangeAction";
+import { OrangeAction } from "@/components/core/OrangeAction";
 
 interface MemoriaConcept {
   id: string;

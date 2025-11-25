@@ -9,6 +9,7 @@ interface FogPanelProps {
   className?: string;
   onClick?: () => void;
   hover?: boolean;
+  delay?: number;
 }
 
 export function FogPanel({
@@ -16,30 +17,30 @@ export function FogPanel({
   className,
   onClick,
   hover = true,
+  delay = 0,
 }: FogPanelProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
+      transition={{ duration: 0.6, delay, ease: "easeOut" }}
       whileHover={hover ? { y: -3, transition: { duration: 0.24 } } : {}}
       onClick={onClick}
       className={cn(
         "relative rounded-lg border border-border",
-        "bg-gradient-to-br from-[rgba(255,255,255,0.07)] to-[rgba(255,255,255,0.02)]",
+        "bg-gradient-to-br from-fogwhite to-transparent",
         "backdrop-blur-sm",
-        "dither grain",
-        "transition-all duration-240",
+        "transition-all duration-300",
         hover && "cursor-pointer",
         hover && "hover:border-[rgba(255,255,255,0.12)]",
-        hover && "hover:shadow-[0_0_40px_rgba(0,0,0,0.6)]",
+        hover && "hover:shadow-stone",
         className
       )}
       style={{
-        boxShadow: "0 0 25px rgba(0, 0, 0, 0.4)",
+        boxShadow: "0 0 25px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.05)",
       }}
     >
-      {/* Dither texture overlay at 35% opacity */}
+      {/* Dither texture overlay */}
       <div
         className="absolute inset-0 rounded-lg pointer-events-none opacity-35"
         style={{
@@ -47,6 +48,15 @@ export function FogPanel({
           mixBlendMode: "overlay",
         }}
       />
+      
+      {/* Fog gradient overlay */}
+      <div
+        className="absolute inset-0 rounded-lg pointer-events-none opacity-20"
+        style={{
+          background: "radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 70%)",
+        }}
+      />
+      
       <div className="relative z-10">{children}</div>
     </motion.div>
   );
