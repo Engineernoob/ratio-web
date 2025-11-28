@@ -39,9 +39,9 @@ module.exports = {
       },
 
       backgroundImage: {
-        noise: "url('/images/textures/noise.png')",
-        dither: "url('/images/textures/dither.png')",
-        parchment: "url('/images/textures/parchment.jpg')",
+        noise: "url('/images/textures/texture_bayer.png')",
+        dither: "url('/images/textures/texture_bayer.png')",
+        parchment: "url('/images/textures/parchment-dither.png')",
         acropolis: "url('/images/backgrounds/acropolis-dithered.png')",
       },
 

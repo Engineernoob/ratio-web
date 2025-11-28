@@ -1,6 +1,16 @@
+/**
+ * MEMORIA - Legacy compatibility layer
+ *
+ * This file maintains backward compatibility with the old MemoriaConcept interface
+ * while the new system uses MemoryCard in lib/memoria/
+ *
+ * New code should import from "@/lib/memoria" instead
+ */
+
 import fs from "fs";
 import path from "path";
 
+// Legacy interface (deprecated - use MemoryCard from lib/memoria/types)
 export interface MemoriaConcept {
   id: string;
   title: string;
@@ -14,6 +24,9 @@ export interface MemoriaConcept {
   review_count: number;
   source: "lesson" | "manual" | "tiktok" | "book_summary" | "book" | "puzzle";
 }
+
+// Re-export new system
+export * from "./memoria";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const MEMORIA_FILE = path.join(DATA_DIR, "memoria.json");
@@ -55,7 +68,17 @@ function saveConcepts(concepts: MemoriaConcept[]): void {
   }
 }
 
-export function addToMemoria(concept: Omit<MemoriaConcept, "id" | "date_added" | "next_review" | "interval_days" | "ease_factor" | "review_count">): MemoriaConcept {
+export function addToMemoria(
+  concept: Omit<
+    MemoriaConcept,
+    | "id"
+    | "date_added"
+    | "next_review"
+    | "interval_days"
+    | "ease_factor"
+    | "review_count"
+  >
+): MemoriaConcept {
   const concepts = getConcepts();
   const today = getTodayDateString();
 
@@ -66,7 +89,7 @@ export function addToMemoria(concept: Omit<MemoriaConcept, "id" | "date_added" |
     next_review: today, // Review immediately
     interval_days: 0,
     ease_factor: 1.0,
-    review_count: 0
+    review_count: 0,
   };
 
   concepts.push(newConcept);
@@ -78,14 +101,17 @@ export function addToMemoria(concept: Omit<MemoriaConcept, "id" | "date_added" |
 export function getDueReviews(): MemoriaConcept[] {
   const today = getTodayDateString();
   const concepts = getConcepts();
-  
-  return concepts.filter(c => c.next_review <= today);
+
+  return concepts.filter((c) => c.next_review <= today);
 }
 
-export function updateReview(conceptId: string, result: "correct" | "incorrect"): MemoriaConcept | null {
+export function updateReview(
+  conceptId: string,
+  result: "correct" | "incorrect"
+): MemoriaConcept | null {
   const concepts = getConcepts();
-  const concept = concepts.find(c => c.id === conceptId);
-  
+  const concept = concepts.find((c) => c.id === conceptId);
+
   if (!concept) {
     return null;
   }
@@ -94,13 +120,15 @@ export function updateReview(conceptId: string, result: "correct" | "incorrect")
 
   if (result === "correct") {
     // Advance interval
-    const currentIndex = INTERVALS.findIndex(interval => interval >= concept.interval_days);
+    const currentIndex = INTERVALS.findIndex(
+      (interval) => interval >= concept.interval_days
+    );
     let nextIndex = currentIndex + 1;
-    
+
     if (nextIndex >= INTERVALS.length) {
       nextIndex = INTERVALS.length - 1; // Stay at max interval
     }
-    
+
     concept.interval_days = INTERVALS[nextIndex];
     concept.review_count += 1;
     concept.ease_factor = Math.min(concept.ease_factor + 0.1, 2.5);
@@ -111,9 +139,9 @@ export function updateReview(conceptId: string, result: "correct" | "incorrect")
   }
 
   concept.next_review = addDays(today, concept.interval_days);
-  
+
   saveConcepts(concepts);
-  
+
   return concept;
 }
 
@@ -123,6 +151,5 @@ export function getAllConcepts(): MemoriaConcept[] {
 
 export function getConceptById(id: string): MemoriaConcept | null {
   const concepts = getConcepts();
-  return concepts.find(c => c.id === id) || null;
+  return concepts.find((c) => c.id === id) || null;
 }
-

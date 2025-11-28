@@ -15,11 +15,10 @@ export function RootLayoutWrapper({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {/* Global Dither Overlay */}
-      <div className="dither-overlay" />
+      {/* Global Dither Overlay - now handled by body::before in globals.css */}
 
       <div className="flex h-screen overflow-hidden">
-        <div className="flex-1 flex ml-64 min-w-0 overflow-y-auto">
+        <div className="flex-1 flex min-w-0 overflow-y-auto">
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}

@@ -77,3 +77,6 @@ export { DebatePanel } from "./DebatePanel";
 export { LedgerPanel } from "./LedgerPanel";
 export { AxiomTable } from "./AxiomTable";
 export { ComputationLogSection } from "./ComputationLogSection";
+
+// Navigation Components
+export { PageNavBar } from "./PageNavBar";

@@ -11,6 +11,9 @@ import { ExpandedScrollModal } from "@/components/archivvm/ExpandedScrollModal";
 import { GoldenButton } from "@/components/archivvm/GoldenButton";
 import { TagPill } from "@/components/archivvm/TagPill";
 import { Scroll } from "@/components/archivvm/ScrollCard";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 // Placeholder data matching the screenshot
 const scrolls: Scroll[] = [
@@ -166,6 +169,7 @@ const ravenSessions = [
 ];
 
 export default function ArchivvmPage() {
+  const pathname = usePathname();
   const [selectedScroll, setSelectedScroll] = useState<Scroll | null>(null);
   const [selectedMicroLessonTitle, setSelectedMicroLessonTitle] = useState<
     string | null
@@ -196,16 +200,86 @@ export default function ArchivvmPage() {
 
   return (
     <div className="min-h-screen bg-black relative">
-      {/* Dither overlay for texture */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-[0.03] z-0"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-          mixBlendMode: "overlay",
-        }}
-      />
-
       <div className="relative z-10 max-w-[1300px] mx-auto px-8 py-8 min-h-screen">
+        {/* Navigation Bar */}
+        <div className="w-full border-b border-[rgba(255,255,255,0.08)] pb-3 mb-8">
+          <div className="flex items-center justify-between font-mono text-xs text-[rgba(232,230,225,0.6)]">
+            <div className="flex items-center gap-2">
+              <Link
+                href="/oikos"
+                className="hover:text-[rgba(232,230,225,0.9)] transition-colors"
+              >
+                RATIO @ OIKOS
+              </Link>
+            </div>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/oikos"
+                className={cn(
+                  "transition-colors",
+                  pathname === "/oikos" && "text-[#b29b68]"
+                )}
+              >
+                OIKOS
+              </Link>
+              <Link
+                href="/bibliotheca"
+                className={cn(
+                  "transition-colors",
+                  pathname === "/bibliotheca" && "text-[#b29b68]"
+                )}
+              >
+                BIBLIOTHECA
+              </Link>
+              <Link
+                href="/laboratorivm"
+                className={cn(
+                  "transition-colors",
+                  pathname === "/laboratorivm" && "text-[#b29b68]"
+                )}
+              >
+                LABORATORIVM
+              </Link>
+              <Link
+                href="/memoria"
+                className={cn(
+                  "transition-colors",
+                  pathname === "/memoria" && "text-[#b29b68]"
+                )}
+              >
+                MEMORIA
+              </Link>
+              <Link
+                href="/archivvm"
+                className={cn(
+                  "transition-colors",
+                  pathname === "/archivvm" && "text-[#b29b68]"
+                )}
+              >
+                ARCHIVVM
+              </Link>
+              <Link
+                href="/scholarivm"
+                className={cn(
+                  "transition-colors",
+                  pathname === "/scholarivm" && "text-[#b29b68]"
+                )}
+              >
+                SCHOLARIUM
+              </Link>
+              <Link
+                href="/ars-rationis"
+                className={cn(
+                  "transition-colors",
+                  pathname === "/ars-rationis" && "text-[#b29b68]"
+                )}
+              >
+                ARS RATIONIS
+              </Link>
+            </div>
+          </div>
+        </div>
+
         {/* Page Header */}
         <PageHeader
           title="ARCHIVVM"

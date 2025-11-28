@@ -13,19 +13,12 @@ export function PageHeader() {
       {/* Navigation Bar */}
       <div className="w-full border-b border-[rgba(255,255,255,0.08)] pb-3 mb-8">
         <div className="flex items-center justify-between font-mono text-xs text-[rgba(232,230,225,0.6)]">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <Link
               href="/oikos"
               className="hover:text-[rgba(232,230,225,0.9)] transition-colors"
             >
-              RATIO
-            </Link>
-            <span>•</span>
-            <Link
-              href="/oikos"
-              className="hover:text-[rgba(232,230,225,0.9)] transition-colors"
-            >
-              OIKOS
+              RATIO @ OIKOS
             </Link>
           </div>
           <div className="flex items-center gap-3">
@@ -33,7 +26,7 @@ export function PageHeader() {
               href="/oikos"
               className={cn(
                 "transition-colors",
-                pathname === "/oikos" && "text-[#d4af37]"
+                pathname === "/oikos" && "text-[#b29b68]"
               )}
             >
               OIKOS
@@ -41,20 +34,17 @@ export function PageHeader() {
             <Link
               href="/bibliotheca"
               className={cn(
-                "transition-colors relative",
-                pathname === "/bibliotheca" && "text-[#d4af37]"
+                "transition-colors",
+                pathname === "/bibliotheca" && "text-[#b29b68]"
               )}
             >
               BIBLIOTHECA
-              {pathname === "/bibliotheca" && (
-                <span className="absolute -bottom-1 left-0 right-0 h-px bg-[#d4af37] opacity-60" />
-              )}
             </Link>
             <Link
               href="/laboratorivm"
               className={cn(
                 "transition-colors",
-                pathname === "/laboratorivm" && "text-[#d4af37]"
+                pathname === "/laboratorivm" && "text-[#b29b68]"
               )}
             >
               LABORATORIVM
@@ -63,7 +53,7 @@ export function PageHeader() {
               href="/memoria"
               className={cn(
                 "transition-colors",
-                pathname === "/memoria" && "text-[#d4af37]"
+                pathname === "/memoria" && "text-[#b29b68]"
               )}
             >
               MEMORIA
@@ -72,7 +62,7 @@ export function PageHeader() {
               href="/archivvm"
               className={cn(
                 "transition-colors",
-                pathname === "/archivvm" && "text-[#d4af37]"
+                pathname === "/archivvm" && "text-[#b29b68]"
               )}
             >
               ARCHIVVM
@@ -81,16 +71,16 @@ export function PageHeader() {
               href="/scholarivm"
               className={cn(
                 "transition-colors",
-                pathname === "/scholarivm" && "text-[#d4af37]"
+                pathname === "/scholarivm" && "text-[#b29b68]"
               )}
             >
-              SCHOLARIVM
+              SCHOLARIUM
             </Link>
             <Link
               href="/ars-rationis"
               className={cn(
                 "transition-colors",
-                pathname === "/ars-rationis" && "text-[#d4af37]"
+                pathname === "/ars-rationis" && "text-[#b29b68]"
               )}
             >
               ARS RATIONIS

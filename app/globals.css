@@ -2,10 +2,22 @@
 
 html,
 body {
-  background: #000;
+  background-color: #000;
   color: #e8e6e1;
   font-family: var(--font-mono);
   overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url("/images/textures/texture_bayer.png");
+  background-size: 256px 256px;
+  background-repeat: repeat;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .engraved-text {
@@ -38,14 +50,21 @@ body {
 }
 
 .dither-overlay {
-  background-image: url("/images/textures/dither.png");
-  opacity: 0.06;
+  position: fixed;
+  inset: 0;
+  background-image: url("/images/textures/texture_bayer.png");
+  background-size: 256px 256px;
+  background-repeat: repeat;
+  opacity: 0.03;
   pointer-events: none;
+  z-index: 0;
 }
 
 .noise {
-  background-image: url("/images/textures/noise.png");
-  opacity: 0.05;
+  background-image: url("/images/textures/texture_bayer.png");
+  background-size: 256px 256px;
+  background-repeat: repeat;
+  opacity: 0.03;
 }
 
 .scrollbar-hide {
@@ -58,8 +77,9 @@ body {
 }
 
 .grain {
-  background-image: url("/images/textures/dither.png");
-  background-size: 200px 200px;
+  background-image: url("/images/textures/texture_bayer.png");
+  background-size: 256px 256px;
+  background-repeat: repeat;
   opacity: 0.03;
   pointer-events: none;
 }

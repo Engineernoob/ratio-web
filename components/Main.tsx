@@ -9,10 +9,11 @@ interface MainProps {
 export function Main({ children, className }: MainProps) {
   return (
     <main
-      className={cn(
-        "flex-1 overflow-y-auto bg-background dither grain relative",
-        className
-      )}
+      className={cn("flex-1 overflow-y-auto bg-background relative", className)}
+      style={{
+        position: "relative",
+        zIndex: 1,
+      }}
     >
       <div className="p-8 max-w-6xl mx-auto scroll-fade-top scroll-fade-bottom">
         {children}
