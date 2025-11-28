@@ -1,0 +1,16 @@
+{
+  "id": "atomic_habits",
+  "title": "Atomic Habits",
+  "author": "James Clear",
+  "chapters": [
+    { "id": "ch1", "title": "The Fundamentals", "file": "chapter-1.json" },
+    { "id": "ch2", "title": "Make It Obvious", "file": "chapter-2.json" },
+    { "id": "ch3", "title": "Make It Attractive", "file": "chapter-3.json" }
+  ],
+  "bookSpine": {
+    "x": 622,
+    "y": 122,
+    "width": 28,
+    "height": 200
+  }
+}

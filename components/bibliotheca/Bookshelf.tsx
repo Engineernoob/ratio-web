@@ -14,6 +14,18 @@ export interface BookData {
   height: number;
 }
 
+interface BookManifest {
+  id: string;
+  title: string;
+  author: string;
+  bookSpine: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+}
+
 interface BookshelfProps {
   books: BookData[];
   shelfImagePath: string;
@@ -27,17 +39,39 @@ export function Bookshelf({
 }: BookshelfProps) {
   const [zoomedBookId, setZoomedBookId] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [zoomedBookSpine, setZoomedBookSpine] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null>(null);
 
-  const handleBookClick = (bookId: string) => {
-    setZoomedBookId(bookId);
-    setIsTransitioning(true);
-
-    // Trigger navigation after animation
-    setTimeout(() => {
-      if (onBookClick) {
-        onBookClick(bookId);
+  const handleBookClick = async (bookId: string) => {
+    try {
+      // Fetch book manifest
+      const response = await fetch(`/api/books/${bookId}?action=manifest`);
+      if (!response.ok) {
+        console.error("Failed to load book manifest");
+        return;
       }
-    }, 600);
+
+      const data = await response.json();
+      const manifest: BookManifest = data.manifest;
+
+      // Set zoom animation using bookSpine coordinates
+      setZoomedBookSpine(manifest.bookSpine);
+      setZoomedBookId(bookId);
+      setIsTransitioning(true);
+
+      // Trigger navigation after animation
+      setTimeout(() => {
+        if (onBookClick) {
+          onBookClick(bookId);
+        }
+      }, 600);
+    } catch (error) {
+      console.error("Error loading book manifest:", error);
+    }
   };
 
   return (
@@ -95,6 +129,33 @@ export function Bookshelf({
             />
           ))}
         </div>
+
+        {/* Highlight zoomed book spine */}
+        {zoomedBookId && zoomedBookSpine && (
+          <motion.div
+            className="absolute"
+            style={{
+              left: `${zoomedBookSpine.x}px`,
+              top: `${zoomedBookSpine.y}px`,
+              width: `${zoomedBookSpine.width}px`,
+              height: `${zoomedBookSpine.height}px`,
+            }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div
+              className="absolute inset-0 rounded-sm"
+              style={{
+                background:
+                  "linear-gradient(to right, rgba(200, 182, 141, 0.3) 0%, rgba(200, 182, 141, 0.15) 100%)",
+                boxShadow:
+                  "inset 0 0 40px rgba(200, 182, 141, 0.4), 0 0 30px rgba(200, 182, 141, 0.3)",
+                border: "2px solid rgba(200, 182, 141, 0.5)",
+              }}
+            />
+          </motion.div>
+        )}
 
         {/* Transition Overlay */}
         <AnimatePresence>

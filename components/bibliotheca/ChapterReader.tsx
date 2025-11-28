@@ -11,26 +11,37 @@ import {
   X,
 } from "lucide-react";
 import { useMemoriaQueue } from "@/hooks/useMemoriaQueue";
+import type { ChapterContent } from "@/lib/books";
 
-interface Chapter {
+interface ChapterRef {
   id: string;
   title: string;
-  page: number;
+  file: string;
+  pageStart?: number;
+  pageEnd?: number;
 }
 
 interface ChapterReaderProps {
   bookId: string;
   bookTitle: string;
+  author?: string;
   pdfPath?: string;
-  chapters?: Chapter[];
+  chapters: ChapterRef[];
+  currentChapter: ChapterContent | null;
+  selectedChapterId: string | null;
+  onChapterSelect: (chapterId: string, fileName: string) => void;
   onClose?: () => void;
 }
 
 export function ChapterReader({
   bookId,
   bookTitle,
+  author,
   pdfPath,
-  chapters = [],
+  chapters,
+  currentChapter,
+  selectedChapterId,
+  onChapterSelect,
   onClose,
 }: ChapterReaderProps) {
   const [currentPage, setCurrentPage] = useState(1);
@@ -38,14 +49,27 @@ export function ChapterReader({
   const [notes, setNotes] = useState<Record<number, string>>({});
   const [currentNote, setCurrentNote] = useState("");
   const [showChapterList, setShowChapterList] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const pdfContainerRef = useRef<HTMLDivElement>(null);
   const { createCard } = useMemoriaQueue();
+
+  // Sync PDF page when chapter changes
+  useEffect(() => {
+    if (selectedChapterId && chapters.length > 0) {
+      const chapter = chapters.find((ch) => ch.id === selectedChapterId);
+      if (chapter?.pageStart) {
+        setCurrentPage(chapter.pageStart);
+      }
+    }
+  }, [selectedChapterId, chapters]);
+
+  // Get current chapter's page range
+  const currentChapterRef = chapters.find((ch) => ch.id === selectedChapterId);
+  const minPage = currentChapterRef?.pageStart || 1;
+  const maxPage = currentChapterRef?.pageEnd || Infinity;
 
   // Page flip sound
   const playPageFlipSound = () => {
     try {
-      // Create a subtle page flip sound using Web Audio API if file doesn't exist
       const audioContext = new (window.AudioContext ||
         (window as any).webkitAudioContext)();
       const oscillator = audioContext.createOscillator();
@@ -65,22 +89,19 @@ export function ChapterReader({
       oscillator.start(audioContext.currentTime);
       oscillator.stop(audioContext.currentTime + 0.1);
     } catch (error) {
-      // Fallback: try to load audio file
       const audio = new Audio("/sounds/page-flip.mp3");
       audio.volume = 0.3;
-      audio.play().catch(() => {
-        // Ignore if file doesn't exist
-      });
+      audio.play().catch(() => {});
     }
   };
 
   const handleNextPage = () => {
-    setCurrentPage((prev) => prev + 1);
+    setCurrentPage((prev) => Math.min(maxPage, prev + 1));
     playPageFlipSound();
   };
 
   const handlePrevPage = () => {
-    setCurrentPage((prev) => Math.max(1, prev - 1));
+    setCurrentPage((prev) => Math.max(minPage, prev - 1));
     playPageFlipSound();
   };
 
@@ -108,11 +129,11 @@ export function ChapterReader({
         sourceMetadata: {
           page: currentPage,
           bookTitle,
+          chapter: currentChapter?.chapter_title,
         },
         tags: ["EXCERPT", "BIBLIOTHECA"],
       });
 
-      // Clear selection
       window.getSelection()?.removeAllRanges();
       setSelectedText("");
     } catch (error) {
@@ -126,11 +147,14 @@ export function ChapterReader({
     setCurrentNote("");
   };
 
-  const handleChapterSelect = (chapter: Chapter) => {
-    setCurrentPage(chapter.page);
+  const handleChapterClick = (chapter: ChapterRef) => {
+    onChapterSelect(chapter.id, chapter.file);
     setShowChapterList(false);
     playPageFlipSound();
   };
+
+  // Build PDF URL with page
+  const pdfUrl = pdfPath ? `${pdfPath}#page=${currentPage}` : null;
 
   return (
     <div
@@ -164,7 +188,7 @@ export function ChapterReader({
         >
           {/* Header */}
           <div className="p-6 border-b" style={{ borderColor: "#312A1D" }}>
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-2">
               <h2
                 className="text-xl font-serif tracking-wider"
                 style={{ color: "#C8B68D" }}
@@ -180,6 +204,14 @@ export function ChapterReader({
                 </button>
               )}
             </div>
+            {author && (
+              <p
+                className="text-sm font-mono mb-4"
+                style={{ color: "#C8B68D", opacity: 0.7 }}
+              >
+                {author}
+              </p>
+            )}
 
             {/* Chapter List Toggle */}
             <button
@@ -216,16 +248,20 @@ export function ChapterReader({
                 {chapters.map((chapter) => (
                   <button
                     key={chapter.id}
-                    onClick={() => handleChapterSelect(chapter)}
+                    onClick={() => handleChapterClick(chapter)}
                     className="w-full text-left px-4 py-3 mb-2 rounded border text-sm font-mono transition-colors"
                     style={{
                       color:
-                        currentPage === chapter.page ? "#C8B68D" : "#C8B68D",
-                      opacity: currentPage === chapter.page ? 1 : 0.7,
+                        selectedChapterId === chapter.id
+                          ? "#C8B68D"
+                          : "#C8B68D",
+                      opacity: selectedChapterId === chapter.id ? 1 : 0.7,
                       borderColor:
-                        currentPage === chapter.page ? "#C8B68D" : "#312A1D",
+                        selectedChapterId === chapter.id
+                          ? "#C8B68D"
+                          : "#312A1D",
                       background:
-                        currentPage === chapter.page
+                        selectedChapterId === chapter.id
                           ? "rgba(200, 182, 141, 0.1)"
                           : "rgba(49, 42, 29, 0.3)",
                     }}
@@ -233,9 +269,11 @@ export function ChapterReader({
                     <div className="font-serif text-xs mb-1">
                       {chapter.title}
                     </div>
-                    <div className="text-xs opacity-60">
-                      Page {chapter.page}
-                    </div>
+                    {chapter.pageStart && (
+                      <div className="text-xs opacity-60">
+                        Page {chapter.pageStart}
+                      </div>
+                    )}
                   </button>
                 ))}
               </motion.div>
@@ -287,58 +325,115 @@ export function ChapterReader({
           </div>
         </motion.div>
 
-        {/* Center - PDF Viewer */}
+        {/* Center - PDF Viewer & Chapter Content */}
         <div className="flex-1 flex flex-col relative">
           {/* PDF Container */}
-          <div
-            ref={pdfContainerRef}
-            className="flex-1 overflow-auto p-8"
-            onMouseUp={handleTextSelection}
-            style={{ background: "rgba(10, 10, 10, 0.5)" }}
-          >
-            {pdfPath ? (
+          {pdfUrl && (
+            <div
+              ref={pdfContainerRef}
+              className="h-1/2 overflow-auto p-8 border-b"
+              onMouseUp={handleTextSelection}
+              style={{
+                background: "rgba(10, 10, 10, 0.5)",
+                borderColor: "#312A1D",
+              }}
+            >
               <iframe
-                src={`${pdfPath}#page=${currentPage}`}
+                src={pdfUrl}
                 className="w-full h-full border-0"
-                style={{ minHeight: "800px" }}
+                style={{ minHeight: "400px" }}
                 title={`${bookTitle} - Page ${currentPage}`}
               />
+            </div>
+          )}
+
+          {/* Chapter Content Area */}
+          <div
+            className={`flex-1 overflow-auto p-8 ${pdfUrl ? "" : "h-full"}`}
+            style={{ background: "rgba(10, 10, 10, 0.3)" }}
+          >
+            {currentChapter ? (
+              <div className="max-w-4xl mx-auto">
+                {/* Chapter Header */}
+                <div
+                  className="mb-8 pb-6 border-b"
+                  style={{ borderColor: "#312A1D" }}
+                >
+                  <h1
+                    className="text-3xl font-serif mb-4 tracking-wider"
+                    style={{ color: "#C8B68D" }}
+                  >
+                    {currentChapter.chapter_title}
+                  </h1>
+                  <p
+                    className="text-base font-mono leading-relaxed"
+                    style={{ color: "#C8B68D", opacity: 0.8 }}
+                  >
+                    {currentChapter.summary}
+                  </p>
+                </div>
+
+                {/* Micro Lessons */}
+                {currentChapter.micro_lessons &&
+                  currentChapter.micro_lessons.length > 0 && (
+                    <div className="space-y-6">
+                      <h2
+                        className="text-xl font-serif mb-6 tracking-wide"
+                        style={{ color: "#C8B68D" }}
+                      >
+                        Micro Lessons
+                      </h2>
+                      {currentChapter.micro_lessons.map((lesson, index) => (
+                        <div
+                          key={index}
+                          className="p-6 rounded border mb-4"
+                          style={{
+                            background: "rgba(49, 42, 29, 0.3)",
+                            borderColor: "#312A1D",
+                          }}
+                        >
+                          <h3
+                            className="text-lg font-serif mb-3"
+                            style={{ color: "#C8B68D" }}
+                          >
+                            {lesson.title}
+                          </h3>
+                          <p
+                            className="text-sm font-mono mb-4 leading-relaxed"
+                            style={{ color: "#C8B68D", opacity: 0.8 }}
+                          >
+                            {lesson.core_idea}
+                          </p>
+                          <div
+                            className="mt-4 pt-4 border-t"
+                            style={{ borderColor: "#312A1D" }}
+                          >
+                            <p
+                              className="text-xs font-mono mb-2"
+                              style={{ color: "#C8B68D", opacity: 0.7 }}
+                            >
+                              <strong>Q:</strong> {lesson.micro_test_q}
+                            </p>
+                            <p
+                              className="text-xs font-mono"
+                              style={{ color: "#C8B68D", opacity: 0.6 }}
+                            >
+                              <strong>A:</strong> {lesson.micro_test_a}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+              </div>
             ) : (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center">
-                  <div
-                    className="w-32 h-32 mx-auto mb-6 rounded-full border-4 flex items-center justify-center"
-                    style={{
-                      borderColor: "#C8B68D",
-                      background:
-                        "radial-gradient(circle, rgba(200, 182, 141, 0.1) 0%, transparent 70%)",
-                    }}
-                  >
-                    <svg
-                      width="64"
-                      height="64"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#C8B68D"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                      <path d="M9 12l2 2 4-4" />
-                    </svg>
-                  </div>
                   <p
-                    className="text-2xl font-serif mb-4"
-                    style={{ color: "#C8B68D" }}
-                  >
-                    This Scroll Is Sealed
-                  </p>
-                  <p
-                    className="text-sm font-mono"
+                    className="text-xl font-serif mb-4"
                     style={{ color: "#C8B68D", opacity: 0.6 }}
                   >
-                    The knowledge within awaits discovery...
+                    Select a chapter to begin reading
                   </p>
                 </div>
               </div>
@@ -349,7 +444,7 @@ export function ChapterReader({
           <AnimatePresence>
             {selectedText && (
               <motion.div
-                className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex items-center gap-3 px-6 py-3 rounded border"
+                className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex items-center gap-3 px-6 py-3 rounded border z-10"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
@@ -384,38 +479,43 @@ export function ChapterReader({
             )}
           </AnimatePresence>
 
-          {/* Page Controls */}
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-4 px-6 py-3 rounded border">
-            <button
-              onClick={handlePrevPage}
-              disabled={currentPage === 1}
-              className="p-2 rounded border transition-colors disabled:opacity-30"
-              style={{
-                color: "#C8B68D",
-                borderColor: "#312A1D",
-                background: "rgba(49, 42, 29, 0.5)",
-              }}
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <span
-              className="text-sm font-mono px-4"
-              style={{ color: "#C8B68D" }}
-            >
-              Page {currentPage}
-            </span>
-            <button
-              onClick={handleNextPage}
-              className="p-2 rounded border transition-colors"
-              style={{
-                color: "#C8B68D",
-                borderColor: "#312A1D",
-                background: "rgba(49, 42, 29, 0.5)",
-              }}
-            >
-              <ChevronRight size={20} />
-            </button>
-          </div>
+          {/* Page Controls (only if PDF exists) */}
+          {pdfUrl && (
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-4 px-6 py-3 rounded border">
+              <button
+                onClick={handlePrevPage}
+                disabled={currentPage <= minPage}
+                className="p-2 rounded border transition-colors disabled:opacity-30"
+                style={{
+                  color: "#C8B68D",
+                  borderColor: "#312A1D",
+                  background: "rgba(49, 42, 29, 0.5)",
+                }}
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <span
+                className="text-sm font-mono px-4"
+                style={{ color: "#C8B68D" }}
+              >
+                Page {currentPage}
+                {currentChapterRef?.pageEnd &&
+                  ` / ${currentChapterRef.pageEnd}`}
+              </span>
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage >= maxPage}
+                className="p-2 rounded border transition-colors disabled:opacity-30"
+                style={{
+                  color: "#C8B68D",
+                  borderColor: "#312A1D",
+                  background: "rgba(49, 42, 29, 0.5)",
+                }}
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Right Sidebar - AI Summary (optional) */}

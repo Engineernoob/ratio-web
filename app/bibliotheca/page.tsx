@@ -73,7 +73,7 @@ export default function BibliothecaPage() {
   const router = useRouter();
 
   const handleBookClick = (bookId: string) => {
-    router.push(`/reader/${bookId}`);
+    router.push(`/reader?book=${bookId}`);
   };
 
   return (
