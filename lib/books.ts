@@ -29,15 +29,12 @@ export interface BookManifest {
 }
 
 export interface ChapterContent {
-  chapter: number;
-  chapter_title: string;
+  title: string;
   summary: string;
-  micro_lessons: Array<{
-    title: string;
-    core_idea: string;
-    micro_test_q: string;
-    micro_test_a: string;
-  }>;
+  keyIdeas: string[];
+  examples: string[];
+  exercises: string[];
+  reflections: string[];
 }
 
 /**
@@ -121,10 +118,12 @@ export function getChapter(
 
     // Validate required fields
     if (
-      typeof chapter.chapter !== "number" ||
-      !chapter.chapter_title ||
+      !chapter.title ||
       !chapter.summary ||
-      !Array.isArray(chapter.micro_lessons)
+      !Array.isArray(chapter.keyIdeas) ||
+      !Array.isArray(chapter.examples) ||
+      !Array.isArray(chapter.exercises) ||
+      !Array.isArray(chapter.reflections)
     ) {
       console.error(`Invalid chapter structure: ${fileName}`);
       return null;

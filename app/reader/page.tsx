@@ -1,24 +1,30 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { ChapterReader } from "@/components/bibliotheca/ChapterReader";
-import type { BookManifest, ChapterContent } from "@/lib/books";
+import { useEffect, useState, useRef } from "react";
+import { ReaderShell } from "@/components/Reader/ReaderShell";
+import type { BookManifest, ChapterContent, BookChapterRef } from "@/lib/books";
+import type { Highlight } from "@/lib/notes";
 
 export default function ReaderPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const bookId = searchParams.get("book");
+  const chapterParam = searchParams.get("chapter");
 
   const [manifest, setManifest] = useState<BookManifest | null>(null);
   const [currentChapter, setCurrentChapter] = useState<ChapterContent | null>(
     null
   );
-  const [selectedChapterId, setSelectedChapterId] = useState<string | null>(
+  const [selectedChapter, setSelectedChapter] = useState<BookChapterRef | null>(
     null
   );
+  const [notes, setNotes] = useState<Highlight[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const codexReaderRef = useRef<{ jumpToPage: (page: number) => void } | null>(
+    null
+  );
 
   // Load book manifest
   useEffect(() => {
@@ -39,11 +45,23 @@ export default function ReaderPage() {
         const data = await response.json();
         setManifest(data.manifest);
 
-        // Load first chapter by default
+        // Load chapter from URL parameter or first chapter by default
         if (data.manifest.chapters.length > 0) {
-          const firstChapter = data.manifest.chapters[0];
-          setSelectedChapterId(firstChapter.id);
-          await loadChapter(firstChapter.file);
+          let targetChapter: BookChapterRef = data.manifest.chapters[0];
+
+          // Check if chapter parameter is provided
+          if (chapterParam) {
+            const foundChapter = data.manifest.chapters.find(
+              (ch: BookChapterRef) =>
+                ch.file === chapterParam || ch.id === chapterParam
+            );
+            if (foundChapter) {
+              targetChapter = foundChapter;
+            }
+          }
+
+          setSelectedChapter(targetChapter);
+          await loadChapter(targetChapter.file);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load book");
@@ -54,7 +72,26 @@ export default function ReaderPage() {
     };
 
     loadManifest();
-  }, [bookId, router]);
+  }, [bookId, router, chapterParam]);
+
+  // Load notes
+  useEffect(() => {
+    if (!bookId) return;
+
+    const loadNotes = async () => {
+      try {
+        const response = await fetch(`/api/notes/${bookId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setNotes(data.highlights || []);
+        }
+      } catch (err) {
+        console.error("Error loading notes:", err);
+      }
+    };
+
+    loadNotes();
+  }, [bookId]);
 
   // Load chapter content
   const loadChapter = async (fileName: string) => {
@@ -80,13 +117,51 @@ export default function ReaderPage() {
   };
 
   // Handle chapter selection
-  const handleChapterSelect = async (chapterId: string, fileName: string) => {
-    setSelectedChapterId(chapterId);
-    await loadChapter(fileName);
+  const handleSelectChapter = async (chapter: BookChapterRef) => {
+    setSelectedChapter(chapter);
+    await loadChapter(chapter.file);
   };
 
-  const handleClose = () => {
-    router.push("/bibliotheca");
+  // Handle note selection - jump to page and highlight
+  const handleSelectNote = async (note: Highlight) => {
+    // Find the chapter that contains this note's page
+    if (note.chapterId) {
+      const chapter = manifest?.chapters.find((ch) => ch.id === note.chapterId);
+      if (chapter) {
+        setSelectedChapter(chapter);
+        await loadChapter(chapter.file);
+      }
+    }
+
+    // Jump to the page (this will be handled by CodexReader)
+    // We'll need to pass a ref or callback to CodexReader
+    setTimeout(() => {
+      // Trigger page jump via CodexReader
+      // This will be implemented by adding a method to CodexReader
+      const event = new CustomEvent("jumpToPage", {
+        detail: { page: note.pageNumber, highlightId: note.id },
+      });
+      window.dispatchEvent(event);
+    }, 300);
+  };
+
+  // Handle highlight created - refresh notes
+  const handleHighlightCreated = () => {
+    if (!bookId) return;
+
+    const loadNotes = async () => {
+      try {
+        const response = await fetch(`/api/notes/${bookId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setNotes(data.highlights || []);
+        }
+      } catch (err) {
+        console.error("Error loading notes:", err);
+      }
+    };
+
+    loadNotes();
   };
 
   if (!bookId) {
@@ -121,10 +196,10 @@ export default function ReaderPage() {
             {error || "Book not found"}
           </div>
           <button
-            onClick={handleClose}
+            onClick={() => router.push("/bibliotheca")}
             className="mt-6 px-6 py-2 border rounded font-mono text-sm transition-colors"
             style={{
-              borderColor: "#312A1D",
+              borderColor: "rgba(200, 182, 141, 0.3)",
               color: "#C8B68D",
               background: "rgba(49, 42, 29, 0.5)",
             }}
@@ -133,7 +208,7 @@ export default function ReaderPage() {
               e.currentTarget.style.background = "rgba(200, 182, 141, 0.1)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "#312A1D";
+              e.currentTarget.style.borderColor = "rgba(200, 182, 141, 0.3)";
               e.currentTarget.style.background = "rgba(49, 42, 29, 0.5)";
             }}
           >
@@ -145,22 +220,18 @@ export default function ReaderPage() {
   }
 
   return (
-    <ChapterReader
-      bookId={manifest.id}
+    <ReaderShell
       bookTitle={manifest.title}
       author={manifest.author}
-      pdfPath={manifest.pdf}
-      chapters={manifest.chapters.map((ch) => ({
-        id: ch.id,
-        title: ch.title,
-        file: ch.file,
-        pageStart: ch.pageStart,
-        pageEnd: ch.pageEnd,
-      }))}
+      chapters={manifest.chapters}
       currentChapter={currentChapter}
-      selectedChapterId={selectedChapterId}
-      onChapterSelect={handleChapterSelect}
-      onClose={handleClose}
+      selectedChapter={selectedChapter}
+      onSelectChapter={handleSelectChapter}
+      manifest={manifest}
+      pdfPath={manifest.pdf}
+      notes={notes}
+      onSelectNote={handleSelectNote}
+      onHighlightCreated={handleHighlightCreated}
     />
   );
 }
