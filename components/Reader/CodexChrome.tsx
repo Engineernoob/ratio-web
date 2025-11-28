@@ -12,6 +12,7 @@ interface CodexChromeProps {
   onNext: () => void;
   canGoPrevious: boolean;
   canGoNext: boolean;
+  ritualMode?: boolean;
 }
 
 export function CodexChrome({
@@ -23,13 +24,18 @@ export function CodexChrome({
   onNext,
   canGoPrevious,
   canGoNext,
+  ritualMode = false,
 }: CodexChromeProps) {
   // Check if current page is within chapter range
   const isInChapterRange = pageRange
     ? currentPage >= pageRange.start && currentPage <= pageRange.end
     : true;
   return (
-    <div className="absolute inset-0 pointer-events-none z-20">
+    <motion.div
+      className="absolute inset-0 pointer-events-none z-20"
+      animate={{ opacity: ritualMode ? 0 : 1 }}
+      transition={{ duration: 0.4 }}
+    >
       {/* Chapter title above spine */}
       {chapterTitle && (
         <div
@@ -127,6 +133,6 @@ export function CodexChrome({
           <ChevronRight size={20} />
         </motion.button>
       </div>
-    </div>
+    </motion.div>
   );
 }

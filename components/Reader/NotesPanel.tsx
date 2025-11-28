@@ -66,7 +66,7 @@ export function NotesPanel({ notes, chapters, onSelectNote }: NotesPanelProps) {
     return (
       <div className="h-full flex flex-col">
         <div
-          className="p-6 border-b flex-shrink-0"
+          className="p-6 border-b shrink-0"
           style={{ borderColor: "rgba(200, 182, 141, 0.1)" }}
         >
           <h2 className="font-serif text-lg" style={{ color: "#C8B68D" }}>
@@ -91,7 +91,7 @@ export function NotesPanel({ notes, chapters, onSelectNote }: NotesPanelProps) {
     <div className="h-full flex flex-col">
       {/* Header */}
       <div
-        className="p-6 border-b flex-shrink-0"
+        className="p-6 border-b shrink-0"
         style={{ borderColor: "rgba(200, 182, 141, 0.1)" }}
       >
         <h2 className="font-serif text-lg mb-1" style={{ color: "#C8B68D" }}>

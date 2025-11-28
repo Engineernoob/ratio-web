@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { StickyNote, X } from "lucide-react";
+import { StickyNote, X, Sparkles } from "lucide-react";
 import { ChapterSidebar } from "./ChapterSidebar";
 import { ChapterContent } from "./ChapterContent";
 import { CodexReader } from "./CodexReader";
 import { NotesPanel } from "./NotesPanel";
+import { LightVignette } from "@/components/ui/LightVignette";
 import type {
   BookChapterRef,
   ChapterContent as ChapterContentType,
@@ -42,12 +43,18 @@ export function ReaderShell({
   onHighlightCreated,
 }: ReaderShellProps) {
   const [showNotesPanel, setShowNotesPanel] = useState(true);
+  const [ritualMode, setRitualMode] = useState(false);
+
   return (
-    <div
+    <motion.div
       className="fixed inset-0 flex"
       style={{
-        background: "#0A0A0A",
+        background: ritualMode ? "#000000" : "#0A0A0A",
       }}
+      animate={{
+        background: ritualMode ? "#000000" : "#0A0A0A",
+      }}
+      transition={{ duration: 0.5 }}
     >
       {/* Dithering texture overlay */}
       <div
@@ -59,30 +66,75 @@ export function ReaderShell({
         }}
       />
 
+      {/* Ritual Mode Vignette (stronger when active) */}
+      {ritualMode && <LightVignette intensity={0.35} className="z-10" />}
+
+      {/* Ritual Mode Toggle Button */}
+      <div className="absolute top-4 left-4 z-30">
+        <motion.button
+          onClick={() => setRitualMode(!ritualMode)}
+          className="p-3 rounded-full transition-all"
+          style={{
+            background: ritualMode
+              ? "rgba(200, 182, 141, 0.2)"
+              : "rgba(200, 182, 141, 0.1)",
+            border: "1px solid rgba(200, 182, 141, 0.2)",
+            color: "#C8B68D",
+          }}
+          whileHover={{
+            background: "rgba(200, 182, 141, 0.25)",
+            scale: 1.1,
+          }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Sparkles size={18} />
+        </motion.button>
+      </div>
+
       {/* Main Layout - Responsive */}
       <div className="relative flex-1 flex h-full w-full">
         {/* Left Sidebar - Chapters */}
-        <div className="flex-shrink-0">
-          <ChapterSidebar
-            chapters={chapters}
-            selectedChapterId={selectedChapter?.id || null}
-            onSelectChapter={onSelectChapter}
-            bookTitle={bookTitle}
-            author={author}
-          />
-        </div>
+        <AnimatePresence>
+          {!ritualMode && (
+            <motion.div
+              className="shrink-0"
+              initial={{ opacity: 1, x: 0 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -100 }}
+              transition={{ duration: 0.4 }}
+            >
+              <ChapterSidebar
+                chapters={chapters}
+                selectedChapterId={selectedChapter?.id || null}
+                onSelectChapter={onSelectChapter}
+                bookTitle={bookTitle}
+                author={author}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Center Panel - CodexReader */}
-        <div
+        <motion.div
           className="flex-1 flex flex-col border-r min-w-0"
           style={{ borderColor: "rgba(200, 182, 141, 0.1)" }}
+          animate={{
+            marginLeft: ritualMode ? "auto" : 0,
+            marginRight: ritualMode ? "auto" : 0,
+            maxWidth: ritualMode ? "1200px" : "100%",
+          }}
+          transition={{ duration: 0.5 }}
         >
-          <div
-            className="h-[600px] w-full flex-shrink-0"
+          <motion.div
+            className="h-[600px] w-full shrink-0 relative"
             style={{
               background: "#0A0A0A",
               borderBottom: "1px solid rgba(200, 182, 141, 0.1)",
             }}
+            animate={{
+              scale: ritualMode ? 1.05 : 1,
+            }}
+            transition={{ duration: 0.5 }}
           >
             <CodexReader
               bookId={manifest.id}
@@ -90,49 +142,68 @@ export function ReaderShell({
               pdfPath={pdfPath}
               selectedChapter={selectedChapter}
               onHighlightCreated={onHighlightCreated}
+              ritualMode={ritualMode}
             />
-          </div>
+          </motion.div>
 
           {/* Chapter Content */}
-          <div className="flex-1 overflow-hidden min-h-0">
-            <ChapterContent chapter={currentChapter} />
-          </div>
-        </div>
+          <AnimatePresence>
+            {!ritualMode && (
+              <motion.div
+                className="flex-1 overflow-hidden min-h-0"
+                initial={{ opacity: 1 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
+              >
+                <ChapterContent chapter={currentChapter} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
         {/* Toggle Notes Panel Button */}
-        <div
-          className="absolute top-4 right-4 z-30"
-          style={{ right: showNotesPanel ? "280px" : "20px" }}
-        >
-          <motion.button
-            onClick={() => setShowNotesPanel(!showNotesPanel)}
-            className="p-3 rounded-full transition-all"
-            style={{
-              background: showNotesPanel
-                ? "rgba(200, 182, 141, 0.15)"
-                : "rgba(200, 182, 141, 0.1)",
-              border: "1px solid rgba(200, 182, 141, 0.2)",
-              color: "#C8B68D",
-            }}
-            whileHover={{
-              background: "rgba(200, 182, 141, 0.2)",
-              scale: 1.1,
-            }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {showNotesPanel ? <X size={18} /> : <StickyNote size={18} />}
-          </motion.button>
-        </div>
+        <AnimatePresence>
+          {!ritualMode && (
+            <motion.div
+              className="absolute top-4 right-4 z-30"
+              style={{ right: showNotesPanel ? "280px" : "20px" }}
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.button
+                onClick={() => setShowNotesPanel(!showNotesPanel)}
+                className="p-3 rounded-full transition-all"
+                style={{
+                  background: showNotesPanel
+                    ? "rgba(200, 182, 141, 0.15)"
+                    : "rgba(200, 182, 141, 0.1)",
+                  border: "1px solid rgba(200, 182, 141, 0.2)",
+                  color: "#C8B68D",
+                }}
+                whileHover={{
+                  background: "rgba(200, 182, 141, 0.2)",
+                  scale: 1.1,
+                }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {showNotesPanel ? <X size={18} /> : <StickyNote size={18} />}
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Right Sidebar - Notes Panel */}
         <AnimatePresence>
-          {showNotesPanel && (
+          {showNotesPanel && !ritualMode && (
             <motion.div
               initial={{ x: 300, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 300, opacity: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="w-64 flex-shrink-0 border-l"
+              className="w-64 shrink-0 border-l"
               style={{
                 background: "rgba(10, 10, 10, 0.95)",
                 borderColor: "rgba(200, 182, 141, 0.1)",
@@ -147,6 +218,6 @@ export function ReaderShell({
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   );
 }

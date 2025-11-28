@@ -67,7 +67,7 @@ export function ChapterContent({ chapter }: ChapterContentProps) {
                   }}
                 >
                   <span
-                    className="font-mono text-xs mt-1 flex-shrink-0"
+                    className="font-mono text-xs mt-1 shrink-0"
                     style={{ color: "rgba(200, 182, 141, 0.5)" }}
                   >
                     {String(index + 1).padStart(2, "0")}

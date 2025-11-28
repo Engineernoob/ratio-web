@@ -47,7 +47,7 @@ export function HighlightActionBubble({
       color: "#C8B68D",
     },
     {
-      label: "Add to Memoria",
+      label: "Commit to Memoria",
       icon: BookOpen,
       onClick: onAddToMemoria,
       color: "#C8B68D",

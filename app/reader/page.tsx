@@ -3,6 +3,8 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { ReaderShell } from "@/components/Reader/ReaderShell";
+import { ToastContainer } from "@/components/core/Toast";
+import { useToast } from "@/hooks/useToast";
 import type { BookManifest, ChapterContent, BookChapterRef } from "@/lib/books";
 import type { Highlight } from "@/lib/notes";
 
@@ -25,6 +27,7 @@ export default function ReaderPage() {
   const codexReaderRef = useRef<{ jumpToPage: (page: number) => void } | null>(
     null
   );
+  const { toasts, showToast, removeToast } = useToast();
 
   // Load book manifest
   useEffect(() => {
@@ -92,6 +95,19 @@ export default function ReaderPage() {
 
     loadNotes();
   }, [bookId]);
+
+  // Listen for toast events
+  useEffect(() => {
+    const handleShowToast = (event: CustomEvent) => {
+      const { message, type } = event.detail;
+      showToast(message, type || "info");
+    };
+
+    window.addEventListener("showToast", handleShowToast as EventListener);
+    return () => {
+      window.removeEventListener("showToast", handleShowToast as EventListener);
+    };
+  }, [showToast]);
 
   // Load chapter content
   const loadChapter = async (fileName: string) => {
@@ -220,18 +236,21 @@ export default function ReaderPage() {
   }
 
   return (
-    <ReaderShell
-      bookTitle={manifest.title}
-      author={manifest.author}
-      chapters={manifest.chapters}
-      currentChapter={currentChapter}
-      selectedChapter={selectedChapter}
-      onSelectChapter={handleSelectChapter}
-      manifest={manifest}
-      pdfPath={manifest.pdf}
-      notes={notes}
-      onSelectNote={handleSelectNote}
-      onHighlightCreated={handleHighlightCreated}
-    />
+    <>
+      <ReaderShell
+        bookTitle={manifest.title}
+        author={manifest.author}
+        chapters={manifest.chapters}
+        currentChapter={currentChapter}
+        selectedChapter={selectedChapter}
+        onSelectChapter={handleSelectChapter}
+        manifest={manifest}
+        pdfPath={manifest.pdf}
+        notes={notes}
+        onSelectNote={handleSelectNote}
+        onHighlightCreated={handleHighlightCreated}
+      />
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+    </>
   );
 }

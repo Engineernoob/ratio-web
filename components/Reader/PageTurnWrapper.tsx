@@ -51,6 +51,38 @@ export function PageTurnWrapper({
     const newPage = e.data + 1; // Convert to 1-based
     onPageChange?.(newPage);
 
+    // Play page-turn sound
+    const soundFiles = ["/sounds/page-flip-1.mp3", "/sounds/page-flip-2.mp3"];
+    const randomSound =
+      soundFiles[Math.floor(Math.random() * soundFiles.length)];
+    const audio = new Audio(randomSound);
+    audio.volume = 0.3;
+    audio.play().catch(() => {
+      // Fallback: generate simple page flip sound
+      try {
+        const audioContext = new (window.AudioContext ||
+          (window as any).webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.frequency.value = 200;
+        oscillator.type = "sine";
+        gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioContext.currentTime + 0.1
+        );
+
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.1);
+      } catch (err) {
+        // Silent fallback
+      }
+    });
+
     setTimeout(() => setIsFlipping(false), 300);
   };
 

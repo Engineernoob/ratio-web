@@ -11,7 +11,12 @@ interface ToastProps {
   onClose?: () => void;
 }
 
-export function Toast({ message, type = "info", duration = 3000, onClose }: ToastProps) {
+export function Toast({
+  message,
+  type = "info",
+  duration = 3000,
+  onClose,
+}: ToastProps) {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
@@ -39,12 +44,21 @@ export function Toast({ message, type = "info", duration = 3000, onClose }: Toas
           transition={{ duration: 0.2 }}
           className={cn(
             "fixed top-24 right-8 z-50 rounded-lg border px-4 py-3 shadow-lg backdrop-blur-sm",
-            "font-mono text-sm",
+            type === "success" ? "font-serif text-sm" : "font-mono text-sm",
             typeStyles[type]
           )}
+          style={
+            type === "success"
+              ? {
+                  borderColor: "rgba(200, 182, 141, 0.3)",
+                  background: "rgba(200, 182, 141, 0.1)",
+                  color: "#C8B68D",
+                }
+              : undefined
+          }
         >
           <div className="flex items-center gap-3">
-            {type === "success" && <span className="text-accent">✓</span>}
+            {type === "success" && <span style={{ color: "#C8B68D" }}>✓</span>}
             {type === "error" && <span className="text-destructive">✕</span>}
             <span>{message}</span>
           </div>
@@ -55,7 +69,11 @@ export function Toast({ message, type = "info", duration = 3000, onClose }: Toas
 }
 
 interface ToastContainerProps {
-  toasts: Array<{ id: string; message: string; type?: "success" | "error" | "info" }>;
+  toasts: Array<{
+    id: string;
+    message: string;
+    type?: "success" | "error" | "info";
+  }>;
   onRemove: (id: string) => void;
 }
 
@@ -76,4 +94,3 @@ export function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
     </div>
   );
 }
-

@@ -25,6 +25,7 @@ interface HighlightLayerProps {
   viewport: pdfjsLib.PageViewport | null;
   canvasElement: HTMLCanvasElement | null;
   highlights: Highlight[];
+  pulsingHighlightId?: string | null;
   onHighlightCreated?: (highlight: {
     pageNumber: number;
     text: string;
@@ -43,6 +44,7 @@ export function HighlightLayer({
   viewport,
   canvasElement,
   highlights,
+  pulsingHighlightId,
   onHighlightCreated,
   onNoteCreated,
   onMemoriaAdded,
@@ -184,18 +186,65 @@ export function HighlightLayer({
     window.getSelection()?.removeAllRanges();
   }, [selection, onNoteCreated]);
 
-  const handleAddToMemoria = useCallback(() => {
+  const handleAddToMemoria = useCallback(async () => {
     if (!selection) return;
 
-    onMemoriaAdded?.({
-      text: selection.text,
-      pageNumber: selection.pageNumber,
-    });
+    try {
+      // Call sync API to create memory card
+      const response = await fetch("/api/memoria/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookId,
+          chapterId,
+          page: selection.pageNumber,
+          text: selection.text,
+          createdAt: new Date().toISOString(),
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // Notify parent component
+        onMemoriaAdded?.({
+          text: selection.text,
+          pageNumber: selection.pageNumber,
+        });
+
+        // Show success toast
+        const event = new CustomEvent("showToast", {
+          detail: {
+            message: "Added to Memoria",
+            type: "success",
+          },
+        });
+        window.dispatchEvent(event);
+      } else {
+        console.error("Failed to sync to memoria");
+        const event = new CustomEvent("showToast", {
+          detail: {
+            message: "Failed to add to Memoria",
+            type: "error",
+          },
+        });
+        window.dispatchEvent(event);
+      }
+    } catch (error) {
+      console.error("Error syncing to memoria:", error);
+      const event = new CustomEvent("showToast", {
+        detail: {
+          message: "Failed to add to Memoria",
+          type: "error",
+        },
+      });
+      window.dispatchEvent(event);
+    }
 
     setSelection(null);
     setBubblePosition(null);
     window.getSelection()?.removeAllRanges();
-  }, [selection, onMemoriaAdded]);
+  }, [selection, bookId, chapterId, onMemoriaAdded]);
 
   const handleSummarize = useCallback(() => {
     if (!selection) return;
@@ -241,24 +290,37 @@ export function HighlightLayer({
       <AnimatePresence>
         {highlights
           .filter((h) => h.pageNumber === pageNumber)
-          .map((highlight) => (
-            <motion.div
-              key={highlight.id}
-              className="absolute rounded-sm"
-              style={{
-                left: `${highlight.bounds.x}px`,
-                top: `${highlight.bounds.y}px`,
-                width: `${highlight.bounds.width}px`,
-                height: `${highlight.bounds.height}px`,
-                background: "rgba(200, 182, 141, 0.3)",
-                pointerEvents: "none",
-              }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            />
-          ))}
+          .map((highlight) => {
+            const isPulsing = pulsingHighlightId === highlight.id;
+            return (
+              <motion.div
+                key={highlight.id}
+                className="absolute rounded-sm"
+                style={{
+                  left: `${highlight.bounds.x}px`,
+                  top: `${highlight.bounds.y}px`,
+                  width: `${highlight.bounds.width}px`,
+                  height: `${highlight.bounds.height}px`,
+                  background: "rgba(200, 182, 141, 0.3)",
+                  pointerEvents: "none",
+                }}
+                initial={{ opacity: 0 }}
+                animate={{
+                  opacity: 1,
+                  scale: isPulsing ? [1, 1.05, 1] : 1,
+                }}
+                exit={{ opacity: 0 }}
+                transition={{
+                  duration: isPulsing ? 0.6 : 0.3,
+                  scale: {
+                    duration: 0.6,
+                    repeat: isPulsing ? 2 : 0,
+                    ease: "easeInOut",
+                  },
+                }}
+              />
+            );
+          })}
       </AnimatePresence>
 
       {/* Action bubble */}
