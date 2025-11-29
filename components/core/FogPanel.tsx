@@ -36,11 +36,10 @@ export function FogPanel({
         className
       )}
       style={{
-        background: "rgba(0, 0, 0, 0.35)",
-        backdropFilter: "blur(1px)",
-        border: "1px solid rgba(255, 255, 255, 0.05)",
-        boxShadow:
-          "0 0 25px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.05)",
+        background: `var(--surface, rgba(0, 0, 0, 0.35))`,
+        backdropFilter: `blur(var(--blur, 1px))`,
+        border: `1px var(--border-style, solid) color-mix(in srgb, var(--accent-color, var(--accent)) 5%, transparent)`,
+        boxShadow: `0 0 25px rgba(0, 0, 0, 0.4), inset 0 1px 0 color-mix(in srgb, var(--accent-color, var(--accent)) 5%, transparent), 0 0 20px var(--glow-color, transparent)`,
       }}
     >
       <div className="relative z-10">{children}</div>

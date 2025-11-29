@@ -106,14 +106,14 @@ export default function BibliothecaPage() {
 
         {/* Header */}
         <motion.div
-          className="absolute top-4 md:top-8 left-1/2 -translate-x-1/2 text-center pointer-events-none"
+          className="absolute top-4 md:top-8 left-1/2 -translate-x-1/2 text-center"
           style={{ zIndex: 10 }}
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
           <h1
-            className="font-serif text-2xl md:text-4xl mb-2"
+            className="font-serif text-2xl md:text-4xl mb-2 pointer-events-none"
             style={{
               color: "#C8B68D",
               textShadow: "0px 2px 4px rgba(0, 0, 0, 0.5)",
@@ -122,11 +122,21 @@ export default function BibliothecaPage() {
             BIBLIOTHECA
           </h1>
           <p
-            className="font-mono text-xs opacity-60 px-4"
+            className="font-mono text-xs opacity-60 px-4 pointer-events-none"
             style={{ color: "#C8B68D" }}
           >
             Your Living Archive of Volumes
           </p>
+          <a
+            href="/bibliotheca/upload"
+            className="font-mono text-xs mt-3 inline-block px-4 py-2 border border-[#C8B68D] opacity-60 hover:opacity-100 transition-opacity pointer-events-auto"
+            style={{
+              color: "#C8B68D",
+              textShadow: "0px 1px 2px rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            Upload Book
+          </a>
         </motion.div>
 
         {/* Bookshelf Container with Parallax */}

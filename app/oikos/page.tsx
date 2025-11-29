@@ -11,7 +11,10 @@ import { ScrollFeedCard } from "@/components/core/ScrollFeedCard";
 
 export default function OikosPage() {
   return (
-    <div className="min-h-screen bg-black relative">
+    <div
+      className="min-h-screen relative"
+      style={{ background: "var(--background, #000000)" }}
+    >
       <TopNavBar />
 
       <div className="pt-20 pb-12">

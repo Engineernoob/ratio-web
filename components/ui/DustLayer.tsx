@@ -70,7 +70,12 @@ export function DustLayer({
         // Draw particle
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(200, 182, 141, ${particle.opacity})`;
+        // Use accent color from CSS variable
+        const accentRgb =
+          getComputedStyle(document.documentElement)
+            .getPropertyValue("--accent-rgb")
+            .trim() || "200, 182, 141";
+        ctx.fillStyle = `rgba(${accentRgb}, ${particle.opacity})`;
         ctx.fill();
       });
 

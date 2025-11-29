@@ -1,23 +1,27 @@
 @import "tailwindcss";
 
-html,
-body {
-  background-color: #000;
-  color: #e8e6e1;
-  font-family: var(--font-mono);
-  overflow-x: hidden;
+:root {
+  --accent: #c8b68d;
+  --accent-color: #c8b68d;
+  --fog: rgba(200, 182, 141, 0.15);
+  --glow: rgba(200, 182, 141, 0.3);
+  --glow-color: rgba(200, 182, 141, 0.3);
+  --grain: 0.04;
+  --texture-bg: url("/images/textures/parchment.png");
+  --texture-dither: url("/images/textures/texture_bayer.png");
+  --texture-vignette: 0.2;
+  --background: #0a0a0a;
+  --surface: rgba(255, 255, 255, 0.05);
+  --blur: 0px;
+  --border-style: solid;
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image: url("/images/textures/texture_bayer.png");
-  background-size: 256px 256px;
-  background-repeat: repeat;
-  opacity: 0.03;
-  pointer-events: none;
-  z-index: 0;
+html,
+body {
+  background-color: var(--background, #000);
+  color: var(--accent, #e8e6e1);
+  font-family: var(--font-mono);
+  overflow-x: hidden;
 }
 
 .engraved-text {

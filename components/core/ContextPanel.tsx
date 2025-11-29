@@ -15,15 +15,26 @@ export function ContextPanel({ children, title }: ContextPanelProps) {
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="w-80 border-l border-border bg-background/50 backdrop-blur-sm overflow-y-auto dither grain relative"
+      className="w-80 border-l backdrop-blur-sm overflow-y-auto dither grain relative"
       style={{
-        background: "linear-gradient(to bottom right, rgba(255,255,255,0.02), rgba(255,255,255,0.01))",
+        background: `linear-gradient(to bottom right, var(--surface, color-mix(in srgb, var(--accent-color, var(--accent)) 2%, transparent)), var(--surface, color-mix(in srgb, var(--accent-color, var(--accent)) 1%, transparent)))`,
+        backdropFilter: `blur(var(--blur, 4px))`,
+        borderColor: "color-mix(in srgb, var(--accent-color, var(--accent)) 20%, transparent)",
+        borderStyle: `var(--border-style, solid)`,
       }}
     >
       <div className="p-6">
         {title && (
-          <div className="mb-6 border-b border-border pb-4">
-            <h2 className="font-serif text-xl font-semibold engraved engrave">
+          <div
+            className="mb-6 border-b pb-4"
+            style={{
+              borderColor: "color-mix(in srgb, var(--accent) 20%, transparent)",
+            }}
+          >
+            <h2
+              className="font-serif text-xl font-semibold engraved engrave"
+              style={{ color: "var(--accent)" }}
+            >
               {title}
             </h2>
           </div>

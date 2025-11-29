@@ -11,13 +11,22 @@ export function LightVignette({
   intensity = 0.2,
   className = "",
 }: LightVignetteProps) {
+  const vignetteStrength =
+    typeof window !== "undefined"
+      ? parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue(
+            "--texture-vignette"
+          ) || intensity.toString()
+        )
+      : intensity;
+
   return (
     <motion.div
       className={`absolute inset-0 pointer-events-none ${className}`}
       style={{
         background: `radial-gradient(ellipse at center, 
-          rgba(200, 182, 141, ${intensity}) 0%, 
-          rgba(200, 182, 141, ${intensity * 0.5}) 30%, 
+          color-mix(in srgb, var(--accent) calc(${vignetteStrength} * 100%), transparent) 0%, 
+          color-mix(in srgb, var(--accent) calc(${vignetteStrength} * 50%), transparent) 30%, 
           transparent 70%)`,
         zIndex: 1,
       }}
