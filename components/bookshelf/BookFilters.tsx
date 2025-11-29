@@ -48,7 +48,7 @@ export function BookFilters({
       transition={{ duration: 0.4, delay: 0.1 }}
       className="mb-8"
     >
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="filters-container">
         {availableFilters.map((filter) => {
           const isSelected = selectedFilters.includes(filter.id);
           return (

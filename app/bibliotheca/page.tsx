@@ -8,6 +8,7 @@ import { BookSearch } from "@/components/bookshelf/BookSearch";
 import { BookFilters } from "@/components/bookshelf/BookFilters";
 import { Reader } from "@/components/bookshelf/Reader";
 import { BookMeta } from "@/components/bookshelf/BookSpine";
+import "@/styles/bookshelf.css";
 
 export default function BibliothecaPage() {
   const [books, setBooks] = useState<BookMeta[]>([]);
@@ -125,7 +126,7 @@ export default function BibliothecaPage() {
         <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-12 py-12">
           {/* Header */}
           <motion.div
-            className="mb-12 text-center"
+            className="mb-12 text-center mt-12"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
