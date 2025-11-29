@@ -1,11 +1,21 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { AdvancedCodexReader } from "@/components/Reader/AdvancedCodexReader";
-import { ScrollUnrollAnimation } from "@/components/Reader/ScrollUnrollAnimation";
 import type { BookManifest, BookChapterRef, ChapterContent } from "@/lib/books";
 import type { Highlight } from "@/lib/notes";
+
+// Lazy load heavy components
+const AdvancedCodexReader = lazy(() =>
+  import("@/components/Reader/AdvancedCodexReader").then((mod) => ({
+    default: mod.AdvancedCodexReader,
+  }))
+);
+const ScrollUnrollAnimation = lazy(() =>
+  import("@/components/Reader/ScrollUnrollAnimation").then((mod) => ({
+    default: mod.ScrollUnrollAnimation,
+  }))
+);
 
 export default function ReaderPage() {
   const params = useParams();
@@ -224,24 +234,40 @@ export default function ReaderPage() {
 
   return (
     <div ref={containerRef} className="fixed inset-0 overflow-hidden">
-      {showUnroll && (
-        <ScrollUnrollAnimation
-          bookTitle={manifest.title}
-          onComplete={handleUnrollComplete}
-        />
-      )}
-      {!showUnroll && (
-        <AdvancedCodexReader
-          bookId={slug}
-          manifest={manifest}
-          currentChapter={currentChapter}
-          selectedChapter={selectedChapter}
-          onSelectChapter={handleSelectChapter}
-          highlights={highlights}
-          onHighlightCreated={handleHighlightCreated}
-          onNoteCreated={handleNoteCreated}
-        />
-      )}
+      <Suspense
+        fallback={
+          <div
+            className="fixed inset-0 flex items-center justify-center"
+            style={{ background: "#0A0A0A", color: "#C8B68D" }}
+          >
+            <div className="text-center">
+              <div className="font-serif text-xl mb-4">Loading...</div>
+              <div className="font-mono text-sm opacity-60">
+                Preparing the codex
+              </div>
+            </div>
+          </div>
+        }
+      >
+        {showUnroll && (
+          <ScrollUnrollAnimation
+            bookTitle={manifest.title}
+            onComplete={handleUnrollComplete}
+          />
+        )}
+        {!showUnroll && (
+          <AdvancedCodexReader
+            bookId={slug}
+            manifest={manifest}
+            currentChapter={currentChapter}
+            selectedChapter={selectedChapter}
+            onSelectChapter={handleSelectChapter}
+            highlights={highlights}
+            onHighlightCreated={handleHighlightCreated}
+            onNoteCreated={handleNoteCreated}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }

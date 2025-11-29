@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { motion } from "framer-motion";
 import type { GraphEdge } from "@/lib/graph/types";
 
@@ -34,7 +35,7 @@ const edgeTypeStyles: Record<string, { color: string; dashArray?: string }> = {
   },
 };
 
-export function GraphEdgeComponent({
+export const GraphEdgeComponent = memo(function GraphEdgeComponent({
   edge,
   sourceX,
   sourceY,
@@ -43,7 +44,11 @@ export function GraphEdgeComponent({
   isHighlighted,
 }: GraphEdgeProps) {
   const style = edgeTypeStyles[edge.type] || edgeTypeStyles.related;
-  const opacity = isHighlighted ? 0.8 : style.color.match(/[\d.]+/)?.[0] ? parseFloat(style.color.match(/[\d.]+/)?.[0] || "0.3") : 0.3;
+  const opacity = isHighlighted
+    ? 0.8
+    : style.color.match(/[\d.]+/)?.[0]
+    ? parseFloat(style.color.match(/[\d.]+/)?.[0] || "0.3")
+    : 0.3;
 
   return (
     <motion.line
@@ -68,4 +73,4 @@ export function GraphEdgeComponent({
       }}
     />
   );
-}
+});

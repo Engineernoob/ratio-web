@@ -1,6 +1,7 @@
 import type { MemoryCard, ReviewQuality } from "./types";
 import { calculateReview } from "./review";
 import { updateCard } from "./storage";
+import { getTodayDate } from "@/lib/utils/date";
 
 /**
  * Map quality rating to ReviewQuality
@@ -42,7 +43,7 @@ export async function reviewCard(
  * Get cards due for review today
  */
 export function getDueCardsToday(cards: MemoryCard[]): MemoryCard[] {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayDate();
   return cards.filter((card) => card.due <= today);
 }
 
@@ -50,7 +51,6 @@ export function getDueCardsToday(cards: MemoryCard[]): MemoryCard[] {
  * Calculate statistics from cards
  */
 export function calculateStats(cards: MemoryCard[]) {
-  const today = new Date().toISOString().split("T")[0];
   const dueToday = getDueCardsToday(cards);
 
   const totalCards = cards.length;

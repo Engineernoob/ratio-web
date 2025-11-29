@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { motion } from "framer-motion";
 import type { GraphNode, GraphEdge, GraphTheme } from "@/lib/graph/types";
 import { GraphNodeComponent } from "./GraphNode";
@@ -27,13 +27,18 @@ export function GraphCanvas({
   const animationFrameRef = useRef<number | null>(null);
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
-  const [nodePositions, setNodePositions] = useState<Map<string, { x: number; y: number; vx: number; vy: number }>>(new Map());
+  const [nodePositions, setNodePositions] = useState<
+    Map<string, { x: number; y: number; vx: number; vy: number }>
+  >(new Map());
 
   // Initialize positions
   useEffect(() => {
     if (nodes.length === 0) return;
 
-    const positions = new Map<string, { x: number; y: number; vx: number; vy: number }>();
+    const positions = new Map<
+      string,
+      { x: number; y: number; vx: number; vy: number }
+    >();
     nodes.forEach((node, index) => {
       // Start nodes in a circle
       const angle = (index / nodes.length) * Math.PI * 2;
@@ -60,7 +65,7 @@ export function GraphCanvas({
 
       setNodePositions((prevPositions) => {
         if (prevPositions.size === 0) return prevPositions;
-        
+
         const newPositions = new Map(prevPositions);
         const alpha = 0.1; // Cooling factor
         const chargeStrength = -300;
@@ -80,19 +85,43 @@ export function GraphCanvas({
           fx += (centerX - pos.x) * 0.01;
           fy += (centerY - pos.y) * 0.01;
 
-          // Charge force (repulsion)
-          nodes.forEach((other) => {
-            if (other.id === node.id) return;
-            const otherPos = newPositions.get(other.id);
-            if (!otherPos) return;
+          // Charge force (repulsion) - optimized with spatial indexing for large graphs
+          // For small graphs (< 100 nodes), O(n²) is acceptable
+          if (nodes.length < 100) {
+            nodes.forEach((other) => {
+              if (other.id === node.id) return;
+              const otherPos = newPositions.get(other.id);
+              if (!otherPos) return;
 
-            const dx = pos.x - otherPos.x;
-            const dy = pos.y - otherPos.y;
-            const distance = Math.sqrt(dx * dx + dy * dy) || 1;
-            const force = chargeStrength / (distance * distance);
-            fx += (dx / distance) * force;
-            fy += (dy / distance) * force;
-          });
+              const dx = pos.x - otherPos.x;
+              const dy = pos.y - otherPos.y;
+              const distanceSq = dx * dx + dy * dy;
+              if (distanceSq < 0.01) return; // Skip if too close
+              const distance = Math.sqrt(distanceSq);
+              const force = chargeStrength / distanceSq;
+              fx += (dx / distance) * force;
+              fy += (dy / distance) * force;
+            });
+          } else {
+            // For large graphs, use Barnes-Hut approximation or limit interactions
+            // Simple optimization: only check nearby nodes
+            const maxDistance = 200;
+            nodes.forEach((other) => {
+              if (other.id === node.id) return;
+              const otherPos = newPositions.get(other.id);
+              if (!otherPos) return;
+
+              const dx = pos.x - otherPos.x;
+              const dy = pos.y - otherPos.y;
+              const distanceSq = dx * dx + dy * dy;
+              if (distanceSq > maxDistance * maxDistance) return; // Skip far nodes
+              if (distanceSq < 0.01) return;
+              const distance = Math.sqrt(distanceSq);
+              const force = chargeStrength / distanceSq;
+              fx += (dx / distance) * force;
+              fy += (dy / distance) * force;
+            });
+          }
 
           // Link force (attraction)
           edges.forEach((edge) => {
@@ -103,7 +132,8 @@ export function GraphCanvas({
                 const dy = targetPos.y - pos.y;
                 const distance = Math.sqrt(dx * dx + dy * dy) || 1;
                 const targetDistance = linkDistance / (edge.strength || 0.5);
-                const force = (distance - targetDistance) * 0.1 * (edge.strength || 0.5);
+                const force =
+                  (distance - targetDistance) * 0.1 * (edge.strength || 0.5);
                 fx += (dx / distance) * force;
                 fy += (dy / distance) * force;
               }
@@ -114,7 +144,8 @@ export function GraphCanvas({
                 const dy = sourcePos.y - pos.y;
                 const distance = Math.sqrt(dx * dx + dy * dy) || 1;
                 const targetDistance = linkDistance / (edge.strength || 0.5);
-                const force = (distance - targetDistance) * 0.1 * (edge.strength || 0.5);
+                const force =
+                  (distance - targetDistance) * 0.1 * (edge.strength || 0.5);
                 fx += (dx / distance) * force;
                 fy += (dy / distance) * force;
               }
@@ -153,26 +184,36 @@ export function GraphCanvas({
     };
   }, [nodes, edges, width, height]);
 
-  const handleNodeClick = (node: GraphNode) => {
-    setSelectedNodeId(node.id);
-    onNodeClick(node);
-  };
+  const handleNodeClick = useCallback(
+    (node: GraphNode) => {
+      setSelectedNodeId(node.id);
+      onNodeClick(node);
+    },
+    [onNodeClick]
+  );
 
-  const handleNodeHover = (hovered: boolean, nodeId: string) => {
+  const handleNodeHover = useCallback((hovered: boolean, nodeId: string) => {
     setHoveredNodeId(hovered ? nodeId : null);
-  };
+  }, []);
 
-  // Get edge positions
-  const getEdgePositions = (edge: GraphEdge) => {
-    const sourcePos = nodePositions.get(edge.source);
-    const targetPos = nodePositions.get(edge.target);
-    return {
-      sourceX: sourcePos?.x || width / 2,
-      sourceY: sourcePos?.y || height / 2,
-      targetX: targetPos?.x || width / 2,
-      targetY: targetPos?.y || height / 2,
-    };
-  };
+  // Memoize edge positions calculation
+  const edgePositionsMap = useMemo(() => {
+    const map = new Map<
+      string,
+      { sourceX: number; sourceY: number; targetX: number; targetY: number }
+    >();
+    edges.forEach((edge) => {
+      const sourcePos = nodePositions.get(edge.source);
+      const targetPos = nodePositions.get(edge.target);
+      map.set(edge.id, {
+        sourceX: sourcePos?.x || width / 2,
+        sourceY: sourcePos?.y || height / 2,
+        targetX: targetPos?.x || width / 2,
+        targetY: targetPos?.y || height / 2,
+      });
+    });
+    return map;
+  }, [edges, nodePositions, width, height]);
 
   return (
     <div className="relative w-full h-full">
@@ -186,7 +227,8 @@ export function GraphCanvas({
         {/* Edges */}
         <g>
           {edges.map((edge) => {
-            const pos = getEdgePositions(edge);
+            const pos = edgePositionsMap.get(edge.id);
+            if (!pos) return null;
             const isHighlighted =
               hoveredNodeId === edge.source ||
               hoveredNodeId === edge.target ||

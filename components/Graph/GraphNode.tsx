@@ -1,7 +1,7 @@
 "use client";
 
+import { memo } from "react";
 import { motion } from "framer-motion";
-import { useState } from "react";
 import type { GraphNode } from "@/lib/graph/types";
 
 interface GraphNodeProps {
@@ -61,7 +61,7 @@ const nodeTypeColors: Record<
   },
 };
 
-export function GraphNodeComponent({
+export const GraphNodeComponent = memo(function GraphNodeComponent({
   node,
   x,
   y,
@@ -149,4 +149,4 @@ export function GraphNodeComponent({
       </motion.text>
     </g>
   );
-}
+});

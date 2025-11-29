@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { MemoryCard } from "@/lib/memoria/types";
 import { RecallRating } from "./RecallRating";
@@ -12,7 +12,7 @@ interface MemoryCardProps {
   onReveal: () => void;
 }
 
-export function MemoryCard({
+export const MemoryCard = memo(function MemoryCard({
   card,
   onRate,
   isRevealed,
@@ -115,4 +115,4 @@ export function MemoryCard({
       </div>
     </motion.div>
   );
-}
+});

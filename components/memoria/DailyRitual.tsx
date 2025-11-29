@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { getTodayDate } from "@/lib/utils/date";
 import type { MemoryCard } from "@/lib/memoria/types";
 import { MemoryCard as MemoryCardComponent } from "./MemoryCard";
 import { StatsPanel } from "./StatsPanel";
@@ -17,10 +18,10 @@ export function DailyRitual({ cards, onCardReviewed }: DailyRitualProps) {
   const [isRevealed, setIsRevealed] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  const dueCards = cards.filter((card) => {
-    const today = new Date().toISOString().split("T")[0];
-    return card.due <= today;
-  });
+  const dueCards = useMemo(() => {
+    const today = getTodayDate();
+    return cards.filter((card) => card.due <= today);
+  }, [cards]);
 
   const currentCard = dueCards[currentIndex];
   const stats = calculateStats(cards);

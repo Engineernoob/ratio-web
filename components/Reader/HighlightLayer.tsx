@@ -72,13 +72,51 @@ export function HighlightLayer({
         // Clear existing content
         textLayerDiv.innerHTML = "";
 
-        // Create text layer using PDF.js text rendering
-        pdfjsLib.renderTextLayer({
-          textContentSource: textContent,
-          container: textLayerDiv,
-          viewport: viewport,
-          textDivs: [],
-        });
+        // Manually create text divs from text content for selection
+        // Using viewport to convert PDF coordinates to CSS pixels
+        const textDivs: HTMLSpanElement[] = [];
+
+        for (const item of textContent.items) {
+          if ("str" in item && item.str.trim()) {
+            // Get the transform matrix from the text item
+            // item.transform is [a, b, c, d, e, f] where e,f are x,y translation
+            const tx = item.transform[4];
+            const ty = item.transform[5];
+
+            // Apply viewport transform to convert PDF coordinates to CSS pixels
+            const transform = viewport.transform;
+            const x = transform[0] * tx + transform[2] * ty + transform[4];
+            const y = transform[1] * tx + transform[3] * ty + transform[5];
+
+            // Calculate font size from transform matrix (scale factor)
+            const fontHeight =
+              Math.sqrt(
+                Math.pow(item.transform[2], 2) + Math.pow(item.transform[3], 2)
+              ) * viewport.scale;
+
+            // Calculate rotation angle from transform matrix
+            const angle = Math.atan2(item.transform[1], item.transform[0]);
+
+            const span = document.createElement("span");
+            span.textContent = item.str;
+            span.style.position = "absolute";
+            span.style.left = `${x}px`;
+            span.style.top = `${y}px`;
+            span.style.fontSize = `${fontHeight}px`;
+            span.style.fontFamily = item.fontName || "sans-serif";
+            if (Math.abs(angle) > 0.01) {
+              span.style.transform = `rotate(${angle}rad)`;
+              span.style.transformOrigin = "0% 0%";
+            }
+            span.style.whiteSpace = "pre";
+            span.style.cursor = "text";
+            span.style.color = "transparent";
+            span.style.userSelect = "text";
+
+            textLayerDiv.appendChild(span);
+            textDivs.push(span);
+          }
+        }
       } catch (error) {
         console.error("Error loading text layer:", error);
       }
