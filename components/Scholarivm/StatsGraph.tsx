@@ -35,7 +35,8 @@ export function StatsGraph({
       setAnimatedData(
         data.map((point, i) => ({
           ...point,
-          value: startData[i].value + (point.value - startData[i].value) * easeOut,
+          value:
+            startData[i].value + (point.value - startData[i].value) * easeOut,
         }))
       );
 
@@ -68,9 +69,7 @@ export function StatsGraph({
   const points = animatedData.map((point, i) => {
     const x = padding + (i / (animatedData.length - 1 || 1)) * graphWidth;
     const y =
-      padding +
-      graphHeight -
-      ((point.value - min) / range) * graphHeight;
+      padding + graphHeight - ((point.value - min) / range) * graphHeight;
     return { x, y, value: point.value };
   });
 
@@ -90,7 +89,9 @@ export function StatsGraph({
   }, "");
 
   // Area path (for gradient fill)
-  const areaPath = `${pathD} L ${points[points.length - 1].x} ${padding + graphHeight} L ${points[0].x} ${padding + graphHeight} Z`;
+  const areaPath = `${pathD} L ${points[points.length - 1].x} ${
+    padding + graphHeight
+  } L ${points[0].x} ${padding + graphHeight} Z`;
 
   return (
     <motion.div
@@ -131,7 +132,13 @@ export function StatsGraph({
             className="w-full h-auto"
           >
             <defs>
-              <linearGradient id={`gradient-${title}`} x1="0%" y1="0%" x2="0%" y2="100%">
+              <linearGradient
+                id={`gradient-${title}`}
+                x1="0%"
+                y1="0%"
+                x2="0%"
+                y2="100%"
+              >
                 <stop offset="0%" stopColor={color} stopOpacity="0.4" />
                 <stop offset="100%" stopColor={color} stopOpacity="0.05" />
               </linearGradient>
@@ -173,7 +180,11 @@ export function StatsGraph({
               strokeLinejoin="round"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
-              transition={{ duration: 1.5, delay: delay + 0.2, ease: "easeInOut" }}
+              transition={{
+                duration: 1.5,
+                delay: delay + 0.2,
+                ease: "easeInOut",
+              }}
             />
 
             {/* Data points */}

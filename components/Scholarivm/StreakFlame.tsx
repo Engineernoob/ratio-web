@@ -37,7 +37,9 @@ export function StreakFlame({ streak }: StreakFlameProps) {
         height="50"
         viewBox="0 0 40 50"
         style={{
-          filter: `drop-shadow(0 0 ${8 * intensity}px rgba(215, 196, 158, ${0.6 * intensity}))`,
+          filter: `drop-shadow(0 0 ${8 * intensity}px rgba(215, 196, 158, ${
+            0.6 * intensity
+          }))`,
         }}
       >
         <defs>

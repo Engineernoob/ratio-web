@@ -43,60 +43,63 @@ export function ReasoningStats({ stats, delay = 0 }: ReasoningStatsProps) {
 
   const StatBar = ({
     label,
-    value,
+    valueKey,
     index,
   }: {
     label: string;
-    value: number;
+    valueKey: keyof typeof animatedStats;
     index: number;
-  }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: delay + index * 0.1 }}
-      className="mb-4"
-    >
-      <div className="flex justify-between items-center mb-2">
-        <span
-          className="font-mono text-xs uppercase"
-          style={{ color: "rgba(215, 196, 158, 0.6)" }}
-        >
-          {label}
-        </span>
-        <span
-          className="font-serif text-lg font-bold"
-          style={{ color: "#d7c49e" }}
-        >
-          {Math.round(animatedStats[value as keyof typeof animatedStats])}%
-        </span>
-      </div>
-      <div
-        className="h-2 rounded-sm overflow-hidden"
-        style={{
-          background: "rgba(215, 196, 158, 0.1)",
-          border: "1px solid rgba(215, 196, 158, 0.2)",
-        }}
+  }) => {
+    const value = animatedStats[valueKey];
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: delay + index * 0.1 }}
+        className="mb-4"
       >
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{
-            width: `${animatedStats[value as keyof typeof animatedStats]}%`,
-          }}
-          transition={{
-            duration: 1,
-            delay: delay + index * 0.1 + 0.3,
-            ease: "easeOut",
-          }}
-          className="h-full"
+        <div className="flex justify-between items-center mb-2">
+          <span
+            className="font-mono text-xs uppercase"
+            style={{ color: "rgba(215, 196, 158, 0.6)" }}
+          >
+            {label}
+          </span>
+          <span
+            className="font-serif text-lg font-bold"
+            style={{ color: "#d7c49e" }}
+          >
+            {Math.round(value)}%
+          </span>
+        </div>
+        <div
+          className="h-2 rounded-sm overflow-hidden"
           style={{
-            background:
-              "linear-gradient(to right, rgba(215, 196, 158, 0.6), rgba(215, 196, 158, 0.8))",
-            boxShadow: "0 0 10px rgba(215, 196, 158, 0.3)",
+            background: "rgba(215, 196, 158, 0.1)",
+            border: "1px solid rgba(215, 196, 158, 0.2)",
           }}
-        />
-      </div>
-    </motion.div>
-  );
+        >
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{
+              width: `${value}%`,
+            }}
+            transition={{
+              duration: 1,
+              delay: delay + index * 0.1 + 0.3,
+              ease: "easeOut",
+            }}
+            className="h-full"
+            style={{
+              background:
+                "linear-gradient(to right, rgba(215, 196, 158, 0.6), rgba(215, 196, 158, 0.8))",
+              boxShadow: "0 0 10px rgba(215, 196, 158, 0.3)",
+            }}
+          />
+        </div>
+      </motion.div>
+    );
+  };
 
   return (
     <motion.div
@@ -129,9 +132,21 @@ export function ReasoningStats({ stats, delay = 0 }: ReasoningStatsProps) {
           Reasoning Stats
         </h3>
 
-        <StatBar label="Fallacy Accuracy" value="fallacyAccuracy" index={0} />
-        <StatBar label="Logic Puzzle Accuracy" value="logicPuzzleAccuracy" index={1} />
-        <StatBar label="Syllogism Mastery" value="syllogismMastery" index={2} />
+        <StatBar
+          label="Fallacy Accuracy"
+          valueKey="fallacyAccuracy"
+          index={0}
+        />
+        <StatBar
+          label="Logic Puzzle Accuracy"
+          valueKey="logicPuzzleAccuracy"
+          index={1}
+        />
+        <StatBar
+          label="Syllogism Mastery"
+          valueKey="syllogismMastery"
+          index={2}
+        />
       </div>
     </motion.div>
   );

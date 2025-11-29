@@ -98,7 +98,10 @@ export function MasterySlab({ name, data, delay = 0 }: MasterySlabProps) {
           >
             {name}
           </h3>
-          <div className="font-mono text-xs" style={{ color: "rgba(215, 196, 158, 0.6)" }}>
+          <div
+            className="font-mono text-xs"
+            style={{ color: "rgba(215, 196, 158, 0.6)" }}
+          >
             {levelName} • Level {data.level}
           </div>
         </div>
@@ -106,11 +109,17 @@ export function MasterySlab({ name, data, delay = 0 }: MasterySlabProps) {
         {/* XP Bar */}
         <div className="mb-4">
           <div className="flex justify-between items-center mb-2">
-            <span className="font-mono text-xs" style={{ color: "rgba(215, 196, 158, 0.7)" }}>
+            <span
+              className="font-mono text-xs"
+              style={{ color: "rgba(215, 196, 158, 0.7)" }}
+            >
               {Math.round(animatedXP)} XP
             </span>
             {xpToNext > 0 && (
-              <span className="font-mono text-xs" style={{ color: "rgba(215, 196, 158, 0.5)" }}>
+              <span
+                className="font-mono text-xs"
+                style={{ color: "rgba(215, 196, 158, 0.5)" }}
+              >
                 {xpToNext} to next
               </span>
             )}
@@ -127,7 +136,11 @@ export function MasterySlab({ name, data, delay = 0 }: MasterySlabProps) {
               animate={{
                 width: `${Math.min((xpInCurrentLevel % 100) / 100, 1) * 100}%`,
               }}
-              transition={{ duration: 1.5, delay: delay + 0.3, ease: "easeOut" }}
+              transition={{
+                duration: 1.5,
+                delay: delay + 0.3,
+                ease: "easeOut",
+              }}
               className="h-full"
               style={{
                 background:
@@ -141,7 +154,10 @@ export function MasterySlab({ name, data, delay = 0 }: MasterySlabProps) {
         {/* Mastery % */}
         <div className="mb-3">
           <div className="flex justify-between items-center">
-            <span className="font-mono text-xs" style={{ color: "rgba(215, 196, 158, 0.6)" }}>
+            <span
+              className="font-mono text-xs"
+              style={{ color: "rgba(215, 196, 158, 0.6)" }}
+            >
               Mastery
             </span>
             <span
@@ -154,9 +170,15 @@ export function MasterySlab({ name, data, delay = 0 }: MasterySlabProps) {
         </div>
 
         {/* Growth */}
-        <div className="pt-3 border-t" style={{ borderColor: "rgba(215, 196, 158, 0.1)" }}>
+        <div
+          className="pt-3 border-t"
+          style={{ borderColor: "rgba(215, 196, 158, 0.1)" }}
+        >
           <div className="flex justify-between items-center">
-            <span className="font-mono text-xs" style={{ color: "rgba(215, 196, 158, 0.5)" }}>
+            <span
+              className="font-mono text-xs"
+              style={{ color: "rgba(215, 196, 158, 0.5)" }}
+            >
               Since last week
             </span>
             <span className="font-mono text-sm" style={{ color: growthColor }}>

@@ -72,7 +72,8 @@ export function calculateMemoryRetention(cards: MemoryCard[]): number {
   const recentReviews = cards.filter((card) => {
     if (!card.lastReviewed) return false;
     const reviewDate = new Date(card.lastReviewed);
-    const daysSince = (now.getTime() - reviewDate.getTime()) / (1000 * 60 * 60 * 24);
+    const daysSince =
+      (now.getTime() - reviewDate.getTime()) / (1000 * 60 * 60 * 24);
     return daysSince <= card.interval * 1.2; // Within 20% of interval
   });
 
@@ -184,7 +185,8 @@ export function getMemoriaStats(cards: MemoryCard[]): MemoriaStats {
   const now = new Date();
   const upcomingReviews = cards.filter((card) => {
     const dueDate = new Date(card.due);
-    const daysUntil = (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+    const daysUntil =
+      (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
     return daysUntil <= 1 && daysUntil >= 0;
   }).length;
 
@@ -218,9 +220,7 @@ export function generateMemoryRetentionData(
     });
 
     const retention =
-      cards.length > 0
-        ? (cardsReviewed.length / cards.length) * 100
-        : 0;
+      cards.length > 0 ? (cardsReviewed.length / cards.length) * 100 : 0;
 
     data.push({ date: dateStr, value: retention });
   }
@@ -273,13 +273,15 @@ export function calculateReasoningStats(
 
   const fallacyAccuracy =
     fallacyResults.length > 0
-      ? (fallacyResults.filter((r) => r.correct).length / fallacyResults.length) *
+      ? (fallacyResults.filter((r) => r.correct).length /
+          fallacyResults.length) *
         100
       : 0;
 
   const logicPuzzleAccuracy =
     logicResults.length > 0
-      ? (logicResults.filter((r) => r.correct).length / logicResults.length) * 100
+      ? (logicResults.filter((r) => r.correct).length / logicResults.length) *
+        100
       : 0;
 
   const syllogismMastery =

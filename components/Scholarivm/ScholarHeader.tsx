@@ -21,7 +21,8 @@ interface ScholarHeaderProps {
 }
 
 export function ScholarHeader({ streak, quote }: ScholarHeaderProps) {
-  const selectedQuote = quote || dailyQuotes[Math.floor(Math.random() * dailyQuotes.length)];
+  const selectedQuote =
+    quote || dailyQuotes[Math.floor(Math.random() * dailyQuotes.length)];
 
   return (
     <motion.div
