@@ -89,6 +89,27 @@ export function AdvancedCodexReader({
           pageBackground: "rgba(154, 154, 154, 0.02)",
           border: "1px solid rgba(154, 154, 154, 0.1)",
         };
+      case "GLACIES":
+        return {
+          background:
+            "linear-gradient(135deg, rgba(184, 212, 227, 0.05) 0%, rgba(10, 20, 25, 0.95) 100%)",
+          pageBackground: "rgba(184, 212, 227, 0.05)",
+          border: "1px solid rgba(184, 212, 227, 0.2)",
+        };
+      case "SYNAPSE":
+        return {
+          background:
+            "linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, rgba(0, 0, 0, 0.95) 100%)",
+          pageBackground: "rgba(0, 255, 136, 0.02)",
+          border: "2px solid rgba(0, 255, 136, 0.2)",
+        };
+      case "FERRO":
+        return {
+          background:
+            "linear-gradient(135deg, rgba(255, 68, 68, 0.05) 0%, rgba(26, 26, 26, 0.95) 100%)",
+          pageBackground: "rgba(255, 68, 68, 0.02)",
+          border: "3px solid rgba(255, 68, 68, 0.3)",
+        };
       default: // AUREA
         return {
           background:
@@ -148,6 +169,13 @@ export function AdvancedCodexReader({
             theme={currentTheme}
             onTextSelect={setSelectedText}
             highlights={highlights}
+            onHighlightCreated={onHighlightCreated}
+          />
+          <HighlightSystem
+            bookId={bookId}
+            chapterId={selectedChapter?.id}
+            highlights={highlights}
+            theme={currentTheme}
             onHighlightCreated={onHighlightCreated}
           />
         </div>

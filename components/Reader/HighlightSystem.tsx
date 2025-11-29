@@ -43,6 +43,12 @@ export function HighlightSystem({
         return "rgba(212, 165, 116, 0.3)";
       case "UMBRA":
         return "rgba(154, 154, 154, 0.3)";
+      case "GLACIES":
+        return "rgba(184, 212, 227, 0.3)";
+      case "SYNAPSE":
+        return "rgba(0, 255, 136, 0.3)";
+      case "FERRO":
+        return "rgba(139, 139, 139, 0.3)";
       default: // AUREA
         return "rgba(200, 182, 141, 0.3)";
     }

@@ -30,15 +30,15 @@ export async function POST(request: Request) {
         prompt = `Create a Memoria flashcard from this content:\n\n"${text}"\n\nFormat as: Question: ... Answer: ...`;
         break;
       default:
-        return NextResponse.json(
-          { error: "Invalid action" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
     // Call Mentor API (placeholder - replace with actual API endpoint)
     // For now, return a mock response
-    const mockResponse = `This is a mock response for ${action}. The actual Mentor API integration would process: "${text.substring(0, 100)}..."`;
+    const mockResponse = `This is a mock response for ${action}. The actual Mentor API integration would process: "${text.substring(
+      0,
+      100
+    )}..."`;
 
     return NextResponse.json({
       response: mockResponse,

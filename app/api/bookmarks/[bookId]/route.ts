@@ -43,11 +43,7 @@ function saveBookmarks(bookId: string, bookmarks: Bookmark[]): void {
   try {
     ensureBookmarksDir();
     const filePath = getBookmarksFilePath(bookId);
-    fs.writeFileSync(
-      filePath,
-      JSON.stringify({ bookmarks }, null, 2),
-      "utf-8"
-    );
+    fs.writeFileSync(filePath, JSON.stringify({ bookmarks }, null, 2), "utf-8");
   } catch (error) {
     console.error(`Error saving bookmarks for ${bookId}:`, error);
     throw error;

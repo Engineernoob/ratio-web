@@ -79,6 +79,25 @@ export function PageTransition({
           border: "1px solid rgba(154, 154, 154, 0.1)",
           boxShadow: "0 4px 20px rgba(154, 154, 154, 0.1)",
         };
+      case "GLACIES":
+        return {
+          background: "rgba(184, 212, 227, 0.05)",
+          border: "1px solid rgba(184, 212, 227, 0.2)",
+          boxShadow: "0 4px 20px rgba(184, 212, 227, 0.15)",
+          backdropFilter: "blur(10px)",
+        };
+      case "SYNAPSE":
+        return {
+          background: "rgba(0, 255, 136, 0.02)",
+          border: "2px solid rgba(0, 255, 136, 0.3)",
+          boxShadow: "0 4px 20px rgba(0, 255, 136, 0.2)",
+        };
+      case "FERRO":
+        return {
+          background: "rgba(139, 139, 139, 0.02)",
+          border: "4px solid rgba(139, 139, 139, 0.4)",
+          boxShadow: "0 8px 30px rgba(0, 0, 0, 0.6)",
+        };
       default: // AUREA
         return {
           background: "rgba(200, 182, 141, 0.02)",

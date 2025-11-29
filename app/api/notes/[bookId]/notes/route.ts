@@ -7,7 +7,7 @@ export async function POST(
 ) {
   try {
     const body = await request.json();
-    
+
     // Create a note as a highlight with special tag
     const note: Omit<Highlight, "id" | "timestamp"> = {
       bookId: params.bookId,
@@ -20,16 +20,16 @@ export async function POST(
         width: 0,
         height: 0,
       },
-      tags: ["note", ...(body.selectionId ? [`highlight:${body.selectionId}`] : [])],
+      tags: [
+        "note",
+        ...(body.selectionId ? [`highlight:${body.selectionId}`] : []),
+      ],
     };
 
     const savedNote = saveHighlight(params.bookId, note);
     return NextResponse.json({ note: savedNote });
   } catch (error) {
     console.error("Error saving note:", error);
-    return NextResponse.json(
-      { error: "Failed to save note" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to save note" }, { status: 500 });
   }
 }
