@@ -1,205 +1,327 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { BookHotspot } from "@/components/bibliotheca/BookHotspot";
-import type { BookData } from "@/components/bibliotheca/Bookshelf";
-import { ParallaxLayer } from "@/components/ui/ParallaxLayer";
+import { useEffect, useState, useMemo } from "react";
+import { Search, Filter } from "lucide-react";
 import { TopNavBar } from "@/components/core/TopNavBar";
 import { Main } from "@/components/Main";
+import {
+  FilterBar,
+  SortControl,
+  LibraryGrid,
+  MobileFilterDrawer,
+} from "@/components/library";
 
-interface BookshelfMap {
-  books: BookData[];
+type SortOption =
+  | "recently-opened"
+  | "a-z"
+  | "z-a"
+  | "progress"
+  | "ancient-modern"
+  | "modern-ancient";
+
+interface Book {
+  id: string;
+  title: string;
+  author: string;
+  category?: string;
+  tags?: string[];
+  spineTexture?: string;
+  readingProgress?: number;
+  pdfPath?: string;
+  era?: string;
+  difficulty?: string;
+  status?: string;
+  philosophy?: string;
 }
 
 export default function BibliothecaPage() {
-  const router = useRouter();
-  const [books, setBooks] = useState<BookData[]>([]);
+  const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
-  const [clickedBookId, setClickedBookId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const [sortOption, setSortOption] = useState<SortOption>("recently-opened");
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
-  // Load bookshelf map
   useEffect(() => {
-    const loadBookshelfMap = async () => {
-      try {
-        // Try to load from public directory first
-        let response = await fetch("/bookshelf-map.json");
-        if (!response.ok) {
-          // Fallback: try to load from data directory via API
-          response = await fetch("/api/bookshelf-map");
-        }
-
-        if (!response.ok) {
-          throw new Error("Failed to load bookshelf map");
-        }
-
-        const data: BookshelfMap = await response.json();
-        setBooks(data.books || []);
-      } catch (error) {
-        console.error("Error loading bookshelf map:", error);
-        // Fallback to empty array
-        setBooks([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadBookshelfMap();
+    fetchBooks();
   }, []);
 
-  const handleBookClick = (bookId: string) => {
-    setClickedBookId(bookId);
-    setTimeout(() => {
-      router.push(`/reader?book=${bookId}`);
-    }, 600);
+  const fetchBooks = async () => {
+    try {
+      // Fetch all books from API
+      const bookIds = ["meditations", "AtomicHabits"];
+      const bookPromises = bookIds.map(async (id) => {
+        try {
+          const res = await fetch(`/api/books/${id}?action=manifest`);
+          if (res.ok) {
+            const response = await res.json();
+            const data = response.manifest || response;
+            return {
+              id: data.id || id,
+              title: data.title || "",
+              author: data.author || "",
+              category: data.category,
+              tags: data.tags || [],
+              spineTexture:
+                data.spineTexture || "/images/textures/parchment-dither.png",
+              readingProgress: Math.floor(Math.random() * 100), // TODO: Get from user data
+              pdfPath: data.pdf,
+              era: id === "meditations" ? "ancient" : "modern",
+              difficulty: "intermediate",
+              status: "to-read",
+              philosophy: id === "meditations" ? "stoic" : undefined,
+            };
+          }
+        } catch (error) {
+          console.error(`Error loading book ${id}:`, error);
+        }
+        return null;
+      });
+
+      const loadedBooks = (await Promise.all(bookPromises)).filter(
+        (b) => b !== null
+      ) as Book[];
+      setBooks(loadedBooks);
+    } catch (error) {
+      console.error("Error loading books:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Filter and sort books
+  const filteredAndSortedBooks = useMemo(() => {
+    let filtered = books;
+
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (book) =>
+          book.title.toLowerCase().includes(query) ||
+          book.author.toLowerCase().includes(query) ||
+          book.tags?.some((tag) => tag.toLowerCase().includes(query))
+      );
+    }
+
+    // Category filters
+    if (selectedFilters.length > 0) {
+      filtered = filtered.filter((book) => {
+        return selectedFilters.some((filterId) => {
+          if (
+            filterId === "stoicism" ||
+            filterId === "epistemology" ||
+            filterId === "ethics" ||
+            filterId === "logic"
+          ) {
+            return book.tags?.includes(filterId) || book.category === filterId;
+          }
+          if (
+            filterId === "ancient" ||
+            filterId === "medieval" ||
+            filterId === "modern" ||
+            filterId === "contemporary"
+          ) {
+            return book.era === filterId;
+          }
+          if (
+            filterId === "beginner" ||
+            filterId === "intermediate" ||
+            filterId === "advanced"
+          ) {
+            return book.difficulty === filterId;
+          }
+          if (
+            filterId === "to-read" ||
+            filterId === "in-progress" ||
+            filterId === "finished"
+          ) {
+            return book.status === filterId;
+          }
+          if (
+            filterId === "stoic" ||
+            filterId === "epicurean" ||
+            filterId === "aristotelian" ||
+            filterId === "platonist"
+          ) {
+            return book.philosophy === filterId;
+          }
+          return false;
+        });
+      });
+    }
+
+    // Sort
+    const sorted = [...filtered].sort((a, b) => {
+      switch (sortOption) {
+        case "a-z":
+          return a.title.localeCompare(b.title);
+        case "z-a":
+          return b.title.localeCompare(a.title);
+        case "progress":
+          return (b.readingProgress || 0) - (a.readingProgress || 0);
+        case "ancient-modern":
+          const eraOrder = {
+            ancient: 1,
+            medieval: 2,
+            modern: 3,
+            contemporary: 4,
+          };
+          return (
+            (eraOrder[a.era as keyof typeof eraOrder] || 0) -
+            (eraOrder[b.era as keyof typeof eraOrder] || 0)
+          );
+        case "modern-ancient":
+          const eraOrderRev = {
+            ancient: 4,
+            medieval: 3,
+            modern: 2,
+            contemporary: 1,
+          };
+          return (
+            (eraOrderRev[a.era as keyof typeof eraOrderRev] || 0) -
+            (eraOrderRev[b.era as keyof typeof eraOrderRev] || 0)
+          );
+        case "recently-opened":
+        default:
+          return 0; // TODO: Implement recently opened tracking
+      }
+    });
+
+    return sorted;
+  }, [books, searchQuery, selectedFilters, sortOption]);
+
+  const handleFilterChange = (filterId: string) => {
+    setSelectedFilters((prev) =>
+      prev.includes(filterId)
+        ? prev.filter((id) => id !== filterId)
+        : [...prev, filterId]
+    );
+  };
+
+  const handleClearFilters = () => {
+    setSelectedFilters([]);
   };
 
   if (loading) {
     return (
-      <Main>
+      <div className="relative min-h-screen">
         <div
-          className="fixed inset-0 flex items-center justify-center"
-          style={{ background: "#0A0A0A" }}
-        >
-          <div className="text-center">
-            <div
-              className="font-serif text-xl mb-4"
-              style={{ color: "#C8B68D" }}
-            >
-              Loading Bibliotheca...
+          className="fixed inset-0 z-0"
+          style={{
+            backgroundImage: "url('/images/alexandria-shelf.jpg')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            filter: "blur(8px) brightness(0.3)",
+          }}
+        />
+        <TopNavBar />
+        <div className="relative z-10 pt-20">
+          <Main>
+            <div className="text-center py-32">
+              <div className="font-serif text-xl mb-4 text-[#e8e6e1]">
+                Loading Bibliotheca...
+              </div>
+              <div className="font-mono text-sm text-[#888888]">
+                Unfolding the archive...
+              </div>
             </div>
-            <div
-              className="font-mono text-sm opacity-60"
-              style={{ color: "#C8B68D" }}
-            >
-              Unfolding the archive...
-            </div>
-          </div>
+          </Main>
         </div>
-      </Main>
+      </div>
     );
   }
 
   return (
-    <>
+    <div className="relative min-h-screen">
+      {/* Blurred Background */}
+      <div
+        className="fixed inset-0 z-0"
+        style={{
+          backgroundImage: "url('/images/alexandria-shelf.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          filter: "blur(12px) brightness(0.25)",
+        }}
+      />
+      <div className="fixed inset-0 z-0 bg-[rgba(10,10,10,0.4)]" />
+
       <TopNavBar />
-      <Main>
-        <div
-          className="relative w-full min-h-screen overflow-hidden"
-          style={{ background: "#0A0A0A" }}
-        >
-          {/* Dithering texture overlay */}
-          <div
-            className="absolute inset-0 opacity-[0.04] pointer-events-none"
-            style={{
-              backgroundImage: "url('/images/textures/texture_bayer.png')",
-              backgroundSize: "256px 256px",
-              backgroundRepeat: "repeat",
-              zIndex: 0,
-            }}
-          />
 
-          {/* Header */}
-          <motion.div
-            className="absolute top-20 md:top-24 left-1/2 -translate-x-1/2 text-center"
-            style={{ zIndex: 10 }}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1
-              className="font-serif text-2xl md:text-4xl mb-2 pointer-events-none"
-              style={{
-                color: "#C8B68D",
-                textShadow: "0px 2px 4px rgba(0, 0, 0, 0.5)",
-              }}
-            >
-              BIBLIOTHECA
-            </h1>
-            <p
-              className="font-mono text-xs opacity-60 px-4 pointer-events-none"
-              style={{ color: "#C8B68D" }}
-            >
-              Your Living Archive of Volumes
-            </p>
-            <a
-              href="/bibliotheca/upload"
-              className="font-mono text-xs mt-3 inline-block px-4 py-2 border border-[#C8B68D] opacity-60 hover:opacity-100 transition-opacity pointer-events-auto"
-              style={{
-                color: "#C8B68D",
-                textShadow: "0px 1px 2px rgba(0, 0, 0, 0.5)",
-              }}
-            >
-              Upload Book
-            </a>
-          </motion.div>
-
-          {/* Bookshelf Container with Parallax */}
-          <div className="relative w-full h-screen overflow-hidden">
-            {/* Background Shelf with Parallax */}
-            <div className="absolute inset-0" style={{ zIndex: 2 }}>
-              <ParallaxLayer depth={0}>
-                <div
-                  className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-                  style={{
-                    backgroundImage: "url('/images/alexandria-shelf.jpg')",
-                    backgroundPosition: "center",
-                    backgroundSize: "cover",
-                  }}
-                />
-              </ParallaxLayer>
+      <div className="relative z-10 pt-20">
+        <Main>
+          <div className="max-w-7xl mx-auto px-6 md:px-12 py-12">
+            {/* Header */}
+            <div className="mb-12 text-center">
+              <h1 className="font-serif text-4xl md:text-5xl mb-2 text-[#e8e6e1]">
+                BIBLIOTHECA
+              </h1>
+              <p className="font-mono text-sm text-[#888888]">
+                Your Living Archive of Volumes
+              </p>
             </div>
 
-            {/* Dark Vignette Overlay */}
-            <div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                zIndex: 3,
-                background: `
-                radial-gradient(ellipse at center, transparent 0%, transparent 40%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0.6) 100%),
-                linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.4) 100%)
-              `,
-              }}
+            {/* Search Bar */}
+            <div className="mb-8 max-w-2xl mx-auto">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#888888]" />
+                <input
+                  type="text"
+                  placeholder="Search by title, author, or tag..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 rounded-lg bg-[rgba(255,255,255,0.05)] border border-[rgba(200,182,141,0.1)] font-mono text-sm text-[#e8e6e1] placeholder-[#888888] focus:outline-none focus:border-[#c8b68d] focus:ring-1 focus:ring-[#c8b68d] transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Filters and Sort - Desktop */}
+            <div className="mb-8 hidden md:flex md:items-center md:justify-between gap-4">
+              <div className="flex-1">
+                <FilterBar
+                  filters={[]}
+                  selectedFilters={selectedFilters}
+                  onFilterChange={handleFilterChange}
+                  onClearAll={handleClearFilters}
+                />
+              </div>
+              <div>
+                <SortControl value={sortOption} onChange={setSortOption} />
+              </div>
+            </div>
+
+            {/* Mobile Filter Button */}
+            <div className="mb-8 md:hidden flex justify-end">
+              <button
+                onClick={() => setMobileFilterOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[rgba(255,255,255,0.05)] border border-[rgba(200,182,141,0.1)] font-mono text-sm text-[#e8e6e1] hover:bg-[rgba(255,255,255,0.1)] transition-colors"
+              >
+                <Filter className="h-4 w-4" />
+                Filter & Sort
+                {selectedFilters.length > 0 && (
+                  <span className="ml-1 px-2 py-0.5 rounded-full bg-[#c8b68d] text-[#0a0a0a] text-xs">
+                    {selectedFilters.length}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {/* Mobile Filter Drawer */}
+            <MobileFilterDrawer
+              isOpen={mobileFilterOpen}
+              onClose={() => setMobileFilterOpen(false)}
+              selectedFilters={selectedFilters}
+              onFilterChange={handleFilterChange}
+              onClearFilters={handleClearFilters}
+              sortOption={sortOption}
+              onSortChange={setSortOption}
             />
 
-            {/* Book Hotspots with Parallax */}
-            <div className="absolute inset-0" style={{ zIndex: 4 }}>
-              <ParallaxLayer depth={0.3}>
-                <div className="relative w-full h-full">
-                  {books.map((book) => (
-                    <BookHotspot
-                      key={book.id}
-                      book={book}
-                      isZoomed={clickedBookId === book.id}
-                      onClick={() => handleBookClick(book.id)}
-                    />
-                  ))}
-                </div>
-              </ParallaxLayer>
-            </div>
-
-            {/* Zoom overlay when book is clicked */}
-            {clickedBookId && (
-              <motion.div
-                className="absolute inset-0 pointer-events-none"
-                style={{ zIndex: 5 }}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
-              >
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background: "rgba(10, 10, 10, 0.8)",
-                  }}
-                />
-              </motion.div>
-            )}
+            {/* Library Grid */}
+            <LibraryGrid books={filteredAndSortedBooks} />
           </div>
-        </div>
-      </Main>
-    </>
+        </Main>
+      </div>
+    </div>
   );
 }

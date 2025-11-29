@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { X, Bookmark, BookmarkCheck } from "lucide-react";
-import type { BookChapterRef } from "@/lib/books";
+import type { BookChapterRef } from "@/lib/books/types";
 
 interface Bookmark {
   id: string;

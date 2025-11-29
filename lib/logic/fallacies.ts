@@ -79,46 +79,6 @@ function getDefaultFallacies(): Fallacy[] {
   ];
 }
 
-/**
- * Detect fallacies in argument text
- */
-export function detectFallacies(text: string, fallacies: Fallacy[]): Fallacy[] {
-  const detected: Fallacy[] = [];
-  const lowerText = text.toLowerCase();
-
-  for (const fallacy of fallacies) {
-    const patterns = getFallacyPatterns(fallacy.name);
-    const matches = patterns.some((pattern) =>
-      new RegExp(pattern, "i").test(lowerText)
-    );
-
-    if (matches) {
-      detected.push(fallacy);
-    }
-  }
-
-  return detected;
-}
-
-/**
- * Get regex patterns for fallacy detection
- */
-function getFallacyPatterns(fallacyName: string): string[] {
-  const patterns: Record<string, string[]> = {
-    "Ad Hominem": [
-      "you can't trust",
-      "because (he|she|they) (is|are)",
-      "attacking the person",
-    ],
-    "Straw Man": ["they want to", "misrepresent", "distorted version"],
-    "False Dilemma": ["either.*or", "only two options", "with us or against"],
-    "Appeal to Popularity": [
-      "everyone knows",
-      "everyone believes",
-      "most people",
-    ],
-    "Slippery Slope": ["if.*then.*next", "inevitably lead", "chain of events"],
-  };
-
-  return patterns[fallacyName] || [];
-}
+// detectFallacies moved to fallacies-client.ts for client-side use
+// Re-export for server-side compatibility
+export { detectFallacies } from "./fallacies-client";

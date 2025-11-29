@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { Highlight } from "@/lib/notes";
+import type { Highlight } from "@/lib/notes/types";
 import type { Theme } from "@/lib/theme";
 
 interface HighlightSystemProps {

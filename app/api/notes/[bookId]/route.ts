@@ -8,10 +8,11 @@ import {
 
 export async function GET(
   request: Request,
-  { params }: { params: { bookId: string } }
+  { params }: { params: Promise<{ bookId: string }> }
 ) {
   try {
-    const highlights = loadHighlights(params.bookId);
+    const { bookId } = await params;
+    const highlights = loadHighlights(bookId);
     return NextResponse.json({ highlights });
   } catch (error) {
     console.error("Error loading highlights:", error);
@@ -24,11 +25,12 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: { bookId: string } }
+  { params }: { params: Promise<{ bookId: string }> }
 ) {
   try {
+    const { bookId } = await params;
     const body = await request.json();
-    const highlight = saveHighlight(params.bookId, body);
+    const highlight = saveHighlight(bookId, body);
     return NextResponse.json({ highlight });
   } catch (error) {
     console.error("Error saving highlight:", error);
@@ -41,9 +43,10 @@ export async function POST(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { bookId: string } }
+  { params }: { params: Promise<{ bookId: string }> }
 ) {
   try {
+    const { bookId } = await params;
     const { searchParams } = new URL(request.url);
     const highlightId = searchParams.get("id");
 
@@ -54,7 +57,7 @@ export async function DELETE(
       );
     }
 
-    deleteHighlight(params.bookId, highlightId);
+    deleteHighlight(bookId, highlightId);
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting highlight:", error);

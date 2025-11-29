@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { TopNavBar } from "@/components/core/TopNavBar";
 import { ScholarivmShell } from "@/components/Scholarivm/ScholarivmShell";
 import { ScholarHeader } from "@/components/Scholarivm/ScholarHeader";
 import { MasterySlab } from "@/components/Scholarivm/MasterySlab";
@@ -124,8 +125,10 @@ export default function ScholarivmPage() {
 
   if (loading) {
     return (
-      <Main>
-        <ScholarivmShell>
+      <>
+        <TopNavBar />
+        <Main>
+          <ScholarivmShell>
           <div className="flex items-center justify-center min-h-screen">
             <div className="text-center">
               <div
@@ -144,7 +147,8 @@ export default function ScholarivmPage() {
           </div>
         </ScholarivmShell>
       </Main>
-    );
+    </>
+  );
   }
 
   // Calculate statistics
@@ -203,8 +207,10 @@ export default function ScholarivmPage() {
   const memoriaStats = getMemoriaStats(cards);
 
   return (
-    <Main className="scroll-fade-top scroll-fade-bottom">
-      <ScholarivmShell>
+    <>
+      <TopNavBar />
+      <Main className="scroll-fade-top scroll-fade-bottom">
+        <ScholarivmShell>
         <div className="relative z-10 min-h-screen p-6 md:p-12">
           <div className="max-w-7xl mx-auto">
             {/* Header */}
@@ -343,9 +349,10 @@ export default function ScholarivmPage() {
                 </div>
               </div>
             </motion.div>
+            </div>
           </div>
-        </div>
-      </ScholarivmShell>
-    </Main>
+        </ScholarivmShell>
+      </Main>
+    </>
   );
 }

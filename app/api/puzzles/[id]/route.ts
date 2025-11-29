@@ -3,10 +3,11 @@ import { loadPuzzle } from "@/lib/puzzles/loader";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const puzzle = loadPuzzle(params.id);
+    const { id } = await params;
+    const puzzle = loadPuzzle(id);
     if (!puzzle) {
       return NextResponse.json({ error: "Puzzle not found" }, { status: 404 });
     }

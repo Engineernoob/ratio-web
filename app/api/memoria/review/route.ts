@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { reviewCard } from "@/lib/memoria/utils";
-import { getCardById } from "@/lib/memoria/storage";
+import { calculateCardReview } from "@/lib/memoria/utils";
+import { getCardById, updateCard } from "@/lib/memoria/storage";
 
 export async function POST(request: Request) {
   try {
@@ -19,7 +19,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Card not found" }, { status: 404 });
     }
 
-    const updatedCard = await reviewCard(card, quality);
+    // Calculate review result (client-safe function)
+    const updatedCard = calculateCardReview(card, quality);
+    
+    // Save to storage (server-side only)
+    updateCard(updatedCard);
 
     return NextResponse.json({ card: updatedCard });
   } catch (error) {

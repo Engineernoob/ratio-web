@@ -1,6 +1,5 @@
 import type { MemoryCard, ReviewQuality } from "./types";
 import { calculateReview } from "./review";
-import { updateCard } from "./storage";
 import { getTodayDate } from "@/lib/utils/date";
 
 /**
@@ -24,19 +23,44 @@ export function mapQualityToReviewQuality(
 }
 
 /**
- * Review a card and save the result
+ * Review a card and calculate the result
+ * Note: Saving should be done via API route (/api/memoria/review)
+ */
+export function calculateCardReview(
+  card: MemoryCard,
+  quality: "easy" | "good" | "hard" | "forgot"
+): MemoryCard {
+  const reviewQuality = mapQualityToReviewQuality(quality);
+  const result = calculateReview(card, reviewQuality);
+  return result.card;
+}
+
+/**
+ * Review a card and save via API
+ * This is the client-safe version that calls the API route
  */
 export async function reviewCard(
   card: MemoryCard,
   quality: "easy" | "good" | "hard" | "forgot"
 ): Promise<MemoryCard> {
-  const reviewQuality = mapQualityToReviewQuality(quality);
-  const result = calculateReview(card, reviewQuality);
+  const updatedCard = calculateCardReview(card, quality);
 
-  // Save updated card
-  updateCard(result.card);
+  // Save via API route (server-side)
+  const response = await fetch("/api/memoria/review", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      cardId: card.id,
+      quality,
+    }),
+  });
 
-  return result.card;
+  if (!response.ok) {
+    throw new Error("Failed to save card review");
+  }
+
+  const data = await response.json();
+  return data.card || updatedCard;
 }
 
 /**

@@ -1,100 +1,165 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { TopNavBar } from "@/components/core/TopNavBar";
-import { HeroSection } from "@/components/core/HeroSection";
-import { LectioCard } from "@/components/core/LectioCard";
-import { RitualCard } from "@/components/core/RitualCard";
-import { MemoriaCard } from "@/components/core/MemoriaCard";
-import { DayStatusPanel } from "@/components/core/DayStatusPanel";
-import { NextActionsPanel } from "@/components/core/NextActionsPanel";
-import { ScrollFeedCard } from "@/components/core/ScrollFeedCard";
+import { Main } from "@/components/Main";
+import { ToastContainer } from "@/components/core/Toast";
+import { useToast } from "@/hooks/useToast";
+import {
+  AnimatedBackground,
+  HeroSection,
+  MinimalRow,
+  ProgressWidget,
+} from "@/components/home";
+
+interface FeedItem {
+  id: string;
+  type: string;
+  title: string;
+  content: string;
+  micro_test_q?: string;
+  micro_test_a?: string;
+  source?: string;
+  date_assigned?: string;
+}
 
 export default function OikosPage() {
-  return (
-    <div
-      className="min-h-screen relative"
-      style={{ background: "var(--background, #000000)" }}
-    >
-      <TopNavBar />
+  const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toasts, showToast, removeToast } = useToast();
 
-      <div className="pt-20 pb-12">
-        <div className="max-w-[1920px] mx-auto px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-12">
-              {/* Hero Section */}
-              <HeroSection lectioCount={3} ritusCount={2} memoriaCount={7} />
+  useEffect(() => {
+    fetchFeed();
+  }, []);
 
-              {/* Prima Tabulae Hodiernae */}
-              <div>
-                <h2 className="font-mono text-xs text-[#888888] uppercase tracking-wider mb-6">
-                  PRIMA TABVLÆ HODIERNÆ
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <LectioCard delay={0.3} />
-                  <RitualCard delay={0.4} />
-                  <MemoriaCard delay={0.5} />
-                </div>
+  const fetchFeed = async () => {
+    try {
+      const today = new Date().toISOString().split("T")[0];
+      const response = await fetch(`/api/feed?date=${today}`);
+      const data = await response.json();
+      if (data.feed) {
+        setFeedItems(data.feed);
+      }
+    } catch (e) {
+      console.error("Feed error:", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Calculate progress from feed items
+  const lectioItems = feedItems.filter((i) =>
+    ["book_micro", "book_summary"].includes(i.type)
+  );
+  const ritualItems = feedItems.filter((i) => i.type === "tiktok");
+  const memoriaItems = feedItems.filter((i) => i.type === "puzzle");
+
+  const progressItems = [
+    {
+      label: "Lectio",
+      value: Math.min(lectioItems.length, 3),
+      max: 3,
+    },
+    {
+      label: "Rituales",
+      value: Math.min(ritualItems.length, 2),
+      max: 2,
+    },
+    {
+      label: "Memoria",
+      value: Math.min(memoriaItems.length, 5),
+      max: 5,
+    },
+  ];
+
+  // Get content for each row
+  const lectioContent =
+    lectioItems.length > 0
+      ? lectioItems[0].content.length > 120
+        ? `${lectioItems[0].content.slice(0, 120)}...`
+        : lectioItems[0].content
+      : "Continue your reading journey with today's selected texts.";
+
+  const ritualContent =
+    ritualItems.length > 0
+      ? ritualItems[0].content.length > 120
+        ? `${ritualItems[0].content.slice(0, 120)}...`
+        : ritualItems[0].content
+      : "Engage with today's practice and reflection exercises.";
+
+  const memoriaContent =
+    memoriaItems.length > 0
+      ? memoriaItems[0].content.length > 120
+        ? `${memoriaItems[0].content.slice(0, 120)}...`
+        : memoriaItems[0].content
+      : "Review and strengthen your knowledge retention.";
+
+  if (loading) {
+    return (
+      <div className="relative min-h-screen">
+        <AnimatedBackground />
+        <TopNavBar />
+        <div className="relative z-10 pt-20">
+          <Main>
+            <div className="text-center py-32">
+              <div className="font-serif text-xl mb-4 text-[#e8e6e1]">
+                Loading OIKOS...
               </div>
-
-              {/* Scrollvs Hodiernvs */}
-              <div>
-                <div className="mb-2">
-                  <p className="font-mono text-[10px] text-[#888888] uppercase tracking-wider mb-4">
-                    LECTIO • RITVS • MEMORIA IN VNVM CONFLVNT
-                  </p>
-                  <h2 className="font-mono text-xs text-[#888888] uppercase tracking-wider">
-                    SCROLLVS HODIERNVS
-                  </h2>
-                </div>
-                <div className="space-y-6 mt-6">
-                  <ScrollFeedCard
-                    type="LECTIO"
-                    title="CONTINVA VIRTUS VT HABITUS: DE MEDIOCRITATE"
-                    description="Reread the central argument on virtue as a mean between extremes. Mark any sentences that reframe your current studies or challenge your previous annotations."
-                    source="EX SCHEDA • ETHICA NICOMACHEA II"
-                    time="12 MIN"
-                    actionLabel="ADDERE AD MEMORIAM"
-                    delay={0.6}
-                  />
-                  <ScrollFeedCard
-                    type="RITVAL"
-                    title="EXERCITIVM QVAESTIO MATVTINA: QVID HODIE DISCIPIAM?"
-                    description="Answer in three short lines: (1) quid explorandum, (2) quibus mediis, (3) quibus signis vesperi intelleges te profecisse. Keep language precise and concrete."
-                    source="EX OFFICINA • OIKOS RITVS"
-                    time="5 MIN"
-                    actionLabel="SEGNARE COMPLETVM"
-                    delay={0.7}
-                  />
-                  <ScrollFeedCard
-                    type="MEMORIA"
-                    title="REVISIO ARBOR SCIENTIAE: RAMUS LOGICVS"
-                    description="Walk once more through the logical branch of your memory tree. For each nodus, recite the associated principle and provide a fresh example drawn from today's reading or life."
-                    source="EX THEATRO • INTERVALLVM III"
-                    time="20 MIN"
-                    actionLabel="CONIVNGERE CVM LECTIO"
-                    delay={0.8}
-                  />
-                </div>
+              <div className="font-mono text-sm text-[#888888]">
+                Preparing your daily feed...
               </div>
             </div>
-
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <DayStatusPanel
-                lectioComplete={2}
-                lectioTotal={3}
-                ritualiaFacta={1}
-                ritualiaTotal={2}
-                memoriaRevisio={3}
-                memoriaTotal={7}
-                delay={0.3}
-              />
-              <NextActionsPanel delay={0.4} />
-            </div>
-          </div>
+          </Main>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="relative min-h-screen">
+      <AnimatedBackground />
+      <TopNavBar />
+
+      <div className="relative z-10 pt-20">
+        <Main>
+          <div className="max-w-5xl mx-auto px-6 md:px-12 py-16 md:py-24">
+            {/* Hero Section */}
+            <HeroSection />
+
+            {/* Three Minimal Rows */}
+            <div className="space-y-0 mb-24">
+              <MinimalRow
+                title="LECTIO"
+                content={lectioContent}
+                href="/bibliotheca"
+                cta={lectioItems.length > 0 ? "Continue →" : "Begin →"}
+                delay={0.1}
+              />
+              <MinimalRow
+                title="RITUAL"
+                content={ritualContent}
+                href="/oikos"
+                cta={ritualItems.length > 0 ? "Continue →" : "Begin →"}
+                delay={0.2}
+              />
+              <MinimalRow
+                title="MEMORIA"
+                content={memoriaContent}
+                href="/memoria"
+                cta={memoriaItems.length > 0 ? "Continue →" : "Begin →"}
+                delay={0.3}
+              />
+            </div>
+
+            {/* Progress Widget - Right Aligned */}
+            <div className="flex justify-end">
+              <ProgressWidget items={progressItems} />
+            </div>
+          </div>
+        </Main>
+      </div>
+
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );
 }

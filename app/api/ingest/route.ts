@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
-import pdf from "pdf-parse";
+// Dynamic import for pdf-parse to avoid bundling issues
+const pdfParse = require("pdf-parse");
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const BOOKS_DIR = path.join(DATA_DIR, "books");
@@ -348,7 +349,7 @@ export async function POST(request: NextRequest) {
       const buffer = Buffer.from(arrayBuffer);
 
       // Extract text from PDF
-      const pdfData = await pdf(buffer);
+      const pdfData = await pdfParse(buffer);
       let text = pdfData.text;
 
       // Normalize text

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { TopNavBar } from "@/components/core/TopNavBar";
 import { Main } from "@/components/Main";
 import { BrutalistCard } from "@/components/BrutalistCard";
 import { OrangeAction } from "@/components/core/OrangeAction";
@@ -150,24 +151,29 @@ export default function InsightsPage() {
 
   if (!summary) {
     return (
-      <Main>
-        <MemoriaShell>
-          <BrutalistCard borderWidth="1.5" className="p-6">
-            <div className="font-mono text-sm text-muted-foreground">
-              Unable to load insights. Please try again.
-            </div>
-            <OrangeAction onClick={loadInsights} className="mt-4">
-              Retry
-            </OrangeAction>
-          </BrutalistCard>
-        </MemoriaShell>
-      </Main>
+      <>
+        <TopNavBar />
+        <Main>
+          <MemoriaShell>
+            <BrutalistCard borderWidth="1.5" className="p-6">
+              <div className="font-mono text-sm text-muted-foreground">
+                Unable to load insights. Please try again.
+              </div>
+              <OrangeAction onClick={loadInsights} className="mt-4">
+                Retry
+              </OrangeAction>
+            </BrutalistCard>
+          </MemoriaShell>
+        </Main>
+      </>
     );
   }
 
   return (
-    <Main>
-      <MemoriaShell>
+    <>
+      <TopNavBar />
+      <Main>
+        <MemoriaShell>
         <div className="relative z-10 min-h-screen p-6">
           <div className="max-w-6xl mx-auto">
             {/* Header */}
@@ -587,6 +593,7 @@ export default function InsightsPage() {
           </div>
         </div>
       </MemoriaShell>
-    </Main>
+      </Main>
+    </>
   );
 }

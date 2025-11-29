@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { TopNavBar } from "@/components/core/TopNavBar";
 import { MentorShell } from "@/components/Mentor/MentorShell";
 import { PersonaSelector } from "@/components/Mentor/PersonaSelector";
 import { MessageBubble } from "@/components/Mentor/MessageBubble";
@@ -109,8 +110,10 @@ export default function MentorPage() {
   };
 
   return (
-    <Main className="scroll-fade-top scroll-fade-bottom">
-      <MentorShell>
+    <>
+      <TopNavBar />
+      <Main className="scroll-fade-top scroll-fade-bottom">
+        <MentorShell>
         <div className="relative z-10 min-h-screen p-6 md:p-12">
           <div className="max-w-4xl mx-auto">
             {/* Header */}
@@ -234,6 +237,7 @@ export default function MentorPage() {
           </div>
         </div>
       </MentorShell>
-    </Main>
+      </Main>
+    </>
   );
 }

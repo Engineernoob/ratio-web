@@ -18,13 +18,13 @@ export function RootLayoutWrapper({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {/* Theme Layers - Always render to maintain hook consistency */}
-      <ThemeTextureLayer />
-      <ThemeFogLayer />
-      <ThemeGrainLayer />
-      <ThemeAmbientParticles />
+      {/* Theme Layers - Disabled to remove overlays */}
+      {/* <ThemeTextureLayer /> */}
+      {/* <ThemeFogLayer /> */}
+      {/* <ThemeGrainLayer /> */}
+      {/* <ThemeAmbientParticles /> */}
       {/* Modern theme overlays */}
-      {isModern && <ModernThemeOverlays theme={currentTheme} />}
+      {/* {isModern && <ModernThemeOverlays theme={currentTheme} />} */}
 
       {/* Conditional layout structure */}
       {useSimpleLayout ? (

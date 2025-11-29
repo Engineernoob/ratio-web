@@ -318,11 +318,18 @@ export default function BookDetailPage() {
                   Key Ideas
                 </div>
                 <ul className="space-y-2 text-muted-foreground">
-                  {bookSummary.key_ideas.map((idea, idx) => (
-                    <li key={idx} className="border-l border-border pl-3">
+                  {bookSummary.key_ideas?.map((idea, idx) => (
+                    <li
+                      key={`idea-${idx}-${idea.slice(0, 10)}`}
+                      className="border-l border-border pl-3"
+                    >
                       {idea}
                     </li>
-                  ))}
+                  )) || (
+                    <li className="text-muted-foreground">
+                      No key ideas available
+                    </li>
+                  )}
                 </ul>
               </div>
             </div>
@@ -342,7 +349,7 @@ export default function BookDetailPage() {
             <div className="space-y-4">
               {chapters.map((chapter, index) => (
                 <motion.div
-                  key={chapter.chapter}
+                  key={`chapter-${chapter.chapter}-${index}`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: 0.5 + index * 0.1 }}

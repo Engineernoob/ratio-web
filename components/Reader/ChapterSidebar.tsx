@@ -1,6 +1,6 @@
 "use client";
 
-import type { BookChapterRef } from "@/lib/books";
+import type { BookChapterRef } from "@/lib/books/types";
 
 interface ChapterSidebarProps {
   chapters: BookChapterRef[];

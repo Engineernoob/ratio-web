@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { BookChapterRef, ChapterContent } from "@/lib/books";
-import type { Highlight } from "@/lib/notes";
+import type { BookChapterRef, ChapterContent } from "@/lib/books/types";
+import type { Highlight } from "@/lib/notes/types";
 import type { Theme } from "@/lib/theme";
 
 interface PageTransitionProps {

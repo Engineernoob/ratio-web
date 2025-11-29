@@ -25,8 +25,8 @@ export interface MemoriaConcept {
   source: "lesson" | "manual" | "tiktok" | "book_summary" | "book" | "puzzle";
 }
 
-// Re-export new system
-export * from "./memoria";
+// Re-export new system from memoria/index
+export * from "./memoria/index";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const MEMORIA_FILE = path.join(DATA_DIR, "memoria.json");
@@ -34,8 +34,10 @@ const MEMORIA_FILE = path.join(DATA_DIR, "memoria.json");
 // SM-2 Light intervals: 1d → 3d → 7d → 14d → 30d
 const INTERVALS = [1, 3, 7, 14, 30];
 
+import { getTodayDate } from "@/lib/utils/date";
+
 function getTodayDateString(): string {
-  return new Date().toISOString().split("T")[0];
+  return getTodayDate();
 }
 
 function addDays(dateString: string, days: number): string {

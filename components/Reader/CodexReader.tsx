@@ -7,12 +7,9 @@ import { PageCanvas } from "./PageCanvas";
 import { PageTurnWrapper } from "./PageTurnWrapper";
 import { CodexChrome } from "./CodexChrome";
 import { HighlightLayer } from "./HighlightLayer";
-import { LightVignette } from "@/components/ui/LightVignette";
-import { DustLayer } from "@/components/ui/DustLayer";
-import { CandleFlicker } from "@/components/ui/CandleFlicker";
-import type { BookManifest, BookChapterRef } from "@/lib/books";
+import type { BookManifest, BookChapterRef } from "@/lib/books/types";
 import type { HTMLFlipBook as HTMLFlipBookType } from "react-pageflip";
-import type { Highlight } from "@/lib/notes";
+import type { Highlight } from "@/lib/notes/types";
 
 // Configure PDF.js worker
 if (typeof window !== "undefined") {
@@ -460,59 +457,51 @@ export function CodexReader({
       className="h-full w-full flex items-center justify-center relative"
       style={{ background: "#0A0A0A" }}
     >
-      {/* Dust Layer */}
-      <DustLayer particleCount={30} />
-
-      {/* Light Vignette */}
-      <LightVignette intensity={0.22} />
-
       {/* Main book container with animations */}
-      <CandleFlicker>
-        <motion.div
-          className="relative"
-          initial={{ scale: 0.96, opacity: 0 }}
-          animate={{
-            scale: isBookOpen ? 1 : 0.96,
-            opacity: isBookOpen ? 1 : 0,
+      <motion.div
+        className="relative"
+        initial={{ scale: 0.96, opacity: 0 }}
+        animate={{
+          scale: isBookOpen ? 1 : 0.96,
+          opacity: isBookOpen ? 1 : 0,
+        }}
+        transition={{
+          scale: {
+            type: "spring",
+            stiffness: 100,
+            damping: 15,
+            duration: 0.8,
+          },
+          opacity: { duration: 0.5 },
+        }}
+      >
+        <PageTurnWrapper
+          pages={pageElements}
+          currentPage={currentSpreadIndex + 1}
+          flipBookRef={flipBookRef}
+          onPageChange={(spreadIndex) => {
+            // Convert spread index (1-based) back to page number (1-based)
+            // spreadIndex 1 = pages 1-2, spreadIndex 2 = pages 3-4, etc.
+            const newPage = (spreadIndex - 1) * 2 + 1;
+            handlePageChange(newPage);
           }}
-          transition={{
-            scale: {
-              type: "spring",
-              stiffness: 100,
-              damping: 15,
-              duration: 0.8,
-            },
-            opacity: { duration: 0.5 },
-          }}
-        >
-          <PageTurnWrapper
-            pages={pageElements}
-            currentPage={currentSpreadIndex + 1}
-            flipBookRef={flipBookRef}
-            onPageChange={(spreadIndex) => {
-              // Convert spread index (1-based) back to page number (1-based)
-              // spreadIndex 1 = pages 1-2, spreadIndex 2 = pages 3-4, etc.
-              const newPage = (spreadIndex - 1) * 2 + 1;
-              handlePageChange(newPage);
-            }}
-            width={800}
-            height={1000}
-          />
+          width={800}
+          height={1000}
+        />
 
-          {/* UI Chrome overlay */}
-          <CodexChrome
-            currentPage={currentPage}
-            totalPages={totalPages}
-            chapterTitle={selectedChapter?.title}
-            pageRange={pageRange}
-            onPrevious={handlePrevious}
-            onNext={handleNext}
-            canGoPrevious={currentPage > pageRange.start}
-            canGoNext={currentPage < pageRange.end}
-            ritualMode={ritualMode}
-          />
-        </motion.div>
-      </CandleFlicker>
+        {/* UI Chrome overlay */}
+        <CodexChrome
+          currentPage={currentPage}
+          totalPages={totalPages}
+          chapterTitle={selectedChapter?.title}
+          pageRange={pageRange}
+          onPrevious={handlePrevious}
+          onNext={handleNext}
+          canGoPrevious={currentPage > pageRange.start}
+          canGoNext={currentPage < pageRange.end}
+          ritualMode={ritualMode}
+        />
+      </motion.div>
     </div>
   );
 }

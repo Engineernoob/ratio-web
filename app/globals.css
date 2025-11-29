@@ -91,3 +91,115 @@ body {
 .text-gold {
   color: #d7c49eff;
 }
+
+/* OIKOS Background Animations */
+@keyframes bg-drift {
+  0% {
+    background-position: 50% 50%;
+  }
+  50% {
+    background-position: 51% 49%;
+  }
+  100% {
+    background-position: 50% 50%;
+  }
+}
+
+@keyframes vignette-pulse {
+  0% {
+    opacity: 0.12;
+  }
+  50% {
+    opacity: 0.18;
+  }
+  100% {
+    opacity: 0.12;
+  }
+}
+
+@keyframes grain {
+  0%,
+  100% {
+    opacity: 0.09;
+  }
+  50% {
+    opacity: 0.11;
+  }
+}
+
+@keyframes ken-burns {
+  0% {
+    background-position: 50% 50%;
+    background-size: 100%;
+  }
+  50% {
+    background-position: 52% 48%;
+    background-size: 105%;
+  }
+  100% {
+    background-position: 50% 50%;
+    background-size: 100%;
+  }
+}
+
+.oikos-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+
+  background-image: url("/images/backgrounds/acropolis-dithered.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  filter: grayscale(100%) contrast(120%);
+  animation: bg-drift 60s ease-in-out infinite;
+
+  will-change: background-position, filter;
+  transform: translateZ(0);
+}
+
+.oikos-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: -5;
+  pointer-events: none;
+
+  background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
+  mix-blend-mode: multiply;
+  opacity: 0.15;
+
+  animation: vignette-pulse 9s ease-in-out infinite;
+}
+
+.oikos-grain {
+  position: fixed;
+  inset: 0;
+  z-index: -4;
+  pointer-events: none;
+
+  background-image: url("/images/textures/texture_bayer.png");
+  background-size: 256px 256px;
+  background-repeat: repeat;
+  mix-blend-mode: overlay;
+  opacity: 0.08;
+  animation: grain 6s ease-in-out infinite;
+}
+
+.scroll-darken {
+  transition: background-color 0.3s ease-out;
+}
+
+/* Utility classes for OIKOS */
+.card-padding {
+  padding: 1.5rem;
+}
+
+.soft-float {
+  transition: transform 0.3s ease-out;
+}
+
+.soft-float:hover {
+  transform: translateY(-2px);
+}

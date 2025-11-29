@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { TopNavBar } from "@/components/core/TopNavBar";
 import { GraphShell } from "@/components/Graph/GraphShell";
 import { GraphCanvas } from "@/components/Graph/GraphCanvas";
 import { GraphSidebar } from "@/components/Graph/GraphSidebar";
@@ -83,8 +84,10 @@ export default function GraphPage() {
 
   if (loading) {
     return (
-      <Main>
-        <GraphShell theme={theme}>
+      <>
+        <TopNavBar />
+        <Main>
+          <GraphShell theme={theme}>
           <div className="flex items-center justify-center min-h-screen">
             <div className="text-center">
               <div
@@ -103,79 +106,83 @@ export default function GraphPage() {
           </div>
         </GraphShell>
       </Main>
-    );
+    </>
+  );
   }
 
   return (
-    <Main className="scroll-fade-top scroll-fade-bottom">
-      <GraphShell theme={theme}>
-        <div className="relative z-10 min-h-screen p-6 md:p-12">
-          <div className="max-w-full mx-auto">
-            {/* Header */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-center mb-8"
-            >
-              <EngravedHeader level={1} delay={0.2}>
-                KNOWLEDGE GRAPH
-              </EngravedHeader>
-              <motion.p
+    <>
+      <TopNavBar />
+      <Main className="scroll-fade-top scroll-fade-bottom">
+        <GraphShell theme={theme}>
+          <div className="relative z-10 min-h-screen p-6 md:p-12">
+            <div className="max-w-full mx-auto">
+              {/* Header */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="text-center mb-8"
+              >
+                <EngravedHeader level={1} delay={0.2}>
+                  KNOWLEDGE GRAPH
+                </EngravedHeader>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                  className="font-mono text-sm mt-4"
+                  style={{ color: "rgba(215, 196, 158, 0.6)" }}
+                >
+                  Visualize the connections in your learning journey
+                </motion.p>
+              </motion.div>
+
+              {/* Graph Container */}
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-                className="font-mono text-sm mt-4"
-                style={{ color: "rgba(215, 196, 158, 0.6)" }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="relative"
+                style={{ height: "800px" }}
               >
-                Visualize the connections in your learning journey
-              </motion.p>
-            </motion.div>
-
-            {/* Graph Container */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="relative"
-              style={{ height: "800px" }}
-            >
-              {/* Sidebar */}
-              <GraphSidebar
-                theme={theme}
-                onThemeChange={setTheme}
-                nodeCount={nodes.length}
-                edgeCount={edges.length}
-                selectedNodeType={selectedNode?.type}
-              />
-
-              {/* Canvas */}
-              <div
-                className="absolute left-64 right-96 top-0 bottom-0"
-                style={{ marginLeft: "1rem", marginRight: "1rem" }}
-              >
-                <GraphCanvas
-                  nodes={nodes}
-                  edges={edges}
-                  onNodeClick={handleNodeClick}
+                {/* Sidebar */}
+                <GraphSidebar
                   theme={theme}
-                  width={1200}
-                  height={800}
+                  onThemeChange={setTheme}
+                  nodeCount={nodes.length}
+                  edgeCount={edges.length}
+                  selectedNodeType={selectedNode?.type}
                 />
-              </div>
 
-              {/* Node Detail */}
-              <NodeDetailComponent
-                detail={nodeDetail}
-                onClose={() => setSelectedNode(null)}
-                onOpenInReader={handleOpenInReader}
-                onAddToMemoria={handleAddToMemoria}
-                onAnalyzeInArs={handleAnalyzeInArs}
-              />
-            </motion.div>
+                {/* Canvas */}
+                <div
+                  className="absolute left-64 right-96 top-0 bottom-0"
+                  style={{ marginLeft: "1rem", marginRight: "1rem" }}
+                >
+                  <GraphCanvas
+                    nodes={nodes}
+                    edges={edges}
+                    onNodeClick={handleNodeClick}
+                    theme={theme}
+                    width={1200}
+                    height={800}
+                  />
+                </div>
+
+                {/* Node Detail */}
+                <NodeDetailComponent
+                  detail={nodeDetail}
+                  onClose={() => setSelectedNode(null)}
+                  onOpenInReader={handleOpenInReader}
+                  onAddToMemoria={handleAddToMemoria}
+                  onAnalyzeInArs={handleAnalyzeInArs}
+                />
+              </motion.div>
+            </div>
           </div>
-        </div>
-      </GraphShell>
-    </Main>
+        </GraphShell>
+      </Main>
+    </>
   );
 }

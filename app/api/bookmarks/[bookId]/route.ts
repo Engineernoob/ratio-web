@@ -52,10 +52,11 @@ function saveBookmarks(bookId: string, bookmarks: Bookmark[]): void {
 
 export async function GET(
   request: Request,
-  { params }: { params: { bookId: string } }
+  { params }: { params: Promise<{ bookId: string }> }
 ) {
   try {
-    const bookmarks = loadBookmarks(params.bookId);
+    const { bookId } = await params;
+    const bookmarks = loadBookmarks(bookId);
     return NextResponse.json({ bookmarks });
   } catch (error) {
     console.error("Error loading bookmarks:", error);
@@ -68,15 +69,16 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: { bookId: string } }
+  { params }: { params: Promise<{ bookId: string }> }
 ) {
   try {
+    const { bookId } = await params;
     const body = await request.json();
-    const bookmarks = loadBookmarks(params.bookId);
+    const bookmarks = loadBookmarks(bookId);
 
     const newBookmark: Bookmark = {
-      id: `${params.bookId}-${Date.now()}`,
-      bookId: params.bookId,
+      id: `${bookId}-${Date.now()}`,
+      bookId: bookId,
       chapterId: body.chapterId,
       pageNumber: body.pageNumber || 1,
       note: body.note,
@@ -84,7 +86,7 @@ export async function POST(
     };
 
     bookmarks.push(newBookmark);
-    saveBookmarks(params.bookId, bookmarks);
+    saveBookmarks(bookId, bookmarks);
 
     return NextResponse.json({ bookmark: newBookmark });
   } catch (error) {
@@ -98,9 +100,10 @@ export async function POST(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { bookId: string } }
+  { params }: { params: Promise<{ bookId: string }> }
 ) {
   try {
+    const { bookId } = await params;
     const { searchParams } = new URL(request.url);
     const bookmarkId = searchParams.get("id");
 
@@ -111,9 +114,9 @@ export async function DELETE(
       );
     }
 
-    const bookmarks = loadBookmarks(params.bookId);
+    const bookmarks = loadBookmarks(bookId);
     const filtered = bookmarks.filter((b) => b.id !== bookmarkId);
-    saveBookmarks(params.bookId, filtered);
+    saveBookmarks(bookId, filtered);
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -2,8 +2,12 @@
 
 import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { useParams, useRouter } from "next/navigation";
-import type { BookManifest, BookChapterRef, ChapterContent } from "@/lib/books";
-import type { Highlight } from "@/lib/notes";
+import type {
+  BookManifest,
+  BookChapterRef,
+  ChapterContent,
+} from "@/lib/books/types";
+import type { Highlight } from "@/lib/notes/types";
 
 // Lazy load heavy components
 const AdvancedCodexReader = lazy(() =>
@@ -49,12 +53,13 @@ export default function ReaderPage() {
         if (!res.ok) {
           throw new Error("Failed to load book manifest");
         }
-        const data = await res.json();
-        setManifest(data);
+        const response = await res.json();
+        const manifestData = response.manifest || response;
+        setManifest(manifestData);
 
         // Load first chapter by default
-        if (data.chapters && data.chapters.length > 0) {
-          const firstChapter = data.chapters[0];
+        if (manifestData.chapters && manifestData.chapters.length > 0) {
+          const firstChapter = manifestData.chapters[0];
           setSelectedChapter(firstChapter);
           await loadChapter(slug, firstChapter.file);
         }
@@ -96,8 +101,9 @@ export default function ReaderPage() {
       if (!res.ok) {
         throw new Error("Failed to load chapter");
       }
-      const data = await res.json();
-      setCurrentChapter(data);
+      const response = await res.json();
+      const chapterData = response.chapter || response;
+      setCurrentChapter(chapterData);
     } catch (err) {
       console.error("Error loading chapter:", err);
     }

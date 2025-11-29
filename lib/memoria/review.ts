@@ -16,6 +16,7 @@ import type {
   ReviewResult,
   MemoryStage,
 } from "./types";
+import { getTodayDate } from "@/lib/utils/date";
 
 /**
  * Calculate new card state after a review
@@ -24,7 +25,7 @@ export function calculateReview(
   card: MemoryCard,
   quality: ReviewQuality
 ): ReviewResult {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayDate();
 
   let newEase = card.ease;
   let newInterval = card.interval;
@@ -136,7 +137,7 @@ export function initializeCard(input: {
   sourceMetadata?: Record<string, unknown>;
   tags?: string[];
 }): MemoryCard {
-  const today = new Date().toISOString().split("T")[0];
+  const today = getTodayDate();
 
   return {
     id: input.id,

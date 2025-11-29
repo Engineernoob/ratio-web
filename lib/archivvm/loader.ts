@@ -1,4 +1,4 @@
-import type { Highlight } from "@/lib/notes";
+import type { Highlight } from "@/lib/notes/types";
 import type { MemoryCard } from "@/lib/memoria/types";
 import type { ArchivvmItem } from "./types";
 import { loadCards } from "@/lib/memoria/storage";

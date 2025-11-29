@@ -11,8 +11,8 @@ import { NotesPanel } from "./NotesPanel";
 import { AIToolsPanel } from "./AIToolsPanel";
 import { BookmarkPanel } from "./BookmarkPanel";
 import { PageTransition } from "./PageTransition";
-import type { BookManifest, BookChapterRef, ChapterContent } from "@/lib/books";
-import type { Highlight } from "@/lib/notes";
+import type { BookManifest, BookChapterRef, ChapterContent } from "@/lib/books/types";
+import type { Highlight } from "@/lib/notes/types";
 
 interface AdvancedCodexReaderProps {
   bookId: string;
@@ -149,7 +149,7 @@ export function AdvancedCodexReader({
         <AnimatePresence>
           {showChapters && (
             <ChapterNavigation
-              chapters={manifest.chapters}
+              chapters={manifest.chapters || []}
               selectedChapterId={selectedChapter?.id || null}
               onSelectChapter={(chapter) => {
                 onSelectChapter(chapter);

@@ -1,6 +1,6 @@
 "use client";
 
-import type { ChapterContent as ChapterContentType } from "@/lib/books";
+import type { ChapterContent as ChapterContentType } from "@/lib/books/types";
 
 interface ChapterContentProps {
   chapter: ChapterContentType | null;

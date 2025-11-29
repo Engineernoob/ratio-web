@@ -1,27 +1,11 @@
 import fs from "fs";
 import path from "path";
 
+// Re-export types from type-only file
+export type { Highlight, Note } from "./notes/types";
+
 const DATA_DIR = path.join(process.cwd(), "data");
 const NOTES_DIR = path.join(DATA_DIR, "notes");
-
-export interface Highlight {
-  id: string;
-  bookId: string;
-  chapterId?: string;
-  pageNumber: number;
-  text: string;
-  bounds: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  };
-  timestamp: string;
-  tags?: string[];
-}
-
-// Alias for Note (same structure)
-export type Note = Highlight;
 
 /**
  * Ensure notes directory exists

@@ -1286,6 +1286,97 @@
       "interval_days": 0,
       "ease_factor": 1,
       "review_count": 0
+    },
+    {
+      "title": "Let Go of Social Comparison",
+      "explanation": "Comparing yourself to others creates insecurity and distracts from your purpose.",
+      "micro_question": "What does comparison do to the mind?",
+      "micro_answer": "It creates insecurity and distraction.",
+      "source": "book",
+      "id": "concept-1764439402074",
+      "date_added": "2025-11-29",
+      "next_review": "2025-11-29",
+      "interval_days": 0,
+      "ease_factor": 1,
+      "review_count": 0
+    },
+    {
+      "title": "Act Without Attachment",
+      "explanation": "Do the right thing without needing a particular outcome.",
+      "micro_question": "How should you approach outcomes?",
+      "micro_answer": "Without attachment.",
+      "source": "book",
+      "id": "concept-1764439402108",
+      "date_added": "2025-11-29",
+      "next_review": "2025-11-29",
+      "interval_days": 0,
+      "ease_factor": 1,
+      "review_count": 0
+    },
+    {
+      "title": "The Present Moment Is All You Own",
+      "explanation": "Everything outside the present moment is beyond your control, and worrying about it drains energy unnecessarily.",
+      "micro_question": "What is the only time that truly belongs to you?",
+      "micro_answer": "The present moment.",
+      "source": "book",
+      "id": "concept-1764439402112",
+      "date_added": "2025-11-29",
+      "next_review": "2025-11-29",
+      "interval_days": 0,
+      "ease_factor": 1,
+      "review_count": 0
+    },
+    {
+      "title": "You Are a Part of the Whole",
+      "explanation": "Thinking of yourself as a small piece of the universe helps dissolve excessive self-importance.",
+      "micro_question": "How does seeing yourself as part of the whole affect the ego?",
+      "micro_answer": "It weakens ego and fosters humility.",
+      "source": "book",
+      "id": "concept-1764439402116",
+      "date_added": "2025-11-29",
+      "next_review": "2025-11-29",
+      "interval_days": 0,
+      "ease_factor": 1,
+      "review_count": 0
+    },
+    {
+      "title": "Act Only on What Is Before You",
+      "explanation": "Marcus emphasizes focusing entirely on the task at hand rather than scattering attention across past regrets or future worries.",
+      "micro_question": "What should you give your full attention to?",
+      "micro_answer": "The task directly in front of you.",
+      "source": "book",
+      "id": "concept-1764439402131",
+      "date_added": "2025-11-29",
+      "next_review": "2025-11-29",
+      "interval_days": 0,
+      "ease_factor": 1,
+      "review_count": 0
+    },
+    {
+      "title": "True Kindness Is Silent",
+      "explanation": "Marcus learned from mentors that genuine kindness is quiet, humble, and free from expectation.",
+      "micro_question": "What distinguishes true kindness?",
+      "micro_answer": "It seeks no recognition or reward.",
+      "source": "book",
+      "id": "concept-1764439402176",
+      "date_added": "2025-11-29",
+      "next_review": "2025-11-29",
+      "interval_days": 0,
+      "ease_factor": 1,
+      "review_count": 0
+    },
+    {
+      "title": "Your Character Is Shaped by What You Tolerate",
+      "explanation": "Allowing small vices makes room for greater ones.",
+      "micro_question": "What shapes your character over time?",
+      "micro_answer": "What you tolerate in yourself.",
+      "source": "book",
+      "id": "concept-1764439402184",
+      "date_added": "2025-11-29",
+      "next_review": "2025-11-29",
+      "interval_days": 0,
+      "ease_factor": 1,
+      "review_count": 0
     }
   ]
 }

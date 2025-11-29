@@ -3,14 +3,15 @@ import { getBookManifest, getChapter } from "@/lib/books";
 
 export async function GET(
   request: Request,
-  { params }: { params: { bookId: string } }
+  { params }: { params: Promise<{ bookId: string }> }
 ) {
   try {
+    const { bookId } = await params;
     const { searchParams } = new URL(request.url);
     const action = searchParams.get("action");
 
     if (action === "manifest") {
-      const manifest = getBookManifest(params.bookId);
+      const manifest = getBookManifest(bookId);
       if (!manifest) {
         return NextResponse.json({ error: "Book not found" }, { status: 404 });
       }
@@ -26,7 +27,7 @@ export async function GET(
         );
       }
 
-      const chapter = getChapter(params.bookId, fileName);
+      const chapter = getChapter(bookId, fileName);
       if (!chapter) {
         return NextResponse.json(
           { error: "Chapter not found" },

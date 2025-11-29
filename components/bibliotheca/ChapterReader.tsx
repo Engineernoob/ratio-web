@@ -11,7 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { useMemoriaQueue } from "@/hooks/useMemoriaQueue";
-import type { ChapterContent } from "@/lib/books";
+import type { ChapterContent } from "@/lib/books/types";
 
 interface ChapterRef {
   id: string;

@@ -5,8 +5,8 @@ import { useEffect, useState, useRef } from "react";
 import { ReaderShell } from "@/components/Reader/ReaderShell";
 import { ToastContainer } from "@/components/core/Toast";
 import { useToast } from "@/hooks/useToast";
-import type { BookManifest, ChapterContent, BookChapterRef } from "@/lib/books";
-import type { Highlight } from "@/lib/notes";
+import type { BookManifest, ChapterContent, BookChapterRef } from "@/lib/books/types";
+import type { Highlight } from "@/lib/notes/types";
 
 export default function ReaderPage() {
   const searchParams = useSearchParams();

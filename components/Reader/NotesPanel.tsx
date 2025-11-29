@@ -3,8 +3,8 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { X, Plus } from "lucide-react";
-import type { Highlight } from "@/lib/notes";
-import type { BookChapterRef } from "@/lib/books";
+import type { Highlight } from "@/lib/notes/types";
+import type { BookChapterRef } from "@/lib/books/types";
 
 interface NotesPanelProps {
   bookId: string;

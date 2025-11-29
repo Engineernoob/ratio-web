@@ -2,210 +2,263 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { LaboratorivmShell } from "@/components/Laboratorivm/LaboratorivmShell";
-import { CategoryBar } from "@/components/Laboratorivm/CategoryBar";
-import { DailyChallengeBadge } from "@/components/Laboratorivm/DailyChallengeBadge";
-import { PuzzleEngine } from "@/components/Laboratorivm/PuzzleEngine";
-import { Main } from "@/components/Main";
-import type { Puzzle, PuzzleCategory } from "@/lib/puzzles/types";
+import { StatusPanel } from "@/components/lab/StatusPanel";
+import { DialecticaCard } from "@/components/lab/DialecticaCard";
+import { LogicaCard } from "@/components/lab/LogicaCard";
+import { MicroLessonCard, MicroLesson } from "@/components/lab/MicroLessonCard";
+import { Workspace } from "@/components/lab/Workspace";
+import { Continuum } from "@/components/lab/Continuum";
+import dialecticaData from "@/data/lab/dialectica.json";
+import problemataData from "@/data/lab/problemata.json";
+import moduliData from "@/data/lab/moduli.json";
+import "@/styles/lab.css";
+
+interface DialecticaData {
+  dailyQuestion: string;
+  counterarguments: string[];
+  clarityTests: string[];
+}
+
+interface ProblemataData {
+  today: {
+    id: string;
+    prompt: string;
+    solution?: string;
+    explanation?: string[];
+    category?: string;
+    difficulty?: string;
+  };
+  variants: Array<{
+    id: string;
+    prompt: string;
+    category?: string;
+    difficulty?: string;
+  }>;
+}
+
+interface ModuliData {
+  lessons: MicroLesson[];
+}
 
 export default function LaboratorivmPage() {
-  const [selectedCategory, setSelectedCategory] = useState<
-    PuzzleCategory | "All"
-  >("All");
-  const [selectedPuzzleId, setSelectedPuzzleId] = useState<string | null>(null);
-  const [dailyChallengeId, setDailyChallengeId] = useState<string>("");
-  const [completedPuzzles, setCompletedPuzzles] = useState<Set<string>>(
-    new Set()
+  const [selectedLesson, setSelectedLesson] = useState<MicroLesson | null>(
+    null
   );
-  const [puzzles, setPuzzles] = useState<Puzzle[]>([]);
+  const [showCounterargument, setShowCounterargument] = useState(false);
+  const [showClarityTest, setShowClarityTest] = useState(false);
+  const [currentVariant, setCurrentVariant] = useState(0);
 
+  // Status metrics (would be loaded from localStorage or API)
+  const [lectioComplete, setLectioComplete] = useState(45);
+  const [ritvaliaFacta, setRitvaliaFacta] = useState(60);
+  const [memoriaRevisio, setMemoriaRevisio] = useState(75);
+
+  // Load status from localStorage on mount
   useEffect(() => {
-    const loadPuzzles = async () => {
+    const saved = localStorage.getItem("lab-status");
+    if (saved) {
       try {
-        const response = await fetch("/api/puzzles/index");
-        if (response.ok) {
-          const data = await response.json();
-          setPuzzles(data.puzzles || []);
-          setDailyChallengeId(data.dailyChallengeId || "");
-        }
-      } catch (error) {
-        console.error("Error loading puzzles:", error);
+        const status = JSON.parse(saved);
+        setLectioComplete(status.lectioComplete || 45);
+        setRitvaliaFacta(status.ritvaliaFacta || 60);
+        setMemoriaRevisio(status.memoriaRevisio || 75);
+      } catch (e) {
+        console.error("Error loading status:", e);
       }
-    };
-
-    loadPuzzles();
-
-    // Load completed puzzles from localStorage
-    const stored = localStorage.getItem("laboratorivm-completed");
-    if (stored) {
-      setCompletedPuzzles(new Set(JSON.parse(stored)));
     }
   }, []);
 
-  const handlePuzzleComplete = (puzzleId: string) => {
-    const newCompleted = new Set([...completedPuzzles, puzzleId]);
-    setCompletedPuzzles(newCompleted);
+  const handleCounterargument = () => {
+    setShowCounterargument(true);
+    // In a real implementation, this would generate or show a counterargument
+    setTimeout(() => setShowCounterargument(false), 3000);
+  };
+
+  const handleClarityTest = () => {
+    setShowClarityTest(true);
+    // In a real implementation, this would show clarity test questions
+    setTimeout(() => setShowClarityTest(false), 3000);
+  };
+
+  const handleGenerateVariant = () => {
+    if (problemataData && problemataData.variants.length > 0) {
+      const nextVariant = (currentVariant + 1) % problemataData.variants.length;
+      setCurrentVariant(nextVariant);
+    }
+  };
+
+  const handleLessonComplete = () => {
+    if (selectedLesson) {
+      // Update progress
+      const newLectio = Math.min(100, lectioComplete + 5);
+      setLectioComplete(newLectio);
+      setSelectedLesson(null);
+
+      // Save to localStorage
+      localStorage.setItem(
+        "lab-status",
+        JSON.stringify({
+          lectioComplete: newLectio,
+          ritvaliaFacta,
+          memoriaRevisio,
+        })
+      );
+    }
+  };
+
+  const handleAddToMemoria = () => {
+    // Add lesson to memoria system
+    const newMemoria = Math.min(100, memoriaRevisio + 3);
+    setMemoriaRevisio(newMemoria);
+
+    // Save to localStorage
     localStorage.setItem(
-      "laboratorivm-completed",
-      JSON.stringify(Array.from(newCompleted))
+      "lab-status",
+      JSON.stringify({
+        lectioComplete,
+        ritvaliaFacta,
+        memoriaRevisio: newMemoria,
+      })
     );
   };
 
-  const filteredPuzzles = puzzles.filter((puzzle) => {
-    if (selectedCategory === "All") return true;
-    return puzzle.category === selectedCategory;
-  });
+  const continuumItems = [
+    { id: "dialectica", label: "Dialectic" },
+    { id: "logica", label: "Logic Problemata" },
+    { id: "moduli", label: "Micro-Lessons" },
+  ];
 
-  const isDailyChallengeCompleted = dailyChallengeId
-    ? completedPuzzles.has(dailyChallengeId)
-    : false;
+  const currentPuzzle =
+    currentVariant === 0
+      ? problemataData.today
+      : problemataData.variants[currentVariant - 1] || problemataData.today;
 
   return (
-    <Main>
-      <LaboratorivmShell>
-        <div className="relative z-10 min-h-screen p-6">
-          <div className="max-w-7xl mx-auto">
-            {/* Header */}
-            <motion.div
-              className="text-center mb-8"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <h1
-                className="font-serif text-5xl mb-3"
-                style={{
-                  color: "#C8B68D",
-                  textShadow: "0px 2px 8px rgba(0, 0, 0, 0.5)",
-                }}
-              >
-                LABORATORIVM
-              </h1>
-              <p
-                className="font-mono text-sm opacity-60"
-                style={{ color: "#C8B68D" }}
-              >
-                Interactive Cognitive Training Environment
-              </p>
-            </motion.div>
+    <div className="lab-container min-h-screen">
+      {/* Background texture */}
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          backgroundImage: "url('/images/textures/texture_bayer.png')",
+          backgroundSize: "256px 256px",
+          backgroundRepeat: "repeat",
+          opacity: 0.02,
+        }}
+      />
 
-            {/* Daily Challenge */}
-            {dailyChallengeId && (
-              <DailyChallengeBadge
-                puzzleId={dailyChallengeId}
-                isCompleted={isDailyChallengeCompleted}
-                onClick={() => setSelectedPuzzleId(dailyChallengeId)}
+      {/* Status Panel */}
+      <StatusPanel
+        lectioComplete={lectioComplete}
+        ritvaliaFacta={ritvaliaFacta}
+        memoriaRevisio={memoriaRevisio}
+      />
+
+      {/* Main Content */}
+      <div className="relative z-10 pt-12 md:pt-24 pb-12 px-4 md:px-6 lg:px-12">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl mb-3 text-white tracking-wide">
+              LABORATORIVM
+            </h1>
+            <p className="font-mono text-xs md:text-sm lg:text-base text-[#b7b7b7] mb-4">
+              OFFICINA RATIONIS
+            </p>
+            <div className="flex items-center justify-center gap-2 mb-8">
+              <div className="h-px w-24 bg-white/20"></div>
+              <div className="h-px w-24 bg-white/20"></div>
+              <div className="h-px w-24 bg-white/20"></div>
+            </div>
+          </motion.div>
+
+          {/* Continuum Navigation */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
+            <Continuum items={continuumItems} />
+          </motion.div>
+
+          {/* Three Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            {/* Dialectica Card */}
+            <DialecticaCard
+              dailyQuestion={dialecticaData.dailyQuestion}
+              onCounterargument={handleCounterargument}
+              onClarityTest={handleClarityTest}
+            />
+
+            {/* Logica Card */}
+            {currentPuzzle && (
+              <LogicaCard
+                puzzle={currentPuzzle}
+                onRevealSolution={() => {}}
+                onExplain={() => {}}
+                onGenerateVariant={handleGenerateVariant}
               />
             )}
 
-            {/* Category Bar */}
-            <CategoryBar
-              selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
-            />
-
-            {/* Puzzle Selection or Engine */}
-            {selectedPuzzleId ? (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                <PuzzleEngine
-                  puzzleId={selectedPuzzleId}
-                  onComplete={() => handlePuzzleComplete(selectedPuzzleId)}
-                />
-                <motion.button
-                  onClick={() => setSelectedPuzzleId(null)}
-                  className="mt-6 px-6 py-3 font-mono text-sm"
-                  style={{
-                    color: "#C8B68D",
-                    border: "1px solid rgba(200, 182, 141, 0.3)",
-                    background: "rgba(200, 182, 141, 0.1)",
-                    borderRadius: "4px",
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Back to Puzzles
-                </motion.button>
-              </motion.div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredPuzzles.map((puzzle, index) => (
-                  <motion.button
-                    key={puzzle.id}
-                    onClick={() => setSelectedPuzzleId(puzzle.id)}
-                    className="text-left p-6 rounded-lg"
-                    style={{
-                      background: completedPuzzles.has(puzzle.id)
-                        ? "rgba(200, 182, 141, 0.1)"
-                        : "rgba(10, 10, 10, 0.7)",
-                      border: `1px solid ${
-                        completedPuzzles.has(puzzle.id)
-                          ? "rgba(200, 182, 141, 0.4)"
-                          : "rgba(200, 182, 141, 0.2)"
-                      }`,
-                    }}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <h3
-                      className="font-serif text-lg mb-2"
-                      style={{ color: "#C8B68D" }}
-                    >
-                      {puzzle.prompt.substring(0, 60)}
-                      {puzzle.prompt.length > 60 ? "..." : ""}
-                    </h3>
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {puzzle.category && (
-                        <span
-                          className="font-mono text-xs px-2 py-1"
-                          style={{
-                            color: "rgba(200, 182, 141, 0.7)",
-                            background: "rgba(200, 182, 141, 0.1)",
-                            borderRadius: "4px",
-                          }}
-                        >
-                          {puzzle.category}
-                        </span>
-                      )}
-                      {puzzle.difficulty && (
-                        <span
-                          className="font-mono text-xs px-2 py-1"
-                          style={{
-                            color: "rgba(200, 182, 141, 0.7)",
-                            background: "rgba(200, 182, 141, 0.1)",
-                            borderRadius: "4px",
-                          }}
-                        >
-                          {puzzle.difficulty}
-                        </span>
-                      )}
-                      {completedPuzzles.has(puzzle.id) && (
-                        <span
-                          className="font-mono text-xs px-2 py-1"
-                          style={{
-                            color: "#C8B68D",
-                            background: "rgba(200, 182, 141, 0.2)",
-                            borderRadius: "4px",
-                          }}
-                        >
-                          ✓ Completed
-                        </span>
-                      )}
-                    </div>
-                  </motion.button>
+            {/* Moduli Card - List of lessons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="lab-card p-6 rounded-sm"
+            >
+              <h3 className="font-serif text-xl mb-4 text-white">MODVLI</h3>
+              <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                {moduliData.lessons.map((lesson, index) => (
+                  <MicroLessonCard
+                    key={lesson.id}
+                    lesson={lesson}
+                    onClick={() => setSelectedLesson(lesson)}
+                    index={index}
+                  />
                 ))}
               </div>
-            )}
+            </motion.div>
           </div>
+
+          {/* Notifications */}
+          {showCounterargument && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 p-4 bg-[#111] border border-white/20"
+            >
+              <p className="font-mono text-xs text-white">
+                Counterargument generated
+              </p>
+            </motion.div>
+          )}
+
+          {showClarityTest && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 p-4 bg-[#111] border border-white/20"
+            >
+              <p className="font-mono text-xs text-white">Clarity test ready</p>
+            </motion.div>
+          )}
         </div>
-      </LaboratorivmShell>
-    </Main>
+      </div>
+
+      {/* Workspace Modal */}
+      <Workspace
+        lesson={selectedLesson}
+        onClose={() => setSelectedLesson(null)}
+        onComplete={handleLessonComplete}
+        onAddToMemoria={handleAddToMemoria}
+      />
+    </div>
   );
 }

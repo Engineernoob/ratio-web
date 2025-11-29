@@ -12,8 +12,8 @@ import type {
   BookChapterRef,
   ChapterContent as ChapterContentType,
   BookManifest,
-} from "@/lib/books";
-import type { Highlight } from "@/lib/notes";
+} from "@/lib/books/types";
+import type { Highlight } from "@/lib/notes/types";
 
 interface ReaderShellProps {
   bookTitle: string;
@@ -67,7 +67,6 @@ export function ReaderShell({
       />
 
       {/* Ritual Mode Vignette (stronger when active) */}
-      {ritualMode && <LightVignette intensity={0.35} className="z-10" />}
 
       {/* Ritual Mode Toggle Button */}
       <div className="absolute top-4 left-4 z-30">

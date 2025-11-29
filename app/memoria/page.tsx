@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { TopNavBar } from "@/components/core/TopNavBar";
 import { MemoriaShell } from "@/components/Memoria/MemoriaShell";
 import { RitualHeader } from "@/components/Memoria/RitualHeader";
 import { DailyRitual } from "@/components/Memoria/DailyRitual";
@@ -72,99 +73,102 @@ export default function MemoriaPage() {
   }
 
   return (
-    <Main>
-      <MemoriaShell>
-        <div className="relative z-10 min-h-screen p-6">
-          {/* Mode Selector */}
-          <div className="max-w-7xl mx-auto mb-8">
-            <div className="flex items-center justify-center gap-4 mb-6 flex-wrap">
-              <motion.button
-                onClick={() => router.push("/memoria/insights")}
-                className="px-6 py-2 font-mono text-sm"
-                style={{
-                  color: "rgba(200, 182, 141, 0.8)",
-                  border: "1px solid rgba(200, 182, 141, 0.3)",
-                  background: "rgba(200, 182, 141, 0.1)",
-                }}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Insight Curator
-              </motion.button>
-              {(
-                [
-                  { id: "ritual", label: "Daily Ritual" },
-                  { id: "scholar", label: "Scholar Mode" },
-                  { id: "archivum", label: "Archivum" },
-                ] as const
-              ).map((m) => (
+    <>
+      <TopNavBar />
+      <Main>
+        <MemoriaShell>
+          <div className="relative z-10 min-h-screen p-6">
+            {/* Mode Selector */}
+            <div className="max-w-7xl mx-auto mb-8">
+              <div className="flex items-center justify-center gap-4 mb-6 flex-wrap">
                 <motion.button
-                  key={m.id}
-                  onClick={() => setMode(m.id as MemoriaMode)}
+                  onClick={() => router.push("/memoria/insights")}
                   className="px-6 py-2 font-mono text-sm"
                   style={{
-                    color:
-                      mode === m.id ? "#C8B68D" : "rgba(200, 182, 141, 0.5)",
-                    border: `1px solid ${
-                      mode === m.id
-                        ? "rgba(200, 182, 141, 0.4)"
-                        : "rgba(200, 182, 141, 0.2)"
-                    }`,
-                    background:
-                      mode === m.id
-                        ? "rgba(200, 182, 141, 0.15)"
-                        : "rgba(10, 10, 10, 0.6)",
-                    borderRadius: "4px",
+                    color: "rgba(200, 182, 141, 0.8)",
+                    border: "1px solid rgba(200, 182, 141, 0.3)",
+                    background: "rgba(200, 182, 141, 0.1)",
                   }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  {m.label}
+                  Insight Curator
                 </motion.button>
-              ))}
+                {(
+                  [
+                    { id: "ritual", label: "Daily Ritual" },
+                    { id: "scholar", label: "Scholar Mode" },
+                    { id: "archivum", label: "Archivum" },
+                  ] as const
+                ).map((m) => (
+                  <motion.button
+                    key={m.id}
+                    onClick={() => setMode(m.id as MemoriaMode)}
+                    className="px-6 py-2 font-mono text-sm"
+                    style={{
+                      color:
+                        mode === m.id ? "#C8B68D" : "rgba(200, 182, 141, 0.5)",
+                      border: `1px solid ${
+                        mode === m.id
+                          ? "rgba(200, 182, 141, 0.4)"
+                          : "rgba(200, 182, 141, 0.2)"
+                      }`,
+                      background:
+                        mode === m.id
+                          ? "rgba(200, 182, 141, 0.15)"
+                          : "rgba(10, 10, 10, 0.6)",
+                      borderRadius: "4px",
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {m.label}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="max-w-7xl mx-auto">
+              {mode === "ritual" && (
+                <>
+                  <RitualHeader
+                    title="MEMORIA"
+                    subtitle="Daily Ritual of Knowledge Reinforcement"
+                  />
+                  <DailyRitual
+                    cards={cards}
+                    onCardReviewed={handleCardReviewed}
+                  />
+                </>
+              )}
+
+              {mode === "scholar" && (
+                <>
+                  <RitualHeader
+                    title="SCHOLAR MODE"
+                    subtitle="Intensive Study Session"
+                  />
+                  <ScholarMode
+                    cards={cards}
+                    onCardReviewed={handleCardReviewed}
+                  />
+                </>
+              )}
+
+              {mode === "archivum" && (
+                <>
+                  <RitualHeader
+                    title="ARCHIVUM"
+                    subtitle="Complete Memory Archive"
+                  />
+                  <ArchivumMode cards={cards} />
+                </>
+              )}
             </div>
           </div>
-
-          {/* Content */}
-          <div className="max-w-7xl mx-auto">
-            {mode === "ritual" && (
-              <>
-                <RitualHeader
-                  title="MEMORIA"
-                  subtitle="Daily Ritual of Knowledge Reinforcement"
-                />
-                <DailyRitual
-                  cards={cards}
-                  onCardReviewed={handleCardReviewed}
-                />
-              </>
-            )}
-
-            {mode === "scholar" && (
-              <>
-                <RitualHeader
-                  title="SCHOLAR MODE"
-                  subtitle="Intensive Study Session"
-                />
-                <ScholarMode
-                  cards={cards}
-                  onCardReviewed={handleCardReviewed}
-                />
-              </>
-            )}
-
-            {mode === "archivum" && (
-              <>
-                <RitualHeader
-                  title="ARCHIVUM"
-                  subtitle="Complete Memory Archive"
-                />
-                <ArchivumMode cards={cards} />
-              </>
-            )}
-          </div>
-        </div>
-      </MemoriaShell>
-    </Main>
+        </MemoriaShell>
+      </Main>
+    </>
   );
 }

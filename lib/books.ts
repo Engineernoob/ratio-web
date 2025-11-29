@@ -1,41 +1,16 @@
 import fs from "fs";
 import path from "path";
 
+// Re-export types from type-only file
+export type {
+  BookChapterRef,
+  BookSpine,
+  BookManifest,
+  ChapterContent,
+} from "./books/types";
+
 const DATA_DIR = path.join(process.cwd(), "data");
 const BOOKS_DIR = path.join(DATA_DIR, "books");
-
-export interface BookChapterRef {
-  id: string;
-  title: string;
-  file: string;
-  pageStart?: number;
-  pageEnd?: number;
-}
-
-export interface BookSpine {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-export interface BookManifest {
-  id: string;
-  title: string;
-  author: string;
-  chapters: BookChapterRef[];
-  bookSpine: BookSpine;
-  pdf?: string;
-}
-
-export interface ChapterContent {
-  title: string;
-  summary: string;
-  keyIdeas: string[];
-  examples: string[];
-  exercises: string[];
-  reflections: string[];
-}
 
 /**
  * Load book manifest from /data/books/{bookId}/book.json
