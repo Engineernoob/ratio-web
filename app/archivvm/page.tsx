@@ -1,488 +1,236 @@
 "use client";
 
-import { useState } from "react";
-import { PageHeader } from "@/components/archivvm/PageHeader";
-import { ScrollShelf } from "@/components/archivvm/ScrollShelf";
-import { ShelfSection } from "@/components/archivvm/ShelfSection";
-import { ArchivistNotes } from "@/components/archivvm/ArchivistNotes";
-import { ExpandableNote } from "@/components/archivvm/ExpandableNote";
-import { RavenSessionCard } from "@/components/archivvm/RavenSessionCard";
-import { ExpandedScrollModal } from "@/components/archivvm/ExpandedScrollModal";
-import { GoldenButton } from "@/components/archivvm/GoldenButton";
-import { TagPill } from "@/components/archivvm/TagPill";
-import { Scroll } from "@/components/archivvm/ScrollCard";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-
-// Placeholder data matching the screenshot
-const scrolls: Scroll[] = [
-  {
-    id: "1",
-    title: "THINKING IN SYSTEMS",
-    author: "DONELLA MEADOWS",
-    summary:
-      "Systems think in loops, not lines. Each intervention shifts stocks, flows, and feedback. This archive entry condenses the book into a set of leverage points...",
-    type: "book",
-    tags: ["LECTIO"],
-    icon: "📊",
-    strength: "medius",
-    chapters: [
-      { title: "CAPVT I ‣ THE BASICS", strength: "medius" },
-      { title: "CAPVT II ‣ STOCKS AND FLOWS", strength: "medius" },
-      { title: "CAPVT III ‣ FEEDBACK LOOPS", strength: "fragilis" },
-      { title: "CAPVT IV ‣ LEVERAGE POINTS", strength: "novus" },
-    ],
-  },
-  {
-    id: "2",
-    title: "HOW TO TAKE SMART NOTES",
-    author: "SÖNKE AHRNS",
-    summary: "A method for knowledge management and note-taking...",
-    type: "book",
-    tags: ["LECTIO"],
-    icon: "📝",
-    strength: "medius",
-  },
-  {
-    id: "3",
-    title: "THE ART OF THINKING CLEARLY",
-    author: "ROLF DOBELLI",
-    summary: "Cognitive biases and how to avoid them...",
-    type: "book",
-    tags: ["LECTIO"],
-    icon: "🧠",
-    strength: "fragilis",
-  },
-  {
-    id: "4",
-    title: "INFINITE GAMES",
-    author: "SIMON SINEK",
-    summary: "Finite vs infinite games in business and life...",
-    type: "book",
-    tags: ["LECTIO"],
-    icon: "∞",
-    strength: "novus",
-  },
-  {
-    id: "5",
-    title: "THE SHIELD OF ACHILLES",
-    author: "PHILIP BOBBITT",
-    summary: "The evolution of the modern state...",
-    type: "book",
-    tags: ["LECTIO"],
-    icon: "🛡",
-    strength: "medius",
-  },
-  {
-    id: "6",
-    title: "INFORMATION THEORY",
-    author: "CLAUDE SHANNON",
-    summary: "Mathematical theory of communication...",
-    type: "book",
-    tags: ["LECTIO"],
-    icon: "ℹ",
-    strength: "fragilis",
-  },
-];
-
-const microLessons = [
-  {
-    id: "ml1",
-    title: "ONE DECISION, ONE METRIC",
-    tag: "BOOK",
-    scroll: scrolls[0],
-  },
-  {
-    id: "ml2",
-    title: "REHEARSE FAILURE FIRST",
-    tag: "PVZZLE",
-    scroll: scrolls[1],
-  },
-  {
-    id: "ml3",
-    title: "STEELMAN BEFORE STRIKE",
-    tag: "DIALECTIC",
-    scroll: scrolls[2],
-  },
-  {
-    id: "ml4",
-    title: "STATE THE NULL PLAN",
-    tag: "RITUAL",
-    scroll: scrolls[0],
-  },
-];
-
-const sealedScrolls = [
-  {
-    id: "ss1",
-    title: "SHIP OF THESEUS NOTE ARCHIVE",
-    isSealed: true,
-    difficulty: "MEDIVS",
-  },
-  {
-    id: "ss2",
-    title: "SORITES PARADOX",
-    isSealed: false,
-    difficulty: "ALTA",
-  },
-  {
-    id: "ss3",
-    title: "BARBER PARADOX",
-    isSealed: true,
-    difficulty: "BASSA",
-  },
-];
-
-const notes = [
-  {
-    id: "n1",
-    text: "If it does not fit in one sentence, it does not yet fit in memory.",
-  },
-  {
-    id: "n2",
-    text: "The best note is the one you can reconstruct from memory.",
-  },
-  {
-    id: "n3",
-    text: "Knowledge compounds when connected to existing nodes.",
-  },
-];
-
-const ravenSessions = [
-  {
-    id: "rs1",
-    question: "WHEN IS IT RATIONAL TO DELAY A DECISION?",
-    answer:
-      "Your answer: when the expected value of new information exceeds the cost of waiting. The decision should be delayed if the information gain multiplied by its probability is greater than the opportunity cost of delay.",
-    sessionNumber: 24,
-    addedDaysAgo: 2,
-  },
-  {
-    id: "rs2",
-    question: "WHAT IS THE DIFFERENCE BETWEEN RISK AND UNCERTAINTY?",
-    answer:
-      "Your answer: Risk involves known probabilities of outcomes, while uncertainty involves unknown probabilities. Risk can be calculated and insured against; uncertainty requires different decision frameworks.",
-    sessionNumber: 23,
-    addedDaysAgo: 5,
-  },
-];
+import { useEffect, useState, useMemo } from "react";
+import { motion } from "framer-motion";
+import { ArchivvmShell } from "@/components/Archivvm/ArchivvmShell";
+import { ArchivvmSearch } from "@/components/Archivvm/ArchivvmSearch";
+import { ArchivvmFilters } from "@/components/Archivvm/ArchivvmFilters";
+import { ArchivvmGrid } from "@/components/Archivvm/ArchivvmGrid";
+import { ArchivvmModal } from "@/components/Archivvm/ArchivvmModal";
+import { ArchivvmEmptyState } from "@/components/Archivvm/ArchivvmEmptyState";
+import { ToastContainer } from "@/components/core/Toast";
+import { useToast } from "@/hooks/useToast";
+import { Main } from "@/components/Main";
+import type { ArchivvmItem } from "@/lib/archivvm/types";
+import {
+  fuzzySearch,
+  filterItems,
+  getUniqueValues,
+} from "@/lib/archivvm/search";
 
 export default function ArchivvmPage() {
-  const pathname = usePathname();
-  const [selectedScroll, setSelectedScroll] = useState<Scroll | null>(null);
-  const [selectedMicroLessonTitle, setSelectedMicroLessonTitle] = useState<
-    string | null
-  >(null);
+  const [items, setItems] = useState<ArchivvmItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedBook, setSelectedBook] = useState<string | undefined>();
+  const [selectedChapter, setSelectedChapter] = useState<string | undefined>();
+  const [selectedType, setSelectedType] = useState<string | undefined>();
+  const [selectedTag, setSelectedTag] = useState<string | undefined>();
+  const [selectedItem, setSelectedItem] = useState<ArchivvmItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [sealedStates, setSealedStates] = useState<Record<string, boolean>>(
-    sealedScrolls.reduce((acc, scroll) => {
-      acc[scroll.id] = scroll.isSealed;
-      return acc;
-    }, {} as Record<string, boolean>)
-  );
+  const { toasts, removeToast } = useToast();
 
-  const handleOpenScroll = (scroll: Scroll, microLessonTitle?: string) => {
-    setSelectedScroll(scroll);
-    setSelectedMicroLessonTitle(microLessonTitle || null);
+  // Load items
+  useEffect(() => {
+    const loadItems = async () => {
+      try {
+        const response = await fetch("/api/archivvm/items");
+        if (response.ok) {
+          const data = await response.json();
+          setItems(data.items || []);
+        }
+      } catch (error) {
+        console.error("Error loading Archivvm items:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadItems();
+  }, []);
+
+  // Get unique values for filters
+  const uniqueValues = useMemo(() => getUniqueValues(items), [items]);
+
+  // Filter and search items
+  const filteredItems = useMemo(() => {
+    let result = items;
+
+    // Apply filters
+    result = filterItems(result, {
+      bookId: selectedBook,
+      chapterId: selectedChapter,
+      type: selectedType,
+      tag: selectedTag,
+    });
+
+    // Apply search
+    if (searchQuery.trim()) {
+      result = fuzzySearch(result, searchQuery);
+    }
+
+    // Sort by creation date (newest first)
+    result.sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return dateB - dateA;
+    });
+
+    return result;
+  }, [
+    items,
+    searchQuery,
+    selectedBook,
+    selectedChapter,
+    selectedType,
+    selectedTag,
+  ]);
+
+  const handleItemClick = (item: ArchivvmItem) => {
+    setSelectedItem(item);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setSelectedScroll(null);
-    setSelectedMicroLessonTitle(null);
+    setTimeout(() => setSelectedItem(null), 300);
   };
 
-  const handleBreakSeal = (id: string) => {
-    setSealedStates((prev) => ({ ...prev, [id]: false }));
-  };
+  if (loading) {
+    return (
+      <Main>
+        <ArchivvmShell>
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+              <div
+                className="font-serif text-xl mb-4"
+                style={{ color: "#C8B68D" }}
+              >
+                Loading Archivvm...
+              </div>
+              <div
+                className="font-mono text-sm opacity-60"
+                style={{ color: "#C8B68D" }}
+              >
+                Gathering knowledge fragments...
+              </div>
+            </div>
+          </div>
+        </ArchivvmShell>
+      </Main>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-black relative">
-      <div className="relative z-10 max-w-[1300px] mx-auto px-8 py-8 min-h-screen">
-        {/* Navigation Bar */}
-        <div className="w-full border-b border-[rgba(255,255,255,0.08)] pb-3 mb-8">
-          <div className="flex items-center justify-between font-mono text-xs text-[rgba(232,230,225,0.6)]">
-            <div className="flex items-center gap-2">
-              <Link
-                href="/oikos"
-                className="hover:text-[rgba(232,230,225,0.9)] transition-colors"
-              >
-                RATIO @ OIKOS
-              </Link>
-            </div>
-            <div className="flex items-center gap-3">
-              <Link
-                href="/oikos"
-                className={cn(
-                  "transition-colors",
-                  pathname === "/oikos" && "text-[#b29b68]"
-                )}
-              >
-                OIKOS
-              </Link>
-              <Link
-                href="/bibliotheca"
-                className={cn(
-                  "transition-colors",
-                  pathname === "/bibliotheca" && "text-[#b29b68]"
-                )}
-              >
-                BIBLIOTHECA
-              </Link>
-              <Link
-                href="/laboratorivm"
-                className={cn(
-                  "transition-colors",
-                  pathname === "/laboratorivm" && "text-[#b29b68]"
-                )}
-              >
-                LABORATORIVM
-              </Link>
-              <Link
-                href="/memoria"
-                className={cn(
-                  "transition-colors",
-                  pathname === "/memoria" && "text-[#b29b68]"
-                )}
-              >
-                MEMORIA
-              </Link>
-              <Link
-                href="/archivvm"
-                className={cn(
-                  "transition-colors",
-                  pathname === "/archivvm" && "text-[#b29b68]"
-                )}
+    <Main>
+      <ArchivvmShell>
+        <div className="relative z-10 min-h-screen">
+          {/* Header */}
+          <motion.div
+            className="sticky top-0 z-20 p-6 border-b"
+            style={{
+              background: "rgba(10, 10, 10, 0.95)",
+              borderColor: "rgba(200, 182, 141, 0.1)",
+            }}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="max-w-7xl mx-auto">
+              <h1
+                className="font-serif text-4xl mb-2"
+                style={{ color: "#C8B68D" }}
               >
                 ARCHIVVM
-              </Link>
-              <Link
-                href="/scholarivm"
-                className={cn(
-                  "transition-colors",
-                  pathname === "/scholarivm" && "text-[#b29b68]"
-                )}
+              </h1>
+              <p
+                className="font-mono text-xs opacity-60"
+                style={{ color: "#C8B68D" }}
               >
-                SCHOLARIUM
-              </Link>
-              <Link
-                href="/ars-rationis"
-                className={cn(
-                  "transition-colors",
-                  pathname === "/ars-rationis" && "text-[#b29b68]"
-                )}
-              >
-                ARS RATIONIS
-              </Link>
+                Your Personal Knowledge Vault
+              </p>
             </div>
-          </div>
-        </div>
+          </motion.div>
 
-        {/* Page Header */}
-        <PageHeader
-          title="ARCHIVVM"
-          subtitle="TABVLARIVM SAPIENTIÆ"
-          descriptor="ARCHIVVM MEMORIÆ. DISPVATIONVM. LIBRORVM. ET COGITATIONVM."
-        />
-
-        {/* Navigation Bar (ghosted/inactive) */}
-        <div className="flex items-center justify-center gap-6 mb-8 opacity-20">
-          {[
-            "MEMORIA LEDGER",
-            "WORK SESSIONS",
-            "OIKOS INDEX",
-            "PUZZLE & RIDDLES",
-            "LIBRARY SHELVES",
-            "DAILY REFLECTION",
-          ].map((item) => (
-            <span
-              key={item}
-              className="font-mono text-xs uppercase tracking-wider text-muted-foreground"
-            >
-              {item}
-            </span>
-          ))}
-        </div>
-
-        {/* Main Grid Layout */}
-        <div className="grid grid-cols-[70%_30%] gap-8">
-          {/* Left Column - Main Content */}
-          <div>
-            {/* Knowledge Shelf Cards */}
-            <ScrollShelf
-              scrolls={scrolls}
-              visibleCount={6}
-              totalCount={64}
-              onOpenScroll={handleOpenScroll}
-              onAddAllToMemoria={() => console.log("Add all to memoria")}
-            />
-
-            {/* Micro-lessons Shelf */}
-            <ShelfSection
-              title="MICROLESSONS"
-              subtitle="MINUTA DOCTRINA"
-              defaultOpen={true}
-            >
-              <div className="space-y-3">
-                {microLessons.map((lesson) => (
-                  <div
-                    key={lesson.id}
-                    className="flex items-center justify-between p-3 bg-[rgba(0,0,0,0.4)] border border-[rgba(215,196,158,0.3)]"
-                  >
-                    <div className="flex items-center gap-3 flex-1">
-                      <p className="font-mono text-xs text-muted-foreground">
-                        {lesson.title}
-                      </p>
-                      <TagPill label={`TAG: ${lesson.tag}`} />
-                    </div>
-                    <GoldenButton
-                      onClick={() =>
-                        handleOpenScroll(lesson.scroll, lesson.title)
-                      }
-                    >
-                      OPEN SCROLL
-                    </GoldenButton>
+          {/* Main Content */}
+          <div className="max-w-7xl mx-auto p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              {/* Sidebar - Filters */}
+              <div className="lg:col-span-1">
+                <motion.div
+                  className="sticky top-24"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                >
+                  {/* Search */}
+                  <div className="mb-6">
+                    <ArchivvmSearch
+                      value={searchQuery}
+                      onChange={setSearchQuery}
+                    />
                   </div>
-                ))}
-              </div>
-            </ShelfSection>
 
-            {/* Sealed Scrolls Section */}
-            <ShelfSection
-              title="PUZZLES & RIDDLES"
-              subtitle="AENIGMATA"
-              defaultOpen={true}
-            >
-              <div className="space-y-3">
-                {sealedScrolls.map((scroll) => (
+                  {/* Filters */}
+                  <ArchivvmFilters
+                    books={uniqueValues.books}
+                    chapters={uniqueValues.chapters}
+                    types={uniqueValues.types}
+                    tags={uniqueValues.tags}
+                    selectedBook={selectedBook}
+                    selectedChapter={selectedChapter}
+                    selectedType={selectedType}
+                    selectedTag={selectedTag}
+                    onBookChange={setSelectedBook}
+                    onChapterChange={setSelectedChapter}
+                    onTypeChange={setSelectedType}
+                    onTagChange={setSelectedTag}
+                  />
+
+                  {/* Stats */}
                   <div
-                    key={scroll.id}
-                    className="flex items-center gap-4 p-3 bg-[rgba(0,0,0,0.4)] border border-[rgba(215,196,158,0.3)]"
+                    className="mt-6 pt-6 border-t"
+                    style={{ borderColor: "rgba(200, 182, 141, 0.1)" }}
                   >
                     <div
-                      className="shrink-0 w-10 h-10 rounded-full border border-[rgba(215,196,158,0.4)] flex items-center justify-center text-lg"
-                      style={{
-                        boxShadow:
-                          "inset 0 1px 2px rgba(255,255,255,0.05), 0 1px 4px rgba(0,0,0,0.2)",
-                      }}
+                      className="font-mono text-xs opacity-60"
+                      style={{ color: "#C8B68D" }}
                     >
-                      🧭
+                      {filteredItems.length} of {items.length} items
                     </div>
-                    <div className="flex-1">
-                      <p className="font-mono text-xs text-muted-foreground mb-1">
-                        {scroll.title}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-[10px] text-[rgba(215,196,158,0.9)]">
-                          {sealedStates[scroll.id]
-                            ? "SEALED SCROLL + REVEAL ANSWER"
-                            : "SCROLL VNROLLED + ANSWER VISIBLE"}
-                        </span>
-                        <TagPill label={`DIFFICULTAS: ${scroll.difficulty}`} />
-                      </div>
-                    </div>
-                    <GoldenButton
-                      onClick={() =>
-                        sealedStates[scroll.id]
-                          ? handleBreakSeal(scroll.id)
-                          : handleBreakSeal(scroll.id)
-                      }
-                    >
-                      {sealedStates[scroll.id] ? "BREAK SEAL" : "CLOSE SCROLL"}
-                    </GoldenButton>
                   </div>
-                ))}
+                </motion.div>
               </div>
-            </ShelfSection>
 
-            {/* General Notes Section */}
-            <ShelfSection
-              title="NOTES"
-              subtitle="CITA MEMOR"
-              defaultOpen={true}
-            >
-              <div>
-                {notes.map((note) => (
-                  <ExpandableNote key={note.id} text={note.text} icon="□" />
-                ))}
-              </div>
-            </ShelfSection>
-
-            {/* Raven Sessions Section */}
-            <ShelfSection
-              title="RAVEN SESSIONS"
-              subtitle="EXEMPLA INCOGNITA"
-              defaultOpen={true}
-            >
-              <div>
-                {ravenSessions.map((session, index) => (
-                  <RavenSessionCard
-                    key={session.id}
-                    question={session.question}
-                    answer={session.answer}
-                    sessionNumber={session.sessionNumber}
-                    addedDaysAgo={session.addedDaysAgo}
-                    onRerun={() => console.log("Rerun session", session.id)}
-                    delay={index * 0.1}
-                  />
-                ))}
-              </div>
-            </ShelfSection>
-
-            {/* Footer Stats Section */}
-            <div className="mt-8 p-4 bg-[rgba(0,0,0,0.4)] border border-[rgba(215,196,158,0.3)]">
-              <h2 className="font-mono text-xs uppercase tracking-wider text-[rgba(215,196,158,0.8)] mb-4">
-                CORPVS SAPIENTIÆ
-              </h2>
-              <div className="flex items-center justify-between">
-                <p className="font-mono text-xs text-muted-foreground">
-                  TOTAL KNOWLEDGE CONTAINED: 1,274 CONCEPTS SCROLLS CREATED: 432
-                  YOUR ARCHIVE EXPANDS DAILY.
-                </p>
-                <GoldenButton onClick={() => console.log("View stats")}>
-                  VIEW ARCHIVE STATISTICS
-                </GoldenButton>
+              {/* Main Grid */}
+              <div className="lg:col-span-3">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                  {filteredItems.length > 0 ? (
+                    <ArchivvmGrid
+                      items={filteredItems}
+                      onItemClick={handleItemClick}
+                    />
+                  ) : (
+                    <ArchivvmEmptyState />
+                  )}
+                </motion.div>
               </div>
             </div>
           </div>
-
-          {/* Right Column - Archivist Notes */}
-          <div>
-            <ArchivistNotes
-              stats={{
-                totalScrolls: 432,
-                totalMicroLessons: 189,
-                totalConcepts: 1274,
-                lastEdited: "HODIE ‣ HORA IX",
-              }}
-              ledgerState={{
-                strong: 68,
-                medium: 22,
-                fragile: 10,
-              }}
-              onExport={() => console.log("Export everything")}
-            />
-          </div>
         </div>
-      </div>
 
-      {/* Expanded Scroll Modal */}
-      <ExpandedScrollModal
-        scroll={selectedScroll}
-        microLessonTitle={selectedMicroLessonTitle}
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onAddToMemoria={(scroll) => {
-          console.log("Add to memoria", scroll);
-          handleCloseModal();
-        }}
-        onAddAllLessons={(scroll) => {
-          console.log("Add all lessons", scroll);
-          handleCloseModal();
-        }}
-      />
-    </div>
+        {/* Modal */}
+        <ArchivvmModal
+          item={selectedItem}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+        />
+      </ArchivvmShell>
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+    </Main>
   );
 }

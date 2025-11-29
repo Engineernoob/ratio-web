@@ -89,7 +89,7 @@ export function DustLayer({
     <canvas
       ref={canvasRef}
       className={`absolute inset-0 pointer-events-none ${className}`}
-      style={{ zIndex: 0 }}
+      style={{ zIndex: 1 }}
     />
   );
 }

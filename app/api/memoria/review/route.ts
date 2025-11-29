@@ -1,54 +1,31 @@
 import { NextResponse } from "next/server";
-import { getCardById, updateCard } from "@/lib/memoria/storage";
-import { calculateReview } from "@/lib/memoria/review";
-import type { ReviewQuality } from "@/lib/memoria/types";
+import { reviewCard } from "@/lib/memoria/utils";
+import { getCardById } from "@/lib/memoria/storage";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { cardId, quality } = body;
 
-    // Validate inputs
-    if (!cardId || quality === undefined) {
+    if (!cardId || !quality) {
       return NextResponse.json(
-        { error: "Missing required fields: cardId, quality" },
+        { error: "Missing cardId or quality" },
         { status: 400 }
       );
     }
 
-    // Validate quality range
-    if (quality < 0 || quality > 5 || !Number.isInteger(quality)) {
-      return NextResponse.json(
-        { error: "Quality must be an integer between 0 and 5" },
-        { status: 400 }
-      );
-    }
-
-    // Load card
     const card = getCardById(cardId);
     if (!card) {
       return NextResponse.json({ error: "Card not found" }, { status: 404 });
     }
 
-    // Calculate review result
-    const result = calculateReview(card, quality as ReviewQuality);
+    const updatedCard = await reviewCard(card, quality);
 
-    // Update card in storage
-    const updatedCard = updateCard(result.card);
-
-    return NextResponse.json({
-      card: updatedCard,
-      review: {
-        newInterval: result.newInterval,
-        newDue: result.newDue,
-        newEase: result.newEase,
-        newStage: result.newStage,
-      },
-    });
+    return NextResponse.json({ card: updatedCard });
   } catch (error) {
     console.error("Error reviewing card:", error);
     return NextResponse.json(
-      { error: "Failed to process review" },
+      { error: "Failed to review card" },
       { status: 500 }
     );
   }

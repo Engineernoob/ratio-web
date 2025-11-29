@@ -1,155 +1,155 @@
 "use client";
 
-import { useState } from "react";
-import { TopNavBar } from "@/components/core/TopNavBar";
-import { MemoriaHeader } from "@/components/memoria/MemoriaHeader";
-import { MemoriaStatsRow } from "@/components/memoria/MemoriaStatsRow";
-import { ReviewQueueCard } from "@/components/memoria/ReviewQueueCard";
-import { ArcanaMemoriaPanel } from "@/components/memoria/ArcanaMemoriaPanel";
-import { ReviewModal } from "@/components/memoria/ReviewModal";
-import { ReviewFilters } from "@/components/memoria/ReviewFilters";
-import { ArchivumContinuum } from "@/components/memoria/ArchivumContinuum";
-import {
-  reviewQueue,
-  memoryItems,
-  archivumStats,
-  strongestConcepts,
-  weakestConcepts,
-  arcanaMemoria,
-  statsData,
-  ReviewItem,
-  MemoryItem,
-} from "@/lib/memoriaData";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { MemoriaShell } from "@/components/Memoria/MemoriaShell";
+import { RitualHeader } from "@/components/Memoria/RitualHeader";
+import { DailyRitual } from "@/components/Memoria/DailyRitual";
+import { ScholarMode } from "@/components/Memoria/ScholarMode";
+import { ArchivumMode } from "@/components/Memoria/ArchivumMode";
+import { Main } from "@/components/Main";
+import type { MemoryCard } from "@/lib/memoria/types";
 
-type FilterType = "BY SOURCE" | "BY DATE ADDED" | "BY MEMORY STRENGTH";
+type MemoriaMode = "ritual" | "scholar" | "archivum";
 
 export default function MemoriaPage() {
-  const [selectedReview, setSelectedReview] = useState<ReviewItem | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState<FilterType>("BY SOURCE");
+  const [mode, setMode] = useState<MemoriaMode>("ritual");
+  const [cards, setCards] = useState<MemoryCard[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleBeginReview = (item: ReviewItem) => {
-    setSelectedReview(item);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedReview(null);
-  };
-
-  const handleMarkRemembered = () => {
-    // For now, just close the modal
-    handleCloseModal();
-  };
-
-  const handleAgainSoon = () => {
-    // For now, just close the modal
-    handleCloseModal();
-  };
-
-  const handleReviewItem = (item: MemoryItem) => {
-    // Find matching review item or create one
-    const reviewItem = reviewQueue.find((r) => r.title === item.title) || {
-      id: item.id,
-      title: item.title,
-      description: `Review ${item.title}`,
-      origo: item.source,
-      tags: [item.source],
-      dueNow: true,
-      singleTabula: false,
-      interrogatum: "Recall and explain this concept.",
-      responsumRevelatum: "Provide a clear explanation with examples.",
+  // Load cards
+  useEffect(() => {
+    const loadCards = async () => {
+      try {
+        const response = await fetch("/api/memoria/cards");
+        if (response.ok) {
+          const data = await response.json();
+          setCards(data.cards || []);
+        }
+      } catch (error) {
+        console.error("Error loading memoria cards:", error);
+      } finally {
+        setLoading(false);
+      }
     };
-    handleBeginReview(reviewItem);
+
+    loadCards();
+  }, []);
+
+  const handleCardReviewed = () => {
+    // Reload cards after review
+    fetch("/api/memoria/cards")
+      .then((res) => res.json())
+      .then((data) => setCards(data.cards || []))
+      .catch(console.error);
   };
 
-  const handleExport = () => {
-    console.log("Exporting all notes...");
-    // Implement export functionality
-  };
-
-  const handleArcanaReview = () => {
-    // Start review from arcana panel
-    if (reviewQueue.length > 0) {
-      handleBeginReview(reviewQueue[0]);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-black">
-      <TopNavBar />
-
-      <div className="max-w-[1920px] mx-auto px-8 py-12 pt-28">
-        {/* Header */}
-        <MemoriaHeader />
-
-        {/* Stats Row */}
-        <MemoriaStatsRow
-          itemsDueToday={statsData.itemsDueToday}
-          itemsDueLabel={statsData.itemsDueLabel}
-          newConceptsLearned={statsData.newConceptsLearned}
-          newConceptsLabel={statsData.newConceptsLabel}
-          currentReviewStreak={statsData.currentReviewStreak}
-          reviewStreakLabel={statsData.reviewStreakLabel}
-        />
-
-        {/* Main Content Grid */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          {/* Left Column - Review Queue */}
-          <div className="space-y-6">
-            <div>
-              <h2 className="font-mono text-xs uppercase tracking-wider text-gold mb-4">
-                REVIEW QUEUE
-              </h2>
-              <div>
-                {reviewQueue.map((item) => (
-                  <ReviewQueueCard
-                    key={item.id}
-                    item={item}
-                    onBeginReview={handleBeginReview}
-                  />
-                ))}
+  if (loading) {
+    return (
+      <Main>
+        <MemoriaShell>
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="text-center">
+              <div
+                className="font-serif text-xl mb-4"
+                style={{ color: "#C8B68D" }}
+              >
+                Loading Memoria...
+              </div>
+              <div
+                className="font-mono text-sm opacity-60"
+                style={{ color: "#C8B68D" }}
+              >
+                Preparing your memory dojo...
               </div>
             </div>
+          </div>
+        </MemoriaShell>
+      </Main>
+    );
+  }
 
-            {/* Review Filters */}
-            <ReviewFilters
-              selectedFilter={selectedFilter}
-              onFilterChange={setSelectedFilter}
-              memoryItems={memoryItems}
-              onReviewItem={handleReviewItem}
-            />
+  return (
+    <Main>
+      <MemoriaShell>
+        <div className="relative z-10 min-h-screen p-6">
+          {/* Mode Selector */}
+          <div className="max-w-7xl mx-auto mb-8">
+            <div className="flex items-center justify-center gap-4 mb-6">
+              {(
+                [
+                  { id: "ritual", label: "Daily Ritual" },
+                  { id: "scholar", label: "Scholar Mode" },
+                  { id: "archivum", label: "Archivum" },
+                ] as const
+              ).map((m) => (
+                <motion.button
+                  key={m.id}
+                  onClick={() => setMode(m.id as MemoriaMode)}
+                  className="px-6 py-2 font-mono text-sm"
+                  style={{
+                    color:
+                      mode === m.id ? "#C8B68D" : "rgba(200, 182, 141, 0.5)",
+                    border: `1px solid ${
+                      mode === m.id
+                        ? "rgba(200, 182, 141, 0.4)"
+                        : "rgba(200, 182, 141, 0.2)"
+                    }`,
+                    background:
+                      mode === m.id
+                        ? "rgba(200, 182, 141, 0.15)"
+                        : "rgba(10, 10, 10, 0.6)",
+                    borderRadius: "4px",
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {m.label}
+                </motion.button>
+              ))}
+            </div>
           </div>
 
-          {/* Right Column - Arcana Memoriæ */}
-          <div>
-            <ArcanaMemoriaPanel
-              reviewPath={arcanaMemoria.reviewPath}
-              timeEstimate={arcanaMemoria.timeEstimate}
-              includedItemTypes={arcanaMemoria.includedItemTypes}
-              onReview={handleArcanaReview}
-            />
+          {/* Content */}
+          <div className="max-w-7xl mx-auto">
+            {mode === "ritual" && (
+              <>
+                <RitualHeader
+                  title="MEMORIA"
+                  subtitle="Daily Ritual of Knowledge Reinforcement"
+                />
+                <DailyRitual
+                  cards={cards}
+                  onCardReviewed={handleCardReviewed}
+                />
+              </>
+            )}
+
+            {mode === "scholar" && (
+              <>
+                <RitualHeader
+                  title="SCHOLAR MODE"
+                  subtitle="Intensive Study Session"
+                />
+                <ScholarMode
+                  cards={cards}
+                  onCardReviewed={handleCardReviewed}
+                />
+              </>
+            )}
+
+            {mode === "archivum" && (
+              <>
+                <RitualHeader
+                  title="ARCHIVUM"
+                  subtitle="Complete Memory Archive"
+                />
+                <ArchivumMode cards={cards} />
+              </>
+            )}
           </div>
         </div>
-
-        {/* Archivvm Continuum */}
-        <ArchivumContinuum
-          stats={archivumStats}
-          strongestConcepts={strongestConcepts}
-          weakestConcepts={weakestConcepts}
-          onExport={handleExport}
-        />
-      </div>
-
-      {/* Review Modal */}
-      <ReviewModal
-        item={selectedReview}
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onMarkRemembered={handleMarkRemembered}
-        onAgainSoon={handleAgainSoon}
-      />
-    </div>
+      </MemoriaShell>
+    </Main>
   );
 }
