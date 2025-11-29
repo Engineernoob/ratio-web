@@ -19,7 +19,8 @@ export function ContextPanel({ children, title }: ContextPanelProps) {
       style={{
         background: `linear-gradient(to bottom right, var(--surface, color-mix(in srgb, var(--accent-color, var(--accent)) 2%, transparent)), var(--surface, color-mix(in srgb, var(--accent-color, var(--accent)) 1%, transparent)))`,
         backdropFilter: `blur(var(--blur, 4px))`,
-        borderColor: "color-mix(in srgb, var(--accent-color, var(--accent)) 20%, transparent)",
+        borderColor:
+          "color-mix(in srgb, var(--accent-color, var(--accent)) 20%, transparent)",
         borderStyle: `var(--border-style, solid)`,
       }}
     >

@@ -25,17 +25,16 @@ export function ThemePreviewCard({
       onClick={onClick}
       className="text-left p-6 relative overflow-hidden"
       style={{
-        background: isModern && blur > 0
-          ? `linear-gradient(135deg, ${surface}, ${surface}00)`
-          : isSelected
-          ? "rgba(200, 182, 141, 0.15)"
-          : "rgba(10, 10, 10, 0.7)",
+        background:
+          isModern && blur > 0
+            ? `linear-gradient(135deg, ${surface}, ${surface}00)`
+            : isSelected
+            ? "rgba(200, 182, 141, 0.15)"
+            : "rgba(10, 10, 10, 0.7)",
         backdropFilter: isModern && blur > 0 ? `blur(${blur}px)` : "none",
         borderRadius: isModern && theme.id === "FERRO" ? "0" : "0.5rem",
         border: `2px ${borderStyle} ${
-          isSelected
-            ? `${theme.accent}66`
-            : `${theme.accent}33`
+          isSelected ? `${theme.accent}66` : `${theme.accent}33`
         }`,
         boxShadow: isModern
           ? `0 8px 32px ${theme.glowColor || theme.accent}20`
