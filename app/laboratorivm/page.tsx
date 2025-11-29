@@ -1,141 +1,211 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { LaboratorivmShell } from "@/components/Laboratorivm/LaboratorivmShell";
+import { CategoryBar } from "@/components/Laboratorivm/CategoryBar";
+import { DailyChallengeBadge } from "@/components/Laboratorivm/DailyChallengeBadge";
+import { PuzzleEngine } from "@/components/Laboratorivm/PuzzleEngine";
 import { Main } from "@/components/Main";
-import { DialecticaPanel } from "@/components/laboratorium/DialecticaPanel";
-import { LogicaProblemPanel } from "@/components/laboratorium/LogicaProblemPanel";
-import { MicroLessonPanel } from "@/components/laboratorium/MicroLessonPanel";
-import { TrainingLedger } from "@/components/laboratorium/TrainingLedger";
-import { ScholarumContinuum } from "@/components/laboratorium/ScholarumContinuum";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import type { Puzzle, PuzzleCategory } from "@/lib/puzzles/types";
 
 export default function LaboratorivmPage() {
-  const pathname = usePathname();
+  const [selectedCategory, setSelectedCategory] = useState<
+    PuzzleCategory | "All"
+  >("All");
+  const [selectedPuzzleId, setSelectedPuzzleId] = useState<string | null>(null);
+  const [dailyChallengeId, setDailyChallengeId] = useState<string>("");
+  const [completedPuzzles, setCompletedPuzzles] = useState<Set<string>>(
+    new Set()
+  );
+  const [puzzles, setPuzzles] = useState<Puzzle[]>([]);
+
+  useEffect(() => {
+    const loadPuzzles = async () => {
+      try {
+        const response = await fetch("/api/puzzles/index");
+        if (response.ok) {
+          const data = await response.json();
+          setPuzzles(data.puzzles || []);
+          setDailyChallengeId(data.dailyChallengeId || "");
+        }
+      } catch (error) {
+        console.error("Error loading puzzles:", error);
+      }
+    };
+
+    loadPuzzles();
+
+    // Load completed puzzles from localStorage
+    const stored = localStorage.getItem("laboratorivm-completed");
+    if (stored) {
+      setCompletedPuzzles(new Set(JSON.parse(stored)));
+    }
+  }, []);
+
+  const handlePuzzleComplete = (puzzleId: string) => {
+    const newCompleted = new Set([...completedPuzzles, puzzleId]);
+    setCompletedPuzzles(newCompleted);
+    localStorage.setItem(
+      "laboratorivm-completed",
+      JSON.stringify(Array.from(newCompleted))
+    );
+  };
+
+  const filteredPuzzles = puzzles.filter((puzzle) => {
+    if (selectedCategory === "All") return true;
+    return puzzle.category === selectedCategory;
+  });
+
+  const isDailyChallengeCompleted = dailyChallengeId
+    ? completedPuzzles.has(dailyChallengeId)
+    : false;
 
   return (
     <Main>
-      {/* Navigation Bar */}
-      <div className="w-full border-b border-[rgba(255,255,255,0.08)] pb-3 mb-8">
-        <div className="flex items-center justify-between font-mono text-xs text-[rgba(232,230,225,0.6)]">
-          <div className="flex items-center gap-2">
-            <Link
-              href="/oikos"
-              className="hover:text-[rgba(232,230,225,0.9)] transition-colors"
+      <LaboratorivmShell>
+        <div className="relative z-10 min-h-screen p-6">
+          <div className="max-w-7xl mx-auto">
+            {/* Header */}
+            <motion.div
+              className="text-center mb-8"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
             >
-              RATIO @ OIKOS
-            </Link>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/oikos"
-              className={cn(
-                "transition-colors",
-                pathname === "/oikos" && "text-[#b29b68]"
-              )}
-            >
-              OIKOS
-            </Link>
-            <Link
-              href="/bibliotheca"
-              className={cn(
-                "transition-colors",
-                pathname === "/bibliotheca" && "text-[#b29b68]"
-              )}
-            >
-              BIBLIOTHECA
-            </Link>
-            <Link
-              href="/laboratorivm"
-              className={cn(
-                "transition-colors",
-                pathname === "/laboratorivm" && "text-[#b29b68]"
-              )}
-            >
-              LABORATORIVM
-            </Link>
-            <Link
-              href="/memoria"
-              className={cn(
-                "transition-colors",
-                pathname === "/memoria" && "text-[#b29b68]"
-              )}
-            >
-              MEMORIA
-            </Link>
-            <Link
-              href="/archivvm"
-              className={cn(
-                "transition-colors",
-                pathname === "/archivvm" && "text-[#b29b68]"
-              )}
-            >
-              ARCHIVVM
-            </Link>
-            <Link
-              href="/scholarivm"
-              className={cn(
-                "transition-colors",
-                pathname === "/scholarivm" && "text-[#b29b68]"
-              )}
-            >
-              SCHOLARIUM
-            </Link>
-            <Link
-              href="/ars-rationis"
-              className={cn(
-                "transition-colors",
-                pathname === "/ars-rationis" && "text-[#b29b68]"
-              )}
-            >
-              ARS RATIONIS
-            </Link>
+              <h1
+                className="font-serif text-5xl mb-3"
+                style={{
+                  color: "#C8B68D",
+                  textShadow: "0px 2px 8px rgba(0, 0, 0, 0.5)",
+                }}
+              >
+                LABORATORIVM
+              </h1>
+              <p
+                className="font-mono text-sm opacity-60"
+                style={{ color: "#C8B68D" }}
+              >
+                Interactive Cognitive Training Environment
+              </p>
+            </motion.div>
+
+            {/* Daily Challenge */}
+            {dailyChallengeId && (
+              <DailyChallengeBadge
+                puzzleId={dailyChallengeId}
+                isCompleted={isDailyChallengeCompleted}
+                onClick={() => setSelectedPuzzleId(dailyChallengeId)}
+              />
+            )}
+
+            {/* Category Bar */}
+            <CategoryBar
+              selectedCategory={selectedCategory}
+              onCategoryChange={setSelectedCategory}
+            />
+
+            {/* Puzzle Selection or Engine */}
+            {selectedPuzzleId ? (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <PuzzleEngine
+                  puzzleId={selectedPuzzleId}
+                  onComplete={() => handlePuzzleComplete(selectedPuzzleId)}
+                />
+                <motion.button
+                  onClick={() => setSelectedPuzzleId(null)}
+                  className="mt-6 px-6 py-3 font-mono text-sm"
+                  style={{
+                    color: "#C8B68D",
+                    border: "1px solid rgba(200, 182, 141, 0.3)",
+                    background: "rgba(200, 182, 141, 0.1)",
+                    borderRadius: "4px",
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Back to Puzzles
+                </motion.button>
+              </motion.div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredPuzzles.map((puzzle, index) => (
+                  <motion.button
+                    key={puzzle.id}
+                    onClick={() => setSelectedPuzzleId(puzzle.id)}
+                    className="text-left p-6 rounded-lg"
+                    style={{
+                      background: completedPuzzles.has(puzzle.id)
+                        ? "rgba(200, 182, 141, 0.1)"
+                        : "rgba(10, 10, 10, 0.7)",
+                      border: `1px solid ${
+                        completedPuzzles.has(puzzle.id)
+                          ? "rgba(200, 182, 141, 0.4)"
+                          : "rgba(200, 182, 141, 0.2)"
+                      }`,
+                    }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <h3
+                      className="font-serif text-lg mb-2"
+                      style={{ color: "#C8B68D" }}
+                    >
+                      {puzzle.prompt.substring(0, 60)}
+                      {puzzle.prompt.length > 60 ? "..." : ""}
+                    </h3>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {puzzle.category && (
+                        <span
+                          className="font-mono text-xs px-2 py-1"
+                          style={{
+                            color: "rgba(200, 182, 141, 0.7)",
+                            background: "rgba(200, 182, 141, 0.1)",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          {puzzle.category}
+                        </span>
+                      )}
+                      {puzzle.difficulty && (
+                        <span
+                          className="font-mono text-xs px-2 py-1"
+                          style={{
+                            color: "rgba(200, 182, 141, 0.7)",
+                            background: "rgba(200, 182, 141, 0.1)",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          {puzzle.difficulty}
+                        </span>
+                      )}
+                      {completedPuzzles.has(puzzle.id) && (
+                        <span
+                          className="font-mono text-xs px-2 py-1"
+                          style={{
+                            color: "#C8B68D",
+                            background: "rgba(200, 182, 141, 0.2)",
+                            borderRadius: "4px",
+                          }}
+                        >
+                          ✓ Completed
+                        </span>
+                      )}
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
-      </div>
-
-      <div className="px-8 py-12 max-w-[1600px] mx-auto space-y-16">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="text-center space-y-4"
-        >
-          <h1 className="font-serif text-5xl uppercase tracking-[0.14em] engraved-text">
-            LABORATORIVM
-          </h1>
-          <p className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
-            OFFICINA RATIONIS
-          </p>
-          <p className="font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
-            DIALECTIC DRILLS • LOGIC PROBLEMATA • INTERACTIVE MODVLI
-          </p>
-        </motion.div>
-
-        {/* Main 3-Column Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Column 1: Dialectica + Logica */}
-          <div className="space-y-6">
-            <DialecticaPanel delay={0.1} />
-            <LogicaProblemPanel delay={0.15} />
-          </div>
-
-          {/* Column 2: Micro-Lesson */}
-          <div className="space-y-6">
-            <MicroLessonPanel delay={0.2} />
-          </div>
-
-          {/* Column 3: Training Ledger */}
-          <div className="space-y-6">
-            <TrainingLedger delay={0.25} />
-          </div>
-        </div>
-
-        {/* Scholarum Continuum Footer */}
-        <ScholarumContinuum delay={0.3} />
-      </div>
+      </LaboratorivmShell>
     </Main>
   );
 }
