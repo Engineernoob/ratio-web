@@ -63,7 +63,7 @@ export function ScrollUnrollAnimation({
             <div
               className="absolute inset-0 opacity-30"
               style={{
-                backgroundImage: "url('/images/textures/parchment.png')",
+                backgroundImage: "url('/images/textures/parchment-dither.png')",
                 backgroundSize: "cover",
               }}
             />

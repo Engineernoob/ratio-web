@@ -14,25 +14,11 @@ export function RootLayoutWrapper({ children }: { children: React.ReactNode }) {
   const isOikosPage = pathname === "/oikos";
   const isMemoriaPage = pathname === "/memoria";
   const isModern = currentTheme.isModern || false;
-
-  // OIKOS and MEMORIA pages have their own layout with TopNavBar
-  if (isOikosPage || isMemoriaPage) {
-    return (
-      <>
-        <ThemeTextureLayer />
-        <ThemeFogLayer />
-        <ThemeGrainLayer />
-        <ThemeAmbientParticles />
-        {/* Modern theme overlays */}
-        {isModern && <ModernThemeOverlays theme={currentTheme} />}
-        {children}
-      </>
-    );
-  }
+  const useSimpleLayout = isOikosPage || isMemoriaPage;
 
   return (
     <>
-      {/* Theme Layers */}
+      {/* Theme Layers - Always render to maintain hook consistency */}
       <ThemeTextureLayer />
       <ThemeFogLayer />
       <ThemeGrainLayer />
@@ -40,25 +26,30 @@ export function RootLayoutWrapper({ children }: { children: React.ReactNode }) {
       {/* Modern theme overlays */}
       {isModern && <ModernThemeOverlays theme={currentTheme} />}
 
-      <div className="flex h-screen overflow-hidden">
-        <div className="flex-1 flex min-w-0 overflow-y-auto">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={pathname}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{
-                duration: currentTheme.transitions.page.duration,
-                ease: currentTheme.transitions.page.ease,
-              }}
-              className="w-full h-full"
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
+      {/* Conditional layout structure */}
+      {useSimpleLayout ? (
+        children
+      ) : (
+        <div className="flex h-screen overflow-hidden">
+          <div className="flex-1 flex min-w-0 overflow-y-auto">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={pathname}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{
+                  duration: currentTheme.transitions.page.duration,
+                  ease: currentTheme.transitions.page.ease,
+                }}
+                className="w-full h-full"
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

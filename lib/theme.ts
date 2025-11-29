@@ -69,7 +69,7 @@ export const themes: Record<ThemeId, Theme> = {
     description: "Golden light, warm parchment, classical elegance",
     accent: "#C8B68D",
     background: "#0A0A0A",
-    backgroundTexture: "/images/textures/parchment.png",
+    backgroundTexture: "/images/textures/parchment-dither.png",
     ditherTexture: "/images/textures/texture_bayer.png",
     vignetteStrength: 0.2,
     fogColor: "rgba(200, 182, 141, 0.15)",
