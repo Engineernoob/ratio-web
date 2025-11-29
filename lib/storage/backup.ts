@@ -152,7 +152,10 @@ export async function getStorageStats(): Promise<{
 
     for (const { name, bucket } of buckets) {
       const { files } = await listFiles(bucket as any);
-      const size = files.reduce((sum, file) => sum + (file.metadata?.size || 0), 0);
+      const size = files.reduce(
+        (sum, file) => sum + (file.metadata?.size || 0),
+        0
+      );
       bucketSizes[name] = size;
       fileCounts[name] = files.length;
       totalSize += size;
@@ -162,7 +165,10 @@ export async function getStorageStats(): Promise<{
     let lastBackup: string | null = null;
     try {
       const { downloadJSON } = await import("./download");
-      const { data: manifestData } = await downloadJSON("userdata", "backup-manifest.json");
+      const { data: manifestData } = await downloadJSON(
+        "userdata",
+        "backup-manifest.json"
+      );
       lastBackup = manifestData?.timestamp || null;
     } catch (error) {
       // Manifest might not exist yet
@@ -225,4 +231,3 @@ export async function exportAllData(): Promise<{
     };
   }
 }
-

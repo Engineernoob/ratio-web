@@ -39,11 +39,15 @@ export async function initializeBuckets(): Promise<{ error: Error | null }> {
 
       if (error && error.message.includes("not found")) {
         // Create bucket (this requires admin access, so might fail)
-        console.warn(`Bucket ${bucket} does not exist. Please create it in Supabase dashboard.`);
+        console.warn(
+          `Bucket ${bucket} does not exist. Please create it in Supabase dashboard.`
+        );
       }
     } catch (error) {
       errors.push(
-        error instanceof Error ? error : new Error(`Failed to initialize ${bucket}`)
+        error instanceof Error
+          ? error
+          : new Error(`Failed to initialize ${bucket}`)
       );
     }
   }
@@ -91,7 +95,9 @@ export async function uploadFile(
       path: "",
       url: "",
       size: file.size,
-      error: new Error(`File size exceeds maximum of ${MAX_FILE_SIZE / 1024 / 1024}MB`),
+      error: new Error(
+        `File size exceeds maximum of ${MAX_FILE_SIZE / 1024 / 1024}MB`
+      ),
     };
   }
 
@@ -115,7 +121,8 @@ export async function uploadFile(
     const { data, error } = await supabase.storage
       .from(bucket)
       .upload(userPath, file, {
-        contentType: options?.contentType || file.type || "application/octet-stream",
+        contentType:
+          options?.contentType || file.type || "application/octet-stream",
         cacheControl: options?.cacheControl || "3600",
         upsert: options?.upsert || false,
       });

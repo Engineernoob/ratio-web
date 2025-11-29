@@ -92,7 +92,9 @@ export default function StoragePage() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `ratio-export-${new Date().toISOString().split("T")[0]}.json`;
+        a.download = `ratio-export-${
+          new Date().toISOString().split("T")[0]
+        }.json`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -204,7 +206,10 @@ export default function StoragePage() {
                   </div>
                   <div className="space-y-3">
                     {Object.entries(stats.bucketSizes).map(([bucket, size]) => (
-                      <div key={bucket} className="flex justify-between items-center">
+                      <div
+                        key={bucket}
+                        className="flex justify-between items-center"
+                      >
                         <span
                           className="font-mono text-xs uppercase"
                           style={{ color: "rgba(215, 196, 158, 0.7)" }}
@@ -216,7 +221,11 @@ export default function StoragePage() {
                             className="font-mono text-xs"
                             style={{ color: "rgba(215, 196, 158, 0.6)" }}
                           >
-                            {stats.fileCounts[bucket as keyof typeof stats.fileCounts]}{" "}
+                            {
+                              stats.fileCounts[
+                                bucket as keyof typeof stats.fileCounts
+                              ]
+                            }{" "}
                             files
                           </span>
                           <span

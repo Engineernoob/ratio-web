@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { MemoriaShell } from "@/components/Memoria/MemoriaShell";
 import { RitualHeader } from "@/components/Memoria/RitualHeader";
@@ -13,6 +14,7 @@ import type { MemoryCard } from "@/lib/memoria/types";
 type MemoriaMode = "ritual" | "scholar" | "archivum";
 
 export default function MemoriaPage() {
+  const router = useRouter();
   const [mode, setMode] = useState<MemoriaMode>("ritual");
   const [cards, setCards] = useState<MemoryCard[]>([]);
   const [loading, setLoading] = useState(true);
@@ -75,7 +77,20 @@ export default function MemoriaPage() {
         <div className="relative z-10 min-h-screen p-6">
           {/* Mode Selector */}
           <div className="max-w-7xl mx-auto mb-8">
-            <div className="flex items-center justify-center gap-4 mb-6">
+            <div className="flex items-center justify-center gap-4 mb-6 flex-wrap">
+              <motion.button
+                onClick={() => router.push("/memoria/insights")}
+                className="px-6 py-2 font-mono text-sm"
+                style={{
+                  color: "rgba(200, 182, 141, 0.8)",
+                  border: "1px solid rgba(200, 182, 141, 0.3)",
+                  background: "rgba(200, 182, 141, 0.1)",
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Insight Curator
+              </motion.button>
               {(
                 [
                   { id: "ritual", label: "Daily Ritual" },

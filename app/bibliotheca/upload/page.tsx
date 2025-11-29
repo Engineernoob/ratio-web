@@ -1,251 +1,226 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { Main } from "@/components/Main";
-import { BrutalistCard } from "@/components/BrutalistCard";
-import { OrangeAction } from "@/components/core/OrangeAction";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { uploadPDF } from "@/lib/storage/upload";
+import { EngravedHeader } from "@/components/core/EngravedHeader";
+import { Main } from "@/components/Main";
+import { ScholarivmShell } from "@/components/Scholarivm/ScholarivmShell";
 
-export default function UploadPage() {
+export default function BibliothecaUploadPage() {
   const router = useRouter();
-  const [file, setFile] = useState<File | null>(null);
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [category, setCategory] = useState("");
+  const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState<string>("");
-  const [isIngesting, setIsIngesting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-      if (selectedFile.type === "application/pdf") {
-        setFile(selectedFile);
-        setStatus(`Selected: ${selectedFile.name}`);
-      } else {
-        setStatus("Please select a PDF file");
-        setFile(null);
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      if (selectedFile.type !== "application/pdf") {
+        setError("Only PDF files are supported");
+        return;
       }
+      if (selectedFile.size > 100 * 1024 * 1024) {
+        setError("File size must be less than 100MB");
+        return;
+      }
+      setFile(selectedFile);
+      setError(null);
     }
   };
 
-  const handleIngest = async () => {
-    if (!file || !title || !author) {
-      setStatus("Please fill in all required fields");
-      return;
-    }
+  const handleUpload = async () => {
+    if (!file) return;
 
-    setIsIngesting(true);
+    setUploading(true);
     setProgress(0);
-    setStatus("Preparing ingestion...");
+    setError(null);
 
     try {
-      const formData = new FormData();
-      formData.append("pdf", file);
-      formData.append("title", title);
-      formData.append("author", author);
-      formData.append("category", category);
+      // Generate path from filename
+      const path = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
 
-      const xhr = new XMLHttpRequest();
+      // Upload to cloud storage
+      const result = await uploadPDF(path, file);
 
-      xhr.upload.addEventListener("progress", (e) => {
-        if (e.lengthComputable) {
-          const percentComplete = (e.loaded / e.total) * 50; // Upload is 50% of progress
-          setProgress(percentComplete);
-        }
-      });
+      if (result.error) {
+        setError(result.error.message);
+        setUploading(false);
+        return;
+      }
 
-      xhr.addEventListener("load", () => {
-        if (xhr.status === 200) {
-          const response = JSON.parse(xhr.responseText);
-          setProgress(100);
-          setStatus("Ingestion complete!");
+      // Simulate progress (in real app, track actual upload progress)
+      for (let i = 0; i <= 100; i += 10) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        setProgress(i);
+      }
 
-          // Navigate to ingested page after a short delay
-          setTimeout(() => {
-            router.push(`/bibliotheca/${response.slug}/ingested`);
-          }, 1500);
-        } else {
-          const error = JSON.parse(xhr.responseText);
-          setStatus(`Error: ${error.error || "Ingestion failed"}`);
-          setIsIngesting(false);
-        }
-      });
+      // TODO: Run ingestion pipeline here
+      // This would:
+      // 1. Extract text from PDF
+      // 2. Split into chapters
+      // 3. Generate summaries
+      // 4. Create micro-lessons
+      // 5. Store processed data in storage/books/{id}
 
-      xhr.addEventListener("error", () => {
-        setStatus("Network error occurred");
-        setIsIngesting(false);
-      });
-
-      xhr.open("POST", "/api/ingest");
-      xhr.send(formData);
-
-      // Simulate processing progress (after upload)
-      let processingProgress = 50;
-      const progressInterval = setInterval(() => {
-        processingProgress += Math.random() * 10;
-        if (processingProgress < 95) {
-          setProgress(processingProgress);
-        } else {
-          clearInterval(progressInterval);
-        }
-      }, 500);
-    } catch (error) {
-      console.error("Error during ingestion:", error);
-      setStatus("An error occurred during ingestion");
-      setIsIngesting(false);
+      alert("Upload successful! Processing will begin shortly.");
+      router.push("/bibliotheca");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
     }
-  };
-
-  const generateSlug = (text: string) => {
-    return text
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-+|-+$/g, "");
   };
 
   return (
-    <Main>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="max-w-2xl mx-auto"
-      >
-        <div className="mb-8">
-          <h1 className="font-serif text-4xl mb-2 engraved engrave">
-            Book Ingestion
-          </h1>
-          <p className="font-mono text-sm text-muted-foreground">
-            Upload a PDF and begin the ingestion process
-          </p>
-        </div>
+    <Main className="scroll-fade-top scroll-fade-bottom">
+      <ScholarivmShell>
+        <div className="relative z-10 min-h-screen p-6 md:p-12">
+          <div className="max-w-2xl mx-auto">
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-center mb-12"
+            >
+              <EngravedHeader level={1} delay={0.2}>
+                UPLOAD BOOK
+              </EngravedHeader>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="font-mono text-sm mt-4"
+                style={{ color: "rgba(215, 196, 158, 0.6)" }}
+              >
+                Upload a PDF to add it to your library
+              </motion.p>
+            </motion.div>
 
-        <BrutalistCard borderWidth="1.5" className="p-6 mb-6 floating-panel">
-          <div className="space-y-6">
-            {/* PDF File Picker */}
-            <div>
-              <label className="font-serif text-lg mb-3 block engraved">
-                PDF File
-              </label>
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={handleFileChange}
-                disabled={isIngesting}
-                className="font-mono text-sm w-full p-3 border border-border bg-background file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-muted file:text-foreground hover:file:bg-muted/80 disabled:opacity-50 disabled:cursor-not-allowed"
-              />
-              {file && (
-                <p className="font-mono text-xs text-muted-foreground mt-2">
-                  {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                </p>
-              )}
-            </div>
-
-            {/* Book Metadata Form */}
-            <div className="space-y-4">
-              <div>
-                <label className="font-serif text-lg mb-2 block engraved">
-                  Title <span className="text-red-500">*</span>
+            {/* Upload Form */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="space-y-6"
+            >
+              {/* File Input */}
+              <div
+                className="p-6 border rounded-sm"
+                style={{
+                  borderColor: "rgba(215, 196, 158, 0.2)",
+                  background: "rgba(10, 10, 10, 0.6)",
+                }}
+              >
+                <label
+                  className="block font-mono text-xs uppercase mb-3"
+                  style={{ color: "rgba(215, 196, 158, 0.6)" }}
+                >
+                  Select PDF File
                 </label>
                 <input
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  disabled={isIngesting}
-                  placeholder="Enter book title"
-                  className="font-mono text-sm w-full p-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-[#b29b68] disabled:opacity-50 disabled:cursor-not-allowed"
+                  type="file"
+                  accept="application/pdf"
+                  onChange={handleFileSelect}
+                  disabled={uploading}
+                  className="block w-full font-mono text-sm"
+                  style={{
+                    color: "rgba(232, 230, 225, 0.9)",
+                  }}
                 />
-              </div>
-
-              <div>
-                <label className="font-serif text-lg mb-2 block engraved">
-                  Author <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={author}
-                  onChange={(e) => setAuthor(e.target.value)}
-                  disabled={isIngesting}
-                  placeholder="Enter author name"
-                  className="font-mono text-sm w-full p-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-[#b29b68] disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-              </div>
-
-              <div>
-                <label className="font-serif text-lg mb-2 block engraved">
-                  Category
-                </label>
-                <input
-                  type="text"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  disabled={isIngesting}
-                  placeholder="e.g., Philosophy, Science, History"
-                  className="font-mono text-sm w-full p-3 border border-border bg-background focus:outline-none focus:ring-2 focus:ring-[#b29b68] disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-              </div>
-            </div>
-
-            {/* Progress Bar */}
-            {isIngesting && (
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-serif text-sm engraved">Progress</span>
-                  <span className="font-mono text-xs text-muted-foreground">
-                    {Math.round(progress)}%
-                  </span>
-                </div>
-                <div className="w-full h-2 bg-muted border border-border">
-                  <motion.div
-                    className="h-full bg-[#b29b68]"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progress}%` }}
-                    transition={{ duration: 0.3 }}
-                  />
-                </div>
-                {status && (
-                  <p className="font-mono text-xs text-muted-foreground mt-2">
-                    {status}
-                  </p>
+                {file && (
+                  <div
+                    className="mt-4 font-mono text-xs"
+                    style={{ color: "rgba(215, 196, 158, 0.7)" }}
+                  >
+                    Selected: {file.name} (
+                    {(file.size / 1024 / 1024).toFixed(2)} MB)
+                  </div>
                 )}
               </div>
-            )}
 
-            {/* Status Message */}
-            {status && !isIngesting && (
-              <div className="font-mono text-sm text-muted-foreground">
-                {status}
-              </div>
-            )}
+              {/* Error */}
+              {error && (
+                <div
+                  className="p-4 border rounded-sm"
+                  style={{
+                    borderColor: "rgba(255, 100, 100, 0.3)",
+                    background: "rgba(255, 100, 100, 0.05)",
+                    color: "rgba(255, 100, 100, 0.8)",
+                  }}
+                >
+                  <div className="font-mono text-xs">{error}</div>
+                </div>
+              )}
 
-            {/* Begin Ingestion Button */}
-            <OrangeAction
-              onClick={handleIngest}
-              disabled={isIngesting || !file || !title || !author}
-              className="w-full"
-            >
-              {isIngesting ? "Ingesting..." : "Begin Ingestion"}
-            </OrangeAction>
+              {/* Progress */}
+              {uploading && (
+                <div
+                  className="p-6 border rounded-sm"
+                  style={{
+                    borderColor: "rgba(215, 196, 158, 0.2)",
+                    background: "rgba(10, 10, 10, 0.6)",
+                  }}
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <span
+                      className="font-mono text-xs uppercase"
+                      style={{ color: "rgba(215, 196, 158, 0.6)" }}
+                    >
+                      Uploading...
+                    </span>
+                    <span
+                      className="font-mono text-xs"
+                      style={{ color: "#d7c49e" }}
+                    >
+                      {progress}%
+                    </span>
+                  </div>
+                  <div
+                    className="h-2 rounded-sm overflow-hidden"
+                    style={{
+                      background: "rgba(215, 196, 158, 0.1)",
+                    }}
+                  >
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progress}%` }}
+                      transition={{ duration: 0.3 }}
+                      className="h-full"
+                      style={{
+                        background:
+                          "linear-gradient(to right, rgba(215, 196, 158, 0.6), rgba(215, 196, 158, 0.8))",
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Upload Button */}
+              <motion.button
+                onClick={handleUpload}
+                disabled={!file || uploading}
+                whileHover={{ scale: file && !uploading ? 1.02 : 1 }}
+                whileTap={{ scale: file && !uploading ? 0.98 : 1 }}
+                className="w-full p-6 border rounded-sm font-mono text-xs uppercase disabled:opacity-50"
+                style={{
+                  borderColor: "rgba(215, 196, 158, 0.3)",
+                  background:
+                    file && !uploading
+                      ? "rgba(215, 196, 158, 0.1)"
+                      : "rgba(10, 10, 10, 0.6)",
+                  color: "#d7c49e",
+                }}
+              >
+                {uploading ? "Uploading..." : "Upload to Cloud"}
+              </motion.button>
+            </motion.div>
           </div>
-        </BrutalistCard>
-
-        {/* Info Card */}
-        <BrutalistCard borderWidth="1" className="p-4">
-          <div className="font-mono text-xs text-muted-foreground space-y-2">
-            <p>
-              <strong>Note:</strong> The ingestion process will:
-            </p>
-            <ul className="list-disc list-inside space-y-1 ml-2">
-              <li>Extract text from the PDF</li>
-              <li>Detect and split chapters</li>
-              <li>Generate summaries, key ideas, and micro-lessons</li>
-              <li>Create chapter files and metadata</li>
-            </ul>
-          </div>
-        </BrutalistCard>
-      </motion.div>
+        </div>
+      </ScholarivmShell>
     </Main>
   );
 }

@@ -238,7 +238,10 @@ export async function loadBackupManifest(): Promise<{
   error: Error | null;
 }> {
   try {
-    const { data, error } = await downloadJSON("userdata", "backup-manifest.json");
+    const { data, error } = await downloadJSON(
+      "userdata",
+      "backup-manifest.json"
+    );
 
     if (error || !data) {
       return { manifest: null, error: error || new Error("No manifest found") };
@@ -248,7 +251,8 @@ export async function loadBackupManifest(): Promise<{
   } catch (error) {
     return {
       manifest: null,
-      error: error instanceof Error ? error : new Error("Failed to load manifest"),
+      error:
+        error instanceof Error ? error : new Error("Failed to load manifest"),
     };
   }
 }

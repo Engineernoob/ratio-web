@@ -1,6 +1,6 @@
 /**
  * Memory AI - Insight Curator Engine
- * 
+ *
  * Analyzes all user data to generate insights, recommendations, and memory cards.
  * Integrates with Memoria, Bibliotheca, Ars Rationis, Laboratorivm, and Scholarivm.
  */
@@ -111,11 +111,15 @@ export async function curateInsights(): Promise<InsightSummary> {
 
   // Generate new memory cards
   const newCards = await generateMemoryCards(allHighlights, chapters, allNotes);
-  
+
   // Save new cards
+  const existingCards = loadCards();
   for (const card of newCards) {
     try {
-      createCard(card);
+      // Check if card already exists
+      if (!existingCards.find((c) => c.id === card.id)) {
+        createCard(card);
+      }
     } catch (error) {
       // Card might already exist, skip
       console.log(`Card ${card.id} already exists, skipping`);
@@ -123,7 +127,11 @@ export async function curateInsights(): Promise<InsightSummary> {
   }
 
   // Find recurring ideas and create unifying insights
-  const unifyingInsights = generateUnifyingInsights(cards, allHighlights, chapters);
+  const unifyingInsights = generateUnifyingInsights(
+    cards,
+    allHighlights,
+    chapters
+  );
 
   // Generate daily recommendations
   const dailyRecommendation = generateDailyRecommendation(
@@ -166,9 +174,10 @@ function analyzeWeaknesses(
       id: card.id,
       title: card.title,
       ease: card.ease,
-      errorRate: card.totalReviews > 0
-        ? (card.totalReviews - card.consecutiveCorrect) / card.totalReviews
-        : 0,
+      errorRate:
+        card.totalReviews > 0
+          ? (card.totalReviews - card.consecutiveCorrect) / card.totalReviews
+          : 0,
       recommendation: generateCardRecommendation(card),
     }))
     .sort((a, b) => a.ease - b.ease)
@@ -284,9 +293,9 @@ async function generateMemoryCards(
     if (highlight.text.length > 20 && highlight.text.length < 500) {
       const keywords = extractKeywords(highlight.text);
       const title = keywords.slice(0, 3).join(" ") || "Key Insight";
-      
+
       const cardId = `ai-highlight-${highlight.id}`;
-      
+
       // Check if card already exists
       const existingCards = loadCards();
       if (existingCards.find((c) => c.id === cardId)) {
@@ -324,7 +333,7 @@ async function generateMemoryCards(
       for (let i = 0; i < chapter.keyIdeas.length; i++) {
         const idea = chapter.keyIdeas[i];
         const cardId = `ai-chapter-${chapter.bookId}-${chapter.chapterId}-${i}`;
-        
+
         const existingCards = loadCards();
         if (existingCards.find((c) => c.id === cardId)) {
           continue;
@@ -360,7 +369,7 @@ async function generateMemoryCards(
   for (const note of notes) {
     if (note.text.length > 30 && note.text.length < 300) {
       const cardId = `ai-note-${note.id}`;
-      
+
       const existingCards = loadCards();
       if (existingCards.find((c) => c.id === cardId)) {
         continue;
@@ -417,7 +426,7 @@ function generateUnifyingInsights(
   for (const text of allTexts) {
     const keywords = extractKeywords(text);
     const keyPhrase = keywords.slice(0, 4).join(" ");
-    
+
     if (keyPhrase.length > 10) {
       if (!ideaMap.has(keyPhrase)) {
         ideaMap.set(keyPhrase, { sources: new Set(), texts: [] });
@@ -458,13 +467,11 @@ function generateDailyRecommendation(
   const today = new Date().toISOString().split("T")[0];
 
   // Recommend 3 weak concepts to study
-  const concepts = weaknessReport.lowEaseCards
-    .slice(0, 3)
-    .map((card) => ({
-      cardId: card.id,
-      title: card.title,
-      reason: card.recommendation,
-    }));
+  const concepts = weaknessReport.lowEaseCards.slice(0, 3).map((card) => ({
+    cardId: card.id,
+    title: card.title,
+    reason: card.recommendation,
+  }));
 
   // Recommend chapters to revisit
   const chaptersToReview = chapters
@@ -483,9 +490,7 @@ function generateDailyRecommendation(
     }));
 
   // Recommend puzzle types based on mistakes
-  const puzzleTypes = new Set(
-    weaknessReport.puzzleMistakes.map((p) => p.type)
-  );
+  const puzzleTypes = new Set(weaknessReport.puzzleMistakes.map((p) => p.type));
   const puzzles = Array.from(puzzleTypes)
     .slice(0, 3)
     .map((type) => ({
@@ -509,9 +514,7 @@ function identifyStrengths(cards: MemoryCard[], userState: any): string[] {
   const strengths: string[] = [];
 
   // High ease cards
-  const strongCards = cards.filter(
-    (c) => c.ease >= 2.3 && c.totalReviews >= 3
-  );
+  const strongCards = cards.filter((c) => c.ease >= 2.3 && c.totalReviews >= 3);
   if (strongCards.length > 0) {
     strengths.push(
       `Mastered ${strongCards.length} concepts with high retention`
@@ -539,7 +542,9 @@ function identifyStrengths(cards: MemoryCard[], userState: any): string[] {
         0
       ) / userState.booksInProgress.length;
     if (avgProgress > 0.5) {
-      strengths.push(`Making good progress through ${userState.booksInProgress.length} books`);
+      strengths.push(
+        `Making good progress through ${userState.booksInProgress.length} books`
+      );
     }
   }
 
@@ -611,15 +616,32 @@ function extractKeywords(text: string): string[] {
     .replace(/[^\w\s]/g, " ")
     .split(/\s+/)
     .filter((w) => w.length > 4 && !isStopWord(w));
-  
+
   // Return unique words
   return Array.from(new Set(words)).slice(0, 5);
 }
 
 function isStopWord(word: string): boolean {
   const stopWords = new Set([
-    "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for",
-    "of", "with", "by", "from", "this", "that", "these", "those",
+    "the",
+    "a",
+    "an",
+    "and",
+    "or",
+    "but",
+    "in",
+    "on",
+    "at",
+    "to",
+    "for",
+    "of",
+    "with",
+    "by",
+    "from",
+    "this",
+    "that",
+    "these",
+    "those",
   ]);
   return stopWords.has(word);
 }
@@ -633,10 +655,7 @@ function generateCardRecommendation(card: MemoryCard): string {
   return "Continue regular reviews to maintain mastery.";
 }
 
-function generateFallacyRecommendation(
-  type: string,
-  fallacies: any[]
-): string {
+function generateFallacyRecommendation(type: string, fallacies: any[]): string {
   const fallacy = fallacies.find((f) => f.id === type || f.name === type);
   if (fallacy) {
     return `Study the ${fallacy.name} fallacy: ${fallacy.description}`;
