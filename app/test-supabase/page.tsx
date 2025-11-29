@@ -1,14 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
 import { testSupabaseConnection, testStorageUpload } from "@/lib/supabase/test";
+import { getCurrentUser } from "@/lib/supabase/auth";
 import { Main } from "@/components/Main";
 import { ScholarivmShell } from "@/components/Scholarivm/ScholarivmShell";
 import { EngravedHeader } from "@/components/core/EngravedHeader";
 
 export default function TestSupabasePage() {
+  const router = useRouter();
   const [testing, setTesting] = useState(false);
+  const [user, setUser] = useState<any>(null);
   const [results, setResults] = useState<{
     success: boolean;
     results: any;
@@ -18,6 +22,14 @@ export default function TestSupabasePage() {
     success: boolean;
     error?: string;
   } | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+    };
+    checkAuth();
+  }, []);
 
   const handleTest = async () => {
     setTesting(true);
@@ -69,23 +81,88 @@ export default function TestSupabasePage() {
               </motion.p>
             </motion.div>
 
+            {/* Auth Status */}
+            {!user && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+                className="mb-8"
+              >
+                <div
+                  className="p-4 border rounded-sm text-center"
+                  style={{
+                    borderColor: "rgba(255, 200, 100, 0.3)",
+                    background: "rgba(255, 200, 100, 0.05)",
+                  }}
+                >
+                  <p
+                    className="font-mono text-xs mb-3"
+                    style={{ color: "rgba(255, 200, 100, 0.8)" }}
+                  >
+                    Not authenticated. Storage tests require sign-in.
+                  </p>
+                  <motion.button
+                    onClick={() => router.push("/auth")}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="px-4 py-2 border rounded-sm font-mono text-xs uppercase"
+                    style={{
+                      borderColor: "rgba(215, 196, 158, 0.3)",
+                      background: "rgba(215, 196, 158, 0.1)",
+                      color: "#d7c49e",
+                    }}
+                  >
+                    Sign In / Sign Up
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
+
+            {user && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+                className="mb-8"
+              >
+                <div
+                  className="p-4 border rounded-sm text-center"
+                  style={{
+                    borderColor: "rgba(150, 255, 150, 0.3)",
+                    background: "rgba(150, 255, 150, 0.05)",
+                  }}
+                >
+                  <p
+                    className="font-mono text-xs"
+                    style={{ color: "rgba(150, 255, 150, 0.8)" }}
+                  >
+                    ✓ Authenticated as: {user.email}
+                  </p>
+                </div>
+              </motion.div>
+            )}
+
             {/* Test Button */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="mb-8 flex justify-center"
+              className="mb-8 flex justify-center relative"
+              style={{ zIndex: 20 }}
             >
               <motion.button
                 onClick={handleTest}
                 disabled={testing}
                 whileHover={{ scale: testing ? 1 : 1.02 }}
                 whileTap={{ scale: testing ? 1 : 0.98 }}
-                className="px-8 py-4 border rounded-sm font-mono text-sm uppercase disabled:opacity-50"
+                className="px-8 py-4 border rounded-sm font-mono text-sm uppercase disabled:opacity-50 relative"
                 style={{
                   borderColor: "rgba(215, 196, 158, 0.3)",
                   background: "rgba(215, 196, 158, 0.1)",
                   color: "#d7c49e",
+                  zIndex: 20,
+                  pointerEvents: "auto",
                 }}
               >
                 {testing ? "Testing..." : "Run Tests"}

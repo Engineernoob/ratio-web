@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 interface LightVignetteProps {
   intensity?: number;
@@ -11,14 +12,22 @@ export function LightVignette({
   intensity = 0.2,
   className = "",
 }: LightVignetteProps) {
-  const vignetteStrength =
-    typeof window !== "undefined"
-      ? parseFloat(
-          getComputedStyle(document.documentElement).getPropertyValue(
-            "--texture-vignette"
-          ) || intensity.toString()
-        )
-      : intensity;
+  const [vignetteStrength, setVignetteStrength] = useState(intensity);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    // Get CSS variable value if available, otherwise use prop
+    const cssValue = getComputedStyle(
+      document.documentElement
+    ).getPropertyValue("--texture-vignette");
+    if (cssValue) {
+      const parsed = parseFloat(cssValue);
+      if (!isNaN(parsed)) {
+        setVignetteStrength(parsed);
+      }
+    }
+  }, []);
 
   return (
     <motion.div
@@ -29,9 +38,10 @@ export function LightVignette({
           color-mix(in srgb, var(--accent) calc(${vignetteStrength} * 50%), transparent) 30%, 
           transparent 70%)`,
         zIndex: 1,
+        opacity: mounted ? 1 : 0,
       }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
+      initial={false}
+      animate={{ opacity: mounted ? 1 : 0 }}
       transition={{ duration: 1 }}
     />
   );

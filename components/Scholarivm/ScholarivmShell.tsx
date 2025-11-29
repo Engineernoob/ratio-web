@@ -38,12 +38,18 @@ export function ScholarivmShell({ children }: ScholarivmShellProps) {
       />
 
       {/* Dust Layer */}
-      <div className="absolute inset-0" style={{ zIndex: 2 }}>
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ zIndex: 2 }}
+      >
         <DustLayer particleCount={30} />
       </div>
 
       {/* Light Vignette */}
-      <div className="absolute inset-0" style={{ zIndex: 3 }}>
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ zIndex: 3 }}
+      >
         <LightVignette intensity={0.15} />
       </div>
 

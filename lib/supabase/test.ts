@@ -86,9 +86,24 @@ export async function testSupabaseConnection(): Promise<{
   // Test 5: Storage (list buckets)
   try {
     const { data, error } = await supabase.storage.listBuckets();
-    results.storage = !error;
     if (error) {
-      errors.push(`Storage access failed: ${error.message}`);
+      // If listing buckets fails, try to access a specific bucket instead
+      const { error: testError } = await supabase.storage
+        .from("userdata")
+        .list("", { limit: 1 });
+
+      if (testError) {
+        errors.push(
+          `Storage access failed: ${error.message}. Bucket test: ${testError.message}`
+        );
+        results.storage = false;
+      } else {
+        // Can access bucket even if can't list all buckets
+        results.storage = true;
+        errors.push(
+          "Cannot list all buckets (may need admin access), but can access userdata bucket"
+        );
+      }
     } else if (data) {
       const requiredBuckets = [
         "books",
@@ -104,10 +119,17 @@ export async function testSupabaseConnection(): Promise<{
       );
       if (missing.length > 0) {
         errors.push(`Missing buckets: ${missing.join(", ")}`);
+        results.storage = false;
+      } else {
+        results.storage = true;
       }
+    } else {
+      results.storage = false;
+      errors.push("Storage buckets list returned no data");
     }
   } catch (error) {
     errors.push(`Storage test failed: ${error}`);
+    results.storage = false;
   }
 
   const success =
@@ -130,22 +152,40 @@ export async function testStorageUpload(): Promise<{
     return { success: false, error: "Supabase not configured" };
   }
 
+  // Check if user is authenticated
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session) {
+    return {
+      success: false,
+      error: "Not authenticated. Please sign in to test storage upload.",
+    };
+  }
+
   try {
     const testContent = JSON.stringify({
       test: true,
       timestamp: new Date().toISOString(),
     });
     const blob = new Blob([testContent], { type: "application/json" });
-    const testPath = `test-${Date.now()}.json`;
+    // Use user ID in path to match RLS policy
+    const userId = session.user.id;
+    const testPath = `${userId}/test-${Date.now()}.json`;
 
     const { data, error } = await supabase.storage
       .from("userdata")
       .upload(testPath, blob, {
         contentType: "application/json",
+        upsert: false,
       });
 
     if (error) {
-      return { success: false, error: error.message };
+      return {
+        success: false,
+        error: `${error.message}. Make sure storage policies are set up correctly.`,
+      };
     }
 
     // Clean up test file
